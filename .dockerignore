@@ -1,0 +1,26 @@
+node_modules
+.next
+dist
+build
+coverage
+
+# logs
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# env and VCS
+.env
+.env.*.local
+.git
+.gitignore
+.vscode
+
+# docker files (don't send the build context docker files to image by default)
+Dockerfile*
+docker-compose*.yml
+
+# tests/artifacts
+playwright-report
+test-results

@@ -1,0 +1,87 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  /* Warm cream background (slightly lighter than sample) */
+  --bg: 40 45% 96%;           /* soft cream */
+  --surface: 40 40% 98%;      /* lighter surface on cream */
+  --fg: 220 25% 12%;          /* deep slate text for contrast */
+  --muted: 32 12% 42%;        /* warm gray for secondary text */
+  --border: 40 25% 90%;       /* gentle border on cream */
+  --accent: 221 85% 38%;      /* Finnish blue accent */
+  --radius: 16px;
+}
+
+/* Dark tokens (high contrast, legible) */
+.dark {
+  --bg: 222 28% 10%;          /* near-black with slight blue tint */
+  --surface: 222 22% 14%;     /* raised card surface */
+  --fg: 210 20% 96%;          /* soft white */
+  --muted: 215 12% 70%;       /* readable secondary */
+  --border: 220 10% 24%;      /* subtle borders */
+  --accent: 210 90% 60%;      /* vivid but not neon */
+}
+
+
+html, body { height: 100%; }
+
+body {
+  @apply bg-[hsl(var(--bg))] text-[hsl(var(--fg))];
+}
+
+a { @apply underline-offset-4 hover:underline; }
+
+@layer base {
+  /* Heading font resolves via --font-heading var; default set below */
+  h1, h2, h3, h4 { @apply font-heading; letter-spacing: -0.01em; }
+  code, kbd, pre { @apply font-mono; }
+}
+
+/* Headings also use Roboto Mono */
+body { --font-heading: var(--font-mono); }
+
+button:focus-visible, a:focus-visible, input:focus-visible, textarea:focus-visible, [role="button"]:focus-visible {
+  @apply outline-none ring-2 ring-offset-2 ring-[hsl(var(--accent))] rounded-md;
+}
+
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border-width: 0;
+}
+
+/* Fixed header height */
+:root { --header-h: 64px; }
+
+/* Patterned background for Marimekko mode: large playful dots, very faint */
+/* (Marimekko theme removed; minimal palette remains default) */
+
+@layer components {
+  .heading-underline { @apply relative pb-2; }
+  .heading-underline::after {
+    content: "";
+    position: absolute;
+    left: 0; bottom: 0; height: 3px; width: 80px;
+    background: hsl(var(--border));
+    border-radius: 9999px;
+  }
+  .soft-section { @apply rounded-2xl border border-[hsl(var(--border))] p-6; background-color: hsl(var(--surface)); }
+  /* Consistent tag chip styling */
+  .tag-chip { @apply inline-flex items-center gap-2 px-3 py-1.5 rounded-full border text-xs transition bg-white border-[hsl(var(--border))] text-gray-700 hover:bg-gray-50; }
+  .tag-chip--active { @apply bg-blue-100 border-blue-200 text-blue-900; }
+  .dark .tag-chip--active { @apply bg-blue-700 border-blue-600 text-white; }
+}
+
+@layer utilities {
+  .text-muted { color: hsl(var(--muted)); }
+  /* Improve readability where neutral-600 is used */
+  .dark .text-neutral-600 { color: hsl(var(--muted)) !important; }
+  .dark .text-gray-600 { color: hsl(var(--muted)) !important; }
+}

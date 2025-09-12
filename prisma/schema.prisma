@@ -1,0 +1,245 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum Role {
+  ADMIN
+  TRAINER
+  EMPLOYEE
+  VIEWER
+}
+
+enum AssetType {
+  PDF
+  VIDEO
+  LINK
+  IMAGE
+  DOC
+  MDX
+}
+
+enum QuestionType {
+  SINGLE
+  MULTI
+  TRUEFALSE
+  SHORT
+}
+
+model User {
+  id         String     @id @default(cuid())
+  name       String?
+  jobFunction String?
+  email      String     @unique
+  password   String?
+  role       Role       @default(EMPLOYEE)
+  approved   Boolean    @default(false)
+  image      String?
+  // Icecat profile fields (user-editable via Profile page)
+  icecatBoUsername String?
+  icecatFoUsername String?
+  contentToken     String?
+  appKey           String?
+  createdAt  DateTime   @default(now())
+  updatedAt  DateTime   @updatedAt
+  sessions   Session[]
+  accounts   Account[]
+  progresses Progress[]
+  attempts   Attempt[]
+  presentations Presentation[]
+}
+
+model Training {
+  id              String   @id @default(cuid())
+  slug            String   @unique
+  title           String
+  summary         String
+  isMandatory     Boolean  @default(false)
+  durationMinutes Int      @default(15)
+  tags            String[]
+  modules         Module[]
+  quizzes         Quiz[]
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+}
+
+model Module {
+  id         String   @id @default(cuid())
+  training   Training @relation(fields: [trainingId], references: [id])
+  trainingId String
+  title      String
+  order      Int
+  lessons    Lesson[]
+}
+
+model Lesson {
+  id          String     @id @default(cuid())
+  module      Module     @relation(fields: [moduleId], references: [id])
+  moduleId    String
+  title       String
+  slug        String     @unique
+  bodyMdx     String?
+  externalUrl String?
+  assets      Asset[]
+  order       Int
+  createdAt   DateTime   @default(now())
+  Progress    Progress[]
+}
+
+model Asset {
+  id       String    @id @default(cuid())
+  lesson   Lesson?   @relation(fields: [lessonId], references: [id])
+  lessonId String?
+  type     AssetType
+  title    String
+  url      String
+}
+
+model Progress {
+  id          String    @id @default(cuid())
+  user        User      @relation(fields: [userId], references: [id])
+  userId      String
+  lesson      Lesson    @relation(fields: [lessonId], references: [id])
+  lessonId    String
+  isCompleted Boolean   @default(false)
+  completedAt DateTime?
+
+  @@unique([userId, lessonId])
+}
+
+model Quiz {
+  id               String     @id @default(cuid())
+  training         Training?  @relation(fields: [trainingId], references: [id])
+  trainingId       String?
+  title            String
+  description      String
+  timeLimitSeconds Int        @default(0)
+  passThreshold    Int        @default(70)
+  questions        Question[]
+  attempts         Attempt[]
+}
+
+model Question {
+  id          String       @id @default(cuid())
+  quiz        Quiz         @relation(fields: [quizId], references: [id])
+  quizId      String
+  type        QuestionType
+  prompt      String
+  options     Json?
+  correct     Json?
+  explanation String?
+  order       Int
+}
+
+model Attempt {
+  id          String    @id @default(cuid())
+  quiz        Quiz      @relation(fields: [quizId], references: [id])
+  quizId      String
+  user        User      @relation(fields: [userId], references: [id])
+  userId      String
+  startedAt   DateTime  @default(now())
+  submittedAt DateTime?
+  score       Int       @default(0)
+  passed      Boolean   @default(false)
+  answers     Json?
+
+  @@unique([quizId, userId, startedAt])
+}
+
+// NextAuth models
+model Account {
+  id                String  @id @default(cuid())
+  userId            String
+  type              String
+  provider          String
+  providerAccountId String
+  refresh_token     String?
+  access_token      String?
+  expires_at        Int?
+  token_type        String?
+  scope             String?
+  id_token          String?
+  session_state     String?
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([provider, providerAccountId])
+}
+
+model Session {
+  id           String   @id @default(cuid())
+  sessionToken String   @unique
+  userId       String
+  expires      DateTime
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model VerificationToken {
+  identifier String
+  token      String   @unique
+  expires    DateTime
+
+  @@id([identifier, token])
+}
+
+enum UploadKind {
+  PRESENTATION
+  DOCUMENT
+}
+
+model Upload {
+  id        String     @id @default(cuid())
+  title     String
+  path      String
+  tags      String[]
+  kind      UploadKind
+  useCase   String?
+  createdAt DateTime   @default(now())
+  updatedAt DateTime   @updatedAt
+}
+
+enum Audience {
+  RETAILERS
+  BRANDS
+}
+
+model Presentation {
+  id          String    @id @default(cuid())
+  title       String
+  description String?
+  path        String          // URL or internal path like /files/...
+  audience    Audience
+  tags        String[]  @default([])
+  createdById String?
+  createdBy   User?     @relation(fields: [createdById], references: [id])
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+
+  @@unique([title, audience])
+  @@index([audience, updatedAt])
+}
+
+model DocumentFile {
+  id        String   @id @default(cuid())
+  title     String
+  path      String
+  tags      String[]  @default([])
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+}
+
+model Invite {
+  id         String   @id @default(cuid())
+  token      String   @unique
+  role       Role
+  email      String?
+  createdBy  String?
+  createdAt  DateTime @default(now())
+  expiresAt  DateTime?
+  usedAt     DateTime?
+}

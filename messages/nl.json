@@ -1,0 +1,12 @@
+{
+  "nav": {
+    "dashboard": "Dashboard",
+    "trainings": "Trainingen",
+    "quizzes": "Toetsen",
+    "admin": "Beheer"
+  },
+  "auth": {
+    "signin": "Inloggen"
+  }
+}
+
