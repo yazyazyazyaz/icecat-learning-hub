@@ -128,7 +128,7 @@ export default async function AdminIntegrationFilesPage({ searchParams }: { sear
                   <tr key={m.id} className="align-middle">
                     <td className="py-2 px-3 text-[15px] text-neutral-900">{m.title}</td>
                     <td className="py-2 px-3 border-l border-[hsl(var(--border))] whitespace-nowrap text-neutral-700">
-                      <span className="inline-flex items-center gap-1 text-[11px] px-2 py-0.5 rounded-full border mr-2">
+                      <span className="inline-flex items-center gap-1 text-[11px] px-2 py-0.5 rounded-full border mr-2 align-middle">
                         <span className={`h-2 w-2 rounded-full ${hasTag(m,'refscope:open') ? 'bg-emerald-600' : hasTag(m,'refscope:full') ? 'bg-sky-600' : 'bg-neutral-400'}`}></span>
                         {hasTag(m,'refscope:open') ? 'Open Icecat' : hasTag(m,'refscope:full') ? 'Full Icecat' : '—'}
                       </span>

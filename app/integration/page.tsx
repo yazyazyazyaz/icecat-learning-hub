@@ -40,20 +40,38 @@ export default async function IntegrationFilesPage({ searchParams }: { searchPar
     <div className="grid gap-4">
       <div className="flex items-center gap-2 flex-wrap max-w-5xl">
         <span className="text-xs text-neutral-500">Access level:</span>
-        <Link className={`tag-chip ${scope==='open'? 'tag-chip--active':''}`} href={`/integration?scope=open`}>Open Icecat</Link>
-        <Link className={`tag-chip ${scope==='full'? 'tag-chip--active':''}`} href={`/integration?scope=full`}>Full Icecat</Link>
-        <span className="ml-3 text-xs text-neutral-500">Groups:</span>
+        <Link
+          className={`tag-chip ${scope==='open'? 'tag-chip--active':''} ${scope==='open' ? 'bg-emerald-50 border-emerald-300 text-emerald-800' : 'hover:border-emerald-300 hover:text-emerald-800'}`}
+          href={`/integration?scope=open`}
+        >
+          Open Icecat
+        </Link>
+        <Link
+          className={`tag-chip ${scope==='full'? 'tag-chip--active':''} ${scope==='full' ? 'bg-sky-50 border-sky-300 text-sky-800' : 'hover:border-sky-300 hover:text-sky-800'}`}
+          href={`/integration?scope=full`}
+        >
+          Full Icecat
+        </Link>
+      </div>
+      <div className="flex items-center gap-2 flex-wrap max-w-5xl">
+        <span className="text-xs text-neutral-500">Groups:</span>
         {GROUPS.map((g) => (
-          <Link key={g} className={`tag-chip ${group===g? 'tag-chip--active':''}`} href={`/integration?scope=${scope}&group=${encodeURIComponent(g)}`}>{g}</Link>
+          <Link
+            key={g}
+            className={`tag-chip ${group===g? 'tag-chip--active':''} ${g==='Index File' ? (group===g ? 'bg-amber-50 border-amber-300 text-amber-800' : 'hover:border-amber-300 hover:text-amber-800') : (group===g ? 'bg-teal-50 border-teal-300 text-teal-800' : 'hover:border-teal-300 hover:text-teal-800')}`}
+            href={`/integration?scope=${scope}&group=${encodeURIComponent(g)}`}
+          >
+            {g}
+          </Link>
         ))}
       </div>
 
       <section className="max-w-5xl">
-        <table className="w-full table-fixed text-sm">
+        <table className="w-full table-auto text-sm">
           <colgroup>
             <col />
-            <col className="w-28" />
-            <col className="w-40" />
+            <col className="w-56" />
+            <col className="w-48" />
           </colgroup>
           <thead className="bg-neutral-50/80 text-neutral-600">
             <tr>
@@ -79,14 +97,14 @@ export default async function IntegrationFilesPage({ searchParams }: { searchPar
                 {byGroup[g].map((m: any) => (
                   <tr key={m.id} className="align-middle">
                     <td className="py-2 px-3 text-sm font-normal text-neutral-900">{m.title}</td>
-                    <td className="py-2 px-3 border-l border-[hsl(var(--border))] whitespace-nowrap text-neutral-700 flex items-center gap-2">
-                      <span className="inline-flex items-center gap-1 text-[11px] px-2 py-0.5 rounded-full border" aria-label="Access level">
+                    <td className="py-2 px-3 border-l border-[hsl(var(--border))] whitespace-nowrap text-neutral-700">
+                      <span className="inline-flex items-center gap-1 text-[11px] px-2 py-0.5 rounded-full border mr-2 align-middle" aria-label="Access level">
                         <span className={`h-2 w-2 rounded-full ${hasTag(m,'refscope:open') ? 'bg-emerald-600' : hasTag(m,'refscope:full') ? 'bg-sky-600' : 'bg-neutral-400'}`}></span>
                         {hasTag(m,'refscope:open') ? 'Open Icecat' : hasTag(m,'refscope:full') ? 'Full Icecat' : '—'}
                       </span>
-                      {fileType(m.path)}
+                      <span className="align-middle">{fileType(m.path)}</span>
                     </td>
-                    <td className="py-2 px-3 border-l border-[hsl(var(--border))] whitespace-nowrap">
+                    <td className="py-2 px-3 border-l border-[hsl(var(--border))] whitespace-nowrap text-right">
                       <LinkActions href={m.path} />
                     </td>
                 </tr>
