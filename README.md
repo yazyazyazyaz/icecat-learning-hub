@@ -62,13 +62,13 @@ Open http://localhost:3000
 
 Demo users: admin@/trainer@/employee@/viewer@ with password `password123`.
 
-## Docker (app + Postgres)
+## Docker (Postgres)
 
 ```
-docker compose up -d --build
+docker compose up -d postgres
 ```
 
-This builds the app, runs migrations on start, and serves on http://localhost:3000.
+This starts the local Postgres instance for development. Run the app with `npm run dev`.
 
 ## NPM scripts
 - `npm run dev` — run Next dev server
