@@ -4,6 +4,8 @@ import { db } from "@/lib/db"
 const DOC_TAGS = [
   'Contracts',
   'Various documents',
+  'Index File',
+  'Reference File',
 ] as const
 
 export default async function DocumentsPage({ searchParams }: { searchParams?: { tag?: string } }) {

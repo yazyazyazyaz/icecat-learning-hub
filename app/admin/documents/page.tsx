@@ -7,6 +7,8 @@ import { SubmitButton, SaveStatus } from "@/components/FormSaveControls"
 const DOC_TAGS = [
   'Contracts',
   'Various documents',
+  'Index File',
+  'Reference File',
 ] as const
 
 export default async function AdminDocumentsPage({ searchParams }: { searchParams?: { tag?: string; edit?: string } }) {
