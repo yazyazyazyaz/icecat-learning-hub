@@ -36,6 +36,7 @@ const baseNavItems: NavItem[] = [
     ],
   },
   { href: "/documents", label: "Documents", icon: Folder },
+  { href: "/integration", label: "Integration Files", icon: Folder },
   { href: "/quizzes", label: "Quizzes", icon: HelpCircle },
   {
     href: "/training",
@@ -127,4 +128,5 @@ export function Sidebar({ className = "" }: { className?: string }) {
   )
 }
 
-export { navItems }
+// Export the static base items for any existing imports expecting `navItems`.
+export { baseNavItems as navItems }

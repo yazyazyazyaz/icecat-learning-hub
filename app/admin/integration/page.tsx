@@ -1,50 +1,38 @@
 import Link from "next/link"
 import { db } from "@/lib/db"
-import { createDocument, updateDocument } from "@/actions/documents"
-import { syncRefsFromIcecat } from "@/actions/refs"
-import { syncRefsFromFrostKitty } from "@/actions/refs"
 import { SubmitButton, SaveStatus } from "@/components/FormSaveControls"
+import { createDocument, updateDocument } from "@/actions/documents"
+import { syncRefsFromFrostKitty, syncRefsFromIcecat } from "@/actions/refs"
 
-const DOC_TAGS = [
-  'Contracts',
-  'Various documents',
-] as const
+const GROUPS = ['Index File','Reference File'] as const
 
-export default async function AdminDocumentsPage({ searchParams }: { searchParams?: { tag?: string; edit?: string } }) {
-  const tag = (searchParams?.tag || '').toString()
+export default async function AdminIntegrationFilesPage({ searchParams }: { searchParams?: { group?: string; edit?: string } }) {
+  const group = (searchParams?.group || '').toString()
   const editId = (searchParams?.edit || '').toString()
-  const where: any = tag ? { tags: { has: tag } } : {}
-  where.NOT = [
-    { tags: { has: 'Index File' } },
-    { tags: { has: 'Reference File' } },
-  ]
+  const where: any = {}
+  if (group && GROUPS.includes(group as any)) where.tags = { has: group }
+
   let items: any[] = []
   try {
     items = await (db as any).documentFile.findMany({ where, orderBy: { updatedAt: 'desc' } })
-  } catch {
+  } catch (e) {
     try {
-      const legacyWhere: any = { kind: 'DOCUMENT', NOT: { tags: { has: 'manual' } } }
-      if (tag) legacyWhere.tags = { has: tag }
+      const legacyWhere: any = { kind: 'DOCUMENT' }
+      if (group && GROUPS.includes(group as any)) legacyWhere.tags = { has: group }
       items = await db.upload.findMany({ where: legacyWhere, orderBy: { updatedAt: 'desc' } })
-    } catch (e) {
-      console.error('AdminDocumentsPage: DB unavailable', e)
+    } catch (e2) {
+      console.error('AdminIntegrationFilesPage: DB unavailable', e2)
       items = []
     }
   }
 
-  const groupsOrder = tag ? [tag] : [...DOC_TAGS, 'Uncategorized']
+  const groupsOrder = group ? [group] : [...GROUPS]
   const byGroup: Record<string, any[]> = {}
   for (const it of items) {
-    const itsTags: string[] = (it.tags || []).filter((t: string) => DOC_TAGS.includes(t as any))
-    if (itsTags.length === 0) {
-      if (!byGroup['Uncategorized']) byGroup['Uncategorized'] = []
-      byGroup['Uncategorized'].push(it)
-    } else {
-      for (const t of itsTags) {
-        if (!byGroup[t]) byGroup[t] = []
-        byGroup[t].push(it)
-      }
-    }
+    const itsTags: string[] = (it.tags || []).filter((t: string) => GROUPS.includes(t as any))
+    const key = itsTags[0] || 'Reference File'
+    if (!byGroup[key]) byGroup[key] = []
+    byGroup[key].push(it)
   }
 
   let editing: any = null
@@ -59,15 +47,25 @@ export default async function AdminDocumentsPage({ searchParams }: { searchParam
   return (
     <div className="space-y-4">
       <section className="bg-white border rounded-2xl shadow-sm p-6">
-        <h1 className="text-2xl font-semibold">Documents</h1>
-        <p className="text-sm text-gray-600 mt-1">Add documents via URL or file upload. Shown on the Documents page.</p>
+        <h1 className="text-2xl font-semibold">Integration Files</h1>
+        <p className="text-sm text-gray-600 mt-1">Index / Reference files used for integrations (Open vs Full).</p>
         <div className="mt-4 flex items-center gap-2 flex-wrap max-w-5xl">
-          <Link className={`tag-chip ${!tag? 'tag-chip--active':''}`} href={`/admin/documents`}>All</Link>
-          {DOC_TAGS.map((t) => (
-            <Link key={t} className={`tag-chip ${tag===t? 'tag-chip--active':''}`} href={`/admin/documents?tag=${encodeURIComponent(t)}`}>{t}</Link>
+          <Link className={`tag-chip ${!group? 'tag-chip--active':''}`} href={`/admin/integration`}>All</Link>
+          {GROUPS.map((g) => (
+            <Link key={g} className={`tag-chip ${group===g? 'tag-chip--active':''}`} href={`/admin/integration?group=${encodeURIComponent(g)}`}>{g}</Link>
           ))}
         </div>
-        {/* Integration Files tools have moved to /admin/integration */}
+        <div className="mt-3 flex flex-wrap gap-3">
+          <form action={async () => { 'use server'; await syncRefsFromFrostKitty() }}>
+            <SubmitButton label="Sync Frost-Kitty (Index/Reference)" pendingLabel="Syncing..." />
+            <SaveStatus className="ml-2" />
+          </form>
+          <form action={async () => { 'use server'; await syncRefsFromIcecat() }}>
+            <SubmitButton label="Import Icecat Reference Files (Open & Full)" pendingLabel="Importing..." />
+            <SaveStatus className="ml-2" />
+          </form>
+        </div>
+
         {editing && (
           <form action={async (fd: FormData) => { 'use server'; await updateDocument(fd) }} className="grid gap-3 md:grid-cols-6 items-end mt-4">
             <input type="hidden" name="id" defaultValue={editing.id} />
@@ -79,7 +77,7 @@ export default async function AdminDocumentsPage({ searchParams }: { searchParam
               <label className="block text-sm mb-1">URL</label>
               <input name="path" defaultValue={editing.path} className="w-full rounded-xl border px-3 py-2 text-sm" placeholder="https://..." />
             </div>
-            <div className="flex items-center gap-2"><SubmitButton label="Update document" pendingLabel="Updating..." /><SaveStatus /></div>
+            <div className="flex items-center gap-2"><SubmitButton label="Update link" pendingLabel="Updating..." /><SaveStatus /></div>
           </form>
         )}
         <form
@@ -91,13 +89,13 @@ export default async function AdminDocumentsPage({ searchParams }: { searchParam
             <input name="title" required className="w-full rounded-xl border px-3 py-2 text-sm" />
           </div>
           <div className="md:col-span-3">
-            <label className="block text-sm mb-1">URL (leave empty if uploading attachment)</label>
+            <label className="block text-sm mb-1">URL</label>
             <input name="path" className="w-full rounded-xl border px-3 py-2 text-sm" placeholder="https://..." />
           </div>
           <div className="md:col-span-6">
             <label className="block text-sm mb-1">Tags</label>
             <div className="flex items-center gap-3 flex-wrap">
-              {DOC_TAGS.map((t) => (
+              {GROUPS.map((t) => (
                 <label key={t} className="text-sm"><input type="checkbox" name="tags" value={t} className="mr-2" /> {t}</label>
               ))}
             </div>
@@ -107,19 +105,14 @@ export default async function AdminDocumentsPage({ searchParams }: { searchParam
               <label className="text-sm"><input type="checkbox" name="tags" value="refscope:full" className="mr-2" /> Full Icecat</label>
             </div>
           </div>
-          <div className="md:col-span-3">
-            <label className="block text-sm mb-1">Or upload attachment (optional)</label>
-            <input name="file" type="file" className="w-full text-sm" />
-            <p className="text-xs text-neutral-500 mt-1">If selected, the file will be uploaded and used instead of URL.</p>
-          </div>
-          <div className="flex items-center gap-2"><SubmitButton label="Add document" pendingLabel="Adding..." /><SaveStatus /></div>
+          <div className="flex items-center gap-2"><SubmitButton label="Add link" pendingLabel="Adding..." /><SaveStatus /></div>
         </form>
       </section>
 
-      {groupsOrder.map((group) => (
-        byGroup[group] && byGroup[group].length > 0 ? (
-          <section key={group} className="bg-white border rounded-2xl shadow-sm p-0 overflow-hidden max-w-5xl">
-            <div className="px-3 py-2 border-b bg-neutral-100 text-[11px] uppercase tracking-wide text-neutral-700">{group}</div>
+      {groupsOrder.map((g) => (
+        byGroup[g] && byGroup[g].length > 0 ? (
+          <section key={g} className="bg-white border rounded-2xl shadow-sm p-0 overflow-hidden max-w-5xl">
+            <div className="px-3 py-2 border-b bg-neutral-100 text-[11px] uppercase tracking-wide text-neutral-700">{g}</div>
             <table className="w-full table-auto text-sm">
               <thead className="bg-neutral-50/80 text-neutral-600">
                 <tr>
@@ -131,23 +124,16 @@ export default async function AdminDocumentsPage({ searchParams }: { searchParam
                 </tr>
               </thead>
               <tbody className="divide-y divide-[hsl(var(--border))]">
-                {byGroup[group].map((m: any) => (
+                {byGroup[g].map((m: any) => (
                   <tr key={m.id} className="align-middle">
                     <td className="py-2 px-3 text-[15px] text-neutral-900">{m.title}</td>
-                    <td className="py-2 px-3 border-l border-[hsl(var(--border))] whitespace-nowrap text-neutral-700">{m.path?.startsWith('/uploads/') ? 'Attachment' : 'Link'}</td>
+                    <td className="py-2 px-3 border-l border-[hsl(var(--border))] whitespace-nowrap text-neutral-700">{fileType(m.path)}</td>
                     <td className="py-2 px-3 border-l border-[hsl(var(--border))] whitespace-nowrap">
-                      {m.path?.startsWith('/uploads/') ? (
-                        <span className="space-x-3">
-                          <a className="underline font-medium" href={m.path} target="_blank" rel="noreferrer">Preview</a>
-                          <a className="underline text-neutral-700" href={m.path} download>Download</a>
-                        </span>
-                      ) : (
-                        <a className="underline font-medium" href={m.path} target="_blank" rel="noreferrer">Open</a>
-                      )}
+                      <a className="underline font-medium" href={m.path} target="_blank" rel="noreferrer">Open</a>
                     </td>
                     <td className="py-2 px-3 border-l border-[hsl(var(--border))] text-neutral-600 whitespace-nowrap">{m.updatedAt.toISOString().slice(0,10)}</td>
                     <td className="py-2 px-3 border-l border-[hsl(var(--border))] text-right">
-                      <Link href={`/admin/documents?edit=${m.id}`} className="px-3 py-1 rounded-full border text-xs">Edit</Link>
+                      <Link href={`/admin/integration?edit=${m.id}`} className="px-3 py-1 rounded-full border text-xs">Edit</Link>
                     </td>
                   </tr>
                 ))}
@@ -159,3 +145,13 @@ export default async function AdminDocumentsPage({ searchParams }: { searchParam
     </div>
   )
 }
+
+function fileType(path: string) {
+  try {
+    const name = (path || '').split('/').pop() || ''
+    const noGz = name.replace(/\.gz$/i, '')
+    const ext = (noGz.split('.').pop() || '').toUpperCase()
+    return ext ? `Link (${ext})` : 'Link'
+  } catch { return 'Link' }
+}
+

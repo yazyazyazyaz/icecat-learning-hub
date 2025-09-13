@@ -6,6 +6,8 @@ import { cn } from "@/lib/utils"
 
 const items = [
   { href: "/admin/users", label: "Users" },
+  { href: "/admin/documents", label: "Documents" },
+  { href: "/admin/integration", label: "Integration Files" },
 ]
 
 export default function AdminNav() {
