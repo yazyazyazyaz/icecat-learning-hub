@@ -1,11 +1,13 @@
 import Link from "next/link"
 import { db } from "@/lib/db"
+import LinkActions from "@/components/LinkActions"
 
 const GROUPS = ['Index File','Reference File'] as const
 
 export default async function IntegrationFilesPage({ searchParams }: { searchParams?: { group?: string; scope?: string } }) {
   const group = (searchParams?.group || '').toString()
-  const scope = (searchParams?.scope || '').toString().toLowerCase()
+  const rawScope = (searchParams?.scope || '').toString().toLowerCase()
+  const scope = rawScope || 'open'
   const where: any = {}
   if (group && GROUPS.includes(group as any)) where.tags = { has: group }
   if (scope === 'open') where.tags = { hasEvery: ['Reference File','refscope:open'] }
@@ -37,13 +39,13 @@ export default async function IntegrationFilesPage({ searchParams }: { searchPar
   return (
     <div className="grid gap-4">
       <div className="flex items-center gap-2 flex-wrap max-w-5xl">
-        <Link className={`tag-chip ${!group? 'tag-chip--active':''}`} href={`/integration`}>All</Link>
+        <span className="text-xs text-neutral-500">Access level:</span>
+        <Link className={`tag-chip ${scope==='open'? 'tag-chip--active':''}`} href={`/integration?scope=open`}>Open Icecat</Link>
+        <Link className={`tag-chip ${scope==='full'? 'tag-chip--active':''}`} href={`/integration?scope=full`}>Full Icecat</Link>
+        <span className="ml-3 text-xs text-neutral-500">Groups:</span>
         {GROUPS.map((g) => (
-          <Link key={g} className={`tag-chip ${group===g? 'tag-chip--active':''}`} href={`/integration?group=${encodeURIComponent(g)}`}>{g}</Link>
+          <Link key={g} className={`tag-chip ${group===g? 'tag-chip--active':''}`} href={`/integration?scope=${scope}&group=${encodeURIComponent(g)}`}>{g}</Link>
         ))}
-        <span className="ml-2 text-xs text-neutral-500">Reference scope:</span>
-        <Link className={`tag-chip ${scope==='open'? 'tag-chip--active':''}`} href={`/integration?group=${encodeURIComponent('Reference File')}&scope=open`}>Open Icecat</Link>
-        <Link className={`tag-chip ${scope==='full'? 'tag-chip--active':''}`} href={`/integration?group=${encodeURIComponent('Reference File')}&scope=full`}>Full Icecat</Link>
       </div>
 
       <section className="max-w-5xl">
@@ -77,16 +79,22 @@ export default async function IntegrationFilesPage({ searchParams }: { searchPar
                 {byGroup[g].map((m: any) => (
                   <tr key={m.id} className="align-middle">
                     <td className="py-2 px-3 text-sm font-normal text-neutral-900">{m.title}</td>
-                    <td className="py-2 px-3 border-l border-[hsl(var(--border))] whitespace-nowrap text-neutral-700">{fileType(m.path)}</td>
-                    <td className="py-2 px-3 border-l border-[hsl(var(--border))] whitespace-nowrap">
-                      <a className="underline font-medium" href={m.path} target="_blank" rel="noreferrer">Open</a>
+                    <td className="py-2 px-3 border-l border-[hsl(var(--border))] whitespace-nowrap text-neutral-700 flex items-center gap-2">
+                      <span className="inline-flex items-center gap-1 text-[11px] px-2 py-0.5 rounded-full border" aria-label="Access level">
+                        <span className={`h-2 w-2 rounded-full ${hasTag(m,'refscope:open') ? 'bg-emerald-600' : hasTag(m,'refscope:full') ? 'bg-sky-600' : 'bg-neutral-400'}`}></span>
+                        {hasTag(m,'refscope:open') ? 'Open Icecat' : hasTag(m,'refscope:full') ? 'Full Icecat' : '—'}
+                      </span>
+                      {fileType(m.path)}
                     </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </section>
-        ) : null
+                    <td className="py-2 px-3 border-l border-[hsl(var(--border))] whitespace-nowrap">
+                      <LinkActions href={m.path} />
+                    </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </section>
+      ) : null
       ))}
     </div>
   )
@@ -101,3 +109,6 @@ function fileType(path: string) {
   } catch { return 'Link' }
 }
 
+function hasTag(m: any, t: string) {
+  try { return Array.isArray(m.tags) && m.tags.includes(t) } catch { return false }
+}

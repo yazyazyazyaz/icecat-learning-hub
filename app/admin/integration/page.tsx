@@ -50,7 +50,7 @@ export default async function AdminIntegrationFilesPage({ searchParams }: { sear
         <h1 className="text-2xl font-semibold">Integration Files</h1>
         <p className="text-sm text-gray-600 mt-1">Index / Reference files used for integrations (Open vs Full).</p>
         <div className="mt-4 flex items-center gap-2 flex-wrap max-w-5xl">
-          <Link className={`tag-chip ${!group? 'tag-chip--active':''}`} href={`/admin/integration`}>All</Link>
+          <span className="text-xs text-neutral-500">Groups:</span>
           {GROUPS.map((g) => (
             <Link key={g} className={`tag-chip ${group===g? 'tag-chip--active':''}`} href={`/admin/integration?group=${encodeURIComponent(g)}`}>{g}</Link>
           ))}
@@ -93,13 +93,13 @@ export default async function AdminIntegrationFilesPage({ searchParams }: { sear
             <input name="path" className="w-full rounded-xl border px-3 py-2 text-sm" placeholder="https://..." />
           </div>
           <div className="md:col-span-6">
-            <label className="block text-sm mb-1">Tags</label>
+            <label className="block text-sm mb-1">Groups</label>
             <div className="flex items-center gap-3 flex-wrap">
               {GROUPS.map((t) => (
                 <label key={t} className="text-sm"><input type="checkbox" name="tags" value={t} className="mr-2" /> {t}</label>
               ))}
             </div>
-            <div className="mt-2 text-xs text-neutral-600">If you select "Reference File", you can optionally add a scope:</div>
+            <div className="mt-2 text-xs text-neutral-600">Access level (only for Reference File):</div>
             <div className="flex items-center gap-3 flex-wrap mt-1">
               <label className="text-sm"><input type="checkbox" name="tags" value="refscope:open" className="mr-2" /> Open Icecat</label>
               <label className="text-sm"><input type="checkbox" name="tags" value="refscope:full" className="mr-2" /> Full Icecat</label>
@@ -127,7 +127,13 @@ export default async function AdminIntegrationFilesPage({ searchParams }: { sear
                 {byGroup[g].map((m: any) => (
                   <tr key={m.id} className="align-middle">
                     <td className="py-2 px-3 text-[15px] text-neutral-900">{m.title}</td>
-                    <td className="py-2 px-3 border-l border-[hsl(var(--border))] whitespace-nowrap text-neutral-700">{fileType(m.path)}</td>
+                    <td className="py-2 px-3 border-l border-[hsl(var(--border))] whitespace-nowrap text-neutral-700">
+                      <span className="inline-flex items-center gap-1 text-[11px] px-2 py-0.5 rounded-full border mr-2">
+                        <span className={`h-2 w-2 rounded-full ${hasTag(m,'refscope:open') ? 'bg-emerald-600' : hasTag(m,'refscope:full') ? 'bg-sky-600' : 'bg-neutral-400'}`}></span>
+                        {hasTag(m,'refscope:open') ? 'Open Icecat' : hasTag(m,'refscope:full') ? 'Full Icecat' : '—'}
+                      </span>
+                      {fileType(m.path)}
+                    </td>
                     <td className="py-2 px-3 border-l border-[hsl(var(--border))] whitespace-nowrap">
                       <a className="underline font-medium" href={m.path} target="_blank" rel="noreferrer">Open</a>
                     </td>
@@ -154,4 +160,3 @@ function fileType(path: string) {
     return ext ? `Link (${ext})` : 'Link'
   } catch { return 'Link' }
 }
-
