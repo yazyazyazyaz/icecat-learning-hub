@@ -162,7 +162,7 @@ export async function runSingle(formData: FormData) {
     const outPath = path.join(dir, filename)
     await fs.writeFile(outPath, buf)
     revalidatePath('/wizard')
-    return { ok: true, path: `/uploads/wizard/${filename}` }
+    return { ok: true, path: `/uploads/wizard/${filename}`, url }
   } else {
     const auth = { user, pass }
     let url = ''
@@ -182,7 +182,7 @@ export async function runSingle(formData: FormData) {
     const outPath = path.join(dir, filename)
     await fs.writeFile(outPath, buf)
     revalidatePath('/wizard')
-    return { ok: true, path: `/uploads/wizard/${filename}` }
+    return { ok: true, path: `/uploads/wizard/${filename}`, url }
   }
 }
 
@@ -240,8 +240,8 @@ export async function runBatch(formData: FormData) {
   const zip = new JSZip()
   const logRows: Array<{ key: string; lang: string; status: 'OK'|'ERROR'; message: string }>=[]
   // Collect error rows for XLSX export
-  const errRowsEan: Array<[string, string, string, string]> = [] // [EAN, Lang, Status, Request]
-  const errRowsMpn: Array<[string, string, string, string, string]> = [] // [MPN, Brand, Lang, Status, Request]
+  const errRowsEan: Array<[string, string, string, string, string]> = [] // [EAN, Lang, Status, Message, Request]
+  const errRowsMpn: Array<[string, string, string, string, string, string]> = [] // [MPN, Brand, Lang, Status, Message, Request]
   // Collect all attempted request links (single-column workbook)
   const linkRows: Array<[string]> = []
   let attempted = 0
@@ -295,7 +295,7 @@ export async function runBatch(formData: FormData) {
       if (lastUrl) linkRows.push([lastUrl])
       success++
     } catch (e) {
-      const msg = (e as any)?.message || 'failed'
+      const msg = ((e as any)?.message || 'failed').toString()
       // Build the exact request URL used (without secrets for XML; JSON includes app_key by design)
       let reqUrl = ''
       if (mpn && brand) {
@@ -316,14 +316,14 @@ export async function runBatch(formData: FormData) {
         const reqUrl = fmt === 'JSON'
           ? buildJsonUrlByMpnBrand({ shop, lang, brand, mpn, appKey: appKey || '' })
           : buildXmlUrlByMpnBrand({ lang, brand, mpn })
-        errRowsMpn.push([mpn, brand, lang, 'ERROR', reqUrl])
+        errRowsMpn.push([mpn, brand, lang, 'ERROR', msg, reqUrl])
         linkRows.push([reqUrl])
       } else if (ean) {
         const shop = getShopName(user)
         const reqUrl = fmt === 'JSON'
           ? buildJsonUrlByEan({ shop, lang, ean, appKey: appKey || '' })
           : buildXmlUrlByEan({ lang, ean })
-        errRowsEan.push([ean, lang, 'ERROR', reqUrl])
+        errRowsEan.push([ean, lang, 'ERROR', msg, reqUrl])
         linkRows.push([reqUrl])
       }
       failed++
@@ -338,12 +338,12 @@ export async function runBatch(formData: FormData) {
   // Write XLSX error workbook with dynamic identifier columns
   const wbErr = XLSX.utils.book_new()
   if (errRowsEan.length > 0) {
-    const header = ['EAN','Lang','Status','Request']
+    const header = ['EAN','Lang','Status','Message','Request']
     const sheet = XLSX.utils.aoa_to_sheet([header, ...errRowsEan])
     XLSX.utils.book_append_sheet(wbErr, sheet, 'Errors_EAN')
   }
   if (errRowsMpn.length > 0) {
-    const header = ['MPN','Brand','Lang','Status','Request']
+    const header = ['MPN','Brand','Lang','Status','Message','Request']
     const sheet = XLSX.utils.aoa_to_sheet([header, ...errRowsMpn])
     XLSX.utils.book_append_sheet(wbErr, sheet, 'Errors_MPN')
   }

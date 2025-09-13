@@ -14,6 +14,7 @@ export default function WizardClient() {
   const [matchBy, setMatchBy] = useState<'EAN'|'MPN'|null>(null)
   const [busy, start] = useTransition()
   const [singleResult, setSingleResult] = useState<string | null>(null)
+  const [singleUrl, setSingleUrl] = useState<string | null>(null)
   const [singleError, setSingleError] = useState<string | null>(null)
   const [singleFmt, setSingleFmt] = useState<'JSON'|'XML'>('JSON')
   const [batchPreview, setBatchPreview] = useState<{ token: string; headers: string[]; rows: any[][]; totalRows: number } | null>(null)
@@ -73,6 +74,7 @@ export default function WizardClient() {
     formData.append('mode', matchBy)
     start(async () => {
       setSingleResult(null)
+      setSingleUrl(null)
       setSingleError(null)
       try {
         if (singleFmt === 'JSON') {
@@ -81,7 +83,9 @@ export default function WizardClient() {
         }
         const res = await runSingle(formData)
         const p = (res as any)?.path || null
+        const u = (res as any)?.url || null
         setSingleResult(p)
+        setSingleUrl(u)
         try { if (p) localStorage.setItem('wizard:singleResult', p) } catch {}
       } catch (e: any) {
         setSingleError(String(e?.message || 'Failed'))
@@ -230,10 +234,33 @@ export default function WizardClient() {
           <div>
             <button disabled={busy} aria-busy={busy} className="rounded-full border px-4 py-2 text-sm disabled:opacity-60 disabled:cursor-not-allowed">{busy? 'Running…' : 'Fetch'}</button>
           </div>
-          {singleResult && (
-            <div className="md:col-span-3">
-              <a className="underline" href={singleResult} download>Download result</a>
-              <button type="button" className="ml-3 px-3 py-1.5 rounded-full border text-sm" onClick={()=>{ setSingleResult(null); try{ localStorage.removeItem('wizard:singleResult') } catch {} }}>Start over</button>
+          {(singleResult || singleError) && (
+            <div className="md:col-span-3 grid gap-2">
+              {singleResult && (
+                <div className="rounded-xl border border-emerald-800 bg-emerald-700 text-white text-sm px-3 py-2">
+                  <div className="flex items-center gap-2">
+                    <Download className="h-4 w-4" />
+                    <a className="underline text-white" href={singleResult} download>
+                      {singleFmt === 'JSON' ? 'Download the JSON' : 'Download the XML'}
+                    </a>
+                  </div>
+                  {singleUrl && (
+                    <div className="pl-6 grid gap-1 mt-1">
+                      <a className="underline text-white break-all" href={singleUrl} target="_blank" rel="noreferrer">
+                        API link
+                      </a>
+                    </div>
+                  )}
+                </div>
+              )}
+              {singleError && (
+                <div className="rounded-xl border border-red-200 bg-red-50 text-red-900 text-sm px-3 py-2">
+                  {singleError}
+                </div>
+              )}
+              <div>
+                <button type="button" className="px-3 py-1.5 rounded-full border text-sm" onClick={()=>{ setSingleResult(null); setSingleUrl(null); setSingleError(null); try{ localStorage.removeItem('wizard:singleResult') } catch {} }}>Start over</button>
+              </div>
             </div>
           )}
         </form>
