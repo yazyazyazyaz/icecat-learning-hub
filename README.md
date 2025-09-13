@@ -8,6 +8,17 @@ npm i
 npm run dev
 ```
 
+### First run with Postgres
+
+```
+cp .env.example .env.local
+npm i
+npm run db:up
+npm run migrate
+npm run seed
+npm run dev
+```
+
 Login-based training hub with lessons, progress, and quizzes. Built with Next.js 14 App Router, Prisma, NextAuth, Tailwind.
 
 ## Stack

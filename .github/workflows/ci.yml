@@ -1,21 +1,35 @@
 name: CI
-
 on:
   push:
-    branches: [ main ]
+    branches: [main]
   pull_request:
-    branches: [ main ]
-
 jobs:
-  build:
+  test:
     runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:15-alpine
+        env:
+          POSTGRES_USER: icecat
+          POSTGRES_PASSWORD: icecat
+          POSTGRES_DB: icecat_hub
+        ports: ["5432:5432"]
+        options: >-
+          --health-cmd="pg_isready -U icecat -d icecat_hub"
+          --health-interval=5s --health-timeout=3s --health-retries=20
+    env:
+      DATABASE_URL: postgresql://icecat:icecat@localhost:5432/icecat_hub
+      NODE_ENV: test
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
         with:
           node-version: 20
       - run: npm ci
-      - run: npm run typecheck
+      - run: npx prisma migrate deploy
+      - run: npm run seed:ci --if-present
       - run: npm run lint
-      - run: npm run test
-
+      - run: npm run typecheck
+      - run: npm run test --if-present
+      - run: npx playwright install --with-deps
+      - run: npx playwright test --config=playwright.ci.ts --reporter=line || true

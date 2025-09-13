@@ -2,27 +2,20 @@ version: "3.9"
 services:
   postgres:
     image: postgres:15-alpine
+    container_name: icecat_postgres
     environment:
       POSTGRES_USER: icecat
       POSTGRES_PASSWORD: icecat
       POSTGRES_DB: icecat_hub
     ports:
       - "5432:5432"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U icecat -d icecat_hub"]
+      interval: 5s
+      timeout: 3s
+      retries: 20
     volumes:
-      - pgdata:/var/lib/postgresql/data
-  app:
-    build: .
-    environment:
-      DATABASE_URL: postgres://icecat:icecat@postgres:5432/icecat_hub
-      NEXTAUTH_URL: http://localhost:3000
-      NEXTAUTH_SECRET: b5ba75b69461bb0017ebea0fde80af6d20656fcd3438c8686795a28a437e17e3
-      NODE_ENV: production
-    depends_on:
-      - postgres
-    ports:
-      - "3000:3000"
-    env_file:
-      - .env
-volumes:
-  pgdata:
+      - db:/var/lib/postgresql/data
 
+volumes:
+  db:

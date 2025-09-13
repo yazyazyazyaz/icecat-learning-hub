@@ -11,6 +11,11 @@
     "test": "vitest",
     "e2e": "playwright test",
     "seed": "prisma db seed",
+    "seed:ci": "prisma db seed",
+    "db:up": "docker compose up -d postgres",
+    "db:down": "docker compose down",
+    "db:reset": "docker compose down -v && docker compose up -d postgres && prisma migrate reset --force",
+    "migrate": "prisma migrate dev",
     "postinstall": "prisma generate",
     "prisma:push": "prisma db push && prisma generate",
     "prisma:migrate": "prisma migrate dev --name sync && prisma generate"
