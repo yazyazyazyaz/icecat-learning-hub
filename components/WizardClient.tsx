@@ -4,7 +4,6 @@ import { useEffect, useMemo, useRef, useState, useTransition } from "react"
 import { previewBatch, runBatch, runSingle } from "@/actions/wizard"
 import { hasAppKey } from "@/actions/profile"
 import { Hourglass, Download, FileText, Link2 } from "lucide-react"
-import Bracket from "@/components/Bracket"
 
 const LANGS = [
   'INT','EN','NL','FR','DE','IT','ES','DK','RU','US','BR','PT','ZH','SV','PL','CZ','HU','FI','EL','NO','TR','BG','KA','RO','SR','UK','JA','CA','ES_AR','HR','AR','VI','KO','MK','SL','EN_SG','EN_ZA','ZH_TW','HE','LT','LV','EN_IN','DE_CH','ID','SK','FA','ES_MX','ET','DE_BE','FR_BE','NL_BE','TH','RU_UA','DE_AT','FR_CH','EN_NZ','EN_SA','EN_ID','EN_MY','HI','FR_CA','TE','TA','KN','EN_IE','ML','EN_AE','ES_CL','ES_PE','ES_CO','MR','BN','MS','EN_AU','IT_CH','EN_PH','FL_PH','EN_CA','EN_EG','AR_EG','AR_SA'
@@ -254,14 +253,14 @@ export default function WizardClient() {
             </form>
           ) : (
             <>
-              <Bracket title="Preview" maxVH={70}>
+              <div className="rounded-xl border bg-white p-3 text-sm overflow-auto">
                 <div className="font-medium mb-2">Preview (first 2 rows)</div>
                 {batchError && (
                   <div className="mb-2 rounded-xl border border-red-200 bg-red-50 text-red-900 text-sm px-3 py-2">
                     {batchError}
                     {batchError.includes('Missing App Key') && (
                       <>
-                        <span className="mx-2">-</span>
+                        <span className="mx-2">—</span>
                         <a href="/profile" className="underline">Go to Profile</a>
                       </>
                     )}
@@ -281,7 +280,7 @@ export default function WizardClient() {
                     ))}
                   </tbody>
                 </table>
-              </Bracket>
+              </div>
               <form action={onRunBatch} className="grid md:grid-cols-3 gap-3 items-end mt-3">
                 <div>
                   <label className="block text-sm mb-1">EAN column</label>
