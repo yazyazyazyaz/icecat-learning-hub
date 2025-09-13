@@ -1,6 +1,7 @@
 import Link from "next/link"
 import { db } from "@/lib/db"
 import LinkActions from "@/components/LinkActions"
+import IntegrationRowPublic from "@/components/IntegrationRowPublic"
 
 const GROUPS = ['Index File','Reference File'] as const
 
@@ -35,7 +36,7 @@ export default async function IntegrationFilesPage({ searchParams }: { searchPar
     }
   }
 
-  const groupsOrder = group ? [group] : [...GROUPS]
+  const groupsOrder = group === 'All' ? [...GROUPS] : [group]
   const byGroup: Record<string, any[]> = {}
   for (const it of items) {
     const itsTags: string[] = (it.tags || []).filter((t: string) => GROUPS.includes(t as any))
@@ -55,7 +56,7 @@ export default async function IntegrationFilesPage({ searchParams }: { searchPar
           Open Icecat
         </Link>
         <Link
-          className={`tag-chip ${scope==='full'? 'tag-chip--active':''} ${scope==='full' ? 'bg-emerald-50 border-emerald-300 text-emerald-800' : 'hover:border-emerald-300 hover:text-emerald-800'}`}
+          className={`tag-chip ${scope==='full'? 'tag-chip--active':''} ${scope==='full' ? 'bg-sky-50 border-sky-300 text-sky-800' : 'hover:border-sky-300 hover:text-sky-800'}`}
           href={`/integration?scope=full&group=${encodeURIComponent(group)}`}
         >
           Full Icecat
@@ -81,9 +82,10 @@ export default async function IntegrationFilesPage({ searchParams }: { searchPar
       </div>
 
       <section className="max-w-5xl">
-        <div className="grid grid-cols-[1fr_16rem_16rem] text-xs text-neutral-600 bg-neutral-50/80">
+        <div className="grid grid-cols-[1fr_12rem_8rem_16rem] text-xs text-neutral-600 bg-neutral-50/80">
           <div className="py-2 px-3">Title</div>
           <div className="py-2 px-3 border-l border-[hsl(var(--border))]">Type</div>
+          <div className="py-2 px-3 border-l border-[hsl(var(--border))]">Format</div>
           <div className="py-2 px-3 border-l border-[hsl(var(--border))]">Link</div>
         </div>
       </section>
@@ -94,19 +96,7 @@ export default async function IntegrationFilesPage({ searchParams }: { searchPar
             <div className="px-3 py-2 bg-neutral-100 text-xs font-medium text-neutral-600">{g}</div>
             <ul className="divide-y divide-[hsl(var(--border))]">
               {byGroup[g].map((m: any) => (
-                <li key={m.id} className="grid grid-cols-[1fr_16rem_16rem] items-center text-sm">
-                  <div className="py-2 px-3 text-neutral-900 truncate" title={m.title}>{m.title}</div>
-                  <div className="py-2 px-3 border-l border-[hsl(var(--border))] text-neutral-700">
-                    <span className="inline-flex items-center gap-1 text-[11px] px-2 py-0.5 rounded-full border mr-2 align-middle" aria-label="Access level">
-                      <span className={`h-2 w-2 rounded-full ${hasTag(m,'refscope:open') ? 'bg-emerald-600' : hasTag(m,'refscope:full') ? 'bg-emerald-600' : 'bg-neutral-400'}`}></span>
-                      {hasTag(m,'refscope:open') ? 'Open Icecat' : hasTag(m,'refscope:full') ? 'Full Icecat' : '—'}
-                    </span>
-                    <span className="align-middle">{fileType(m.path)}</span>
-                  </div>
-                  <div className="py-2 px-3 border-l border-[hsl(var(--border))] text-right">
-                    <LinkActions href={m.path} />
-                  </div>
-                </li>
+                <IntegrationRowPublic key={m.id} title={m.title} path={m.path} tags={m.tags || []} />
               ))}
             </ul>
           </section>
@@ -116,13 +106,13 @@ export default async function IntegrationFilesPage({ searchParams }: { searchPar
   )
 }
 
-function fileType(path: string) {
+function formatFromURL(path: string) {
   try {
     const name = (path || '').split('/').pop() || ''
     const noGz = name.replace(/\.gz$/i, '')
     const ext = (noGz.split('.').pop() || '').toUpperCase()
-    return ext ? `Link (${ext})` : 'Link'
-  } catch { return 'Link' }
+    return ext || ''
+  } catch { return '' }
 }
 
 function hasTag(m: any, t: string) {

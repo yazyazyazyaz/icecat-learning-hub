@@ -71,7 +71,7 @@ export default async function AdminIntegrationFilesPage({ searchParams }: { sear
             Open Icecat
           </Link>
           <Link
-            className={`tag-chip ${scope==='full'? 'tag-chip--active':''} ${scope==='full' ? 'bg-emerald-50 border-emerald-300 text-emerald-800' : 'hover:border-emerald-300 hover:text-emerald-800'}`}
+            className={`tag-chip ${scope==='full'? 'tag-chip--active':''} ${scope==='full' ? 'bg-sky-50 border-sky-300 text-sky-800' : 'hover:border-sky-300 hover:text-sky-800'}`}
             href={`/admin/integration?scope=full&group=${encodeURIComponent(group)}`}
           >
             Full Icecat
@@ -151,9 +151,10 @@ export default async function AdminIntegrationFilesPage({ searchParams }: { sear
 
       {/* Header */}
       <section className="max-w-5xl">
-        <div className="grid grid-cols-[1fr_16rem_16rem_8rem_10rem] text-xs text-neutral-600 bg-neutral-50/80">
+        <div className="grid grid-cols-[1fr_12rem_8rem_12rem_8rem_10rem] text-xs text-neutral-600 bg-neutral-50/80">
           <div className="py-2 px-3">Title</div>
           <div className="py-2 px-3 border-l border-[hsl(var(--border))]">Type</div>
+          <div className="py-2 px-3 border-l border-[hsl(var(--border))]">Format</div>
           <div className="py-2 px-3 border-l border-[hsl(var(--border))]">Link</div>
           <div className="py-2 px-3 border-l border-[hsl(var(--border))]">Updated</div>
           <div className="py-2 px-3 border-l border-[hsl(var(--border))] text-right">Actions</div>
@@ -166,15 +167,15 @@ export default async function AdminIntegrationFilesPage({ searchParams }: { sear
             <div className="px-3 py-2 border-b bg-neutral-100 text-[11px] uppercase tracking-wide text-neutral-700">{g}</div>
             <ul className="divide-y divide-[hsl(var(--border))]">
               {byGroup[g].map((m: any) => (
-                <li key={m.id} className="grid grid-cols-[1fr_16rem_16rem_8rem_10rem] items-center text-sm">
+                <li key={m.id} className="grid grid-cols-[1fr_12rem_8rem_12rem_8rem_10rem] items-center text-sm">
                   <div className="py-2 px-3 text-[15px] text-neutral-900 truncate" title={m.title}>{m.title}</div>
                   <div className="py-2 px-3 border-l border-[hsl(var(--border))] text-neutral-700">
-                    <span className="inline-flex items-center gap-1 text-[11px] px-2 py-0.5 rounded-full border mr-2 align-middle">
-                      <span className={`h-2 w-2 rounded-full ${hasTag(m,'refscope:open') ? 'bg-emerald-600' : hasTag(m,'refscope:full') ? 'bg-emerald-600' : 'bg-neutral-400'}`}></span>
+                    <span className="inline-flex items-center gap-1 text-[11px] px-2 py-0.5 rounded-full border align-middle">
+                      <span className={`h-2 w-2 rounded-full ${hasTag(m,'refscope:open') ? 'bg-emerald-600' : hasTag(m,'refscope:full') ? 'bg-sky-600' : 'bg-neutral-400'}`}></span>
                       {hasTag(m,'refscope:open') ? 'Open Icecat' : hasTag(m,'refscope:full') ? 'Full Icecat' : '—'}
                     </span>
-                    {fileType(m.path)}
                   </div>
+                  <div className="py-2 px-3 border-l border-[hsl(var(--border))] text-neutral-700">{formatFromURL(m.path)}</div>
                   <div className="py-2 px-3 border-l border-[hsl(var(--border))] text-right">
                     <LinkActions href={m.path} />
                   </div>

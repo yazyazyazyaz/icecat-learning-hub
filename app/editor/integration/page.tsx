@@ -61,40 +61,6 @@ export default async function EditorIntegrationFilesPage({ searchParams }: { sea
     <div className="space-y-4">
       <section className="bg-white border rounded-2xl shadow-sm p-6">
         <h1 className="text-2xl font-semibold">Integration Files</h1>
-        <p className="text-sm text-gray-600 mt-1">Manage Index / Reference files for Integration section.</p>
-        <div className="mt-4 flex items-center gap-2 flex-wrap max-w-5xl">
-          <span className="text-xs text-neutral-500">Access level:</span>
-          <Link
-            className={`tag-chip ${scope==='open'? 'tag-chip--active':''} ${scope==='open' ? 'bg-emerald-50 border-emerald-300 text-emerald-800' : 'hover:border-emerald-300 hover:text-emerald-800'}`}
-            href={`/editor/integration?scope=open&group=${encodeURIComponent(group)}`}
-          >
-            Open Icecat
-          </Link>
-          <Link
-            className={`tag-chip ${scope==='full'? 'tag-chip--active':''} ${scope==='full' ? 'bg-emerald-50 border-emerald-300 text-emerald-800' : 'hover:border-emerald-300 hover:text-emerald-800'}`}
-            href={`/editor/integration?scope=full&group=${encodeURIComponent(group)}`}
-          >
-            Full Icecat
-          </Link>
-        </div>
-        <div className="mt-2 flex items-center gap-2 flex-wrap max-w-5xl">
-          <span className="text-xs text-neutral-500">Groups:</span>
-          <Link
-            className={`tag-chip ${group==='All'? 'tag-chip--active':''} ${group==='All' ? 'bg-amber-50 border-amber-300 text-amber-800' : 'hover:border-amber-300 hover:text-amber-800'}`}
-            href={`/editor/integration?scope=${scope}`}
-          >
-            All
-          </Link>
-          {GROUPS.map((g) => (
-            <Link
-              key={g}
-              className={`tag-chip ${group===g? 'tag-chip--active':''} ${group===g ? 'bg-amber-50 border-amber-300 text-amber-800' : 'hover:border-amber-300 hover:text-amber-800'}`}
-              href={`/editor/integration?scope=${scope}&group=${encodeURIComponent(g)}`}
-            >
-              {g}
-            </Link>
-          ))}
-        </div>
 
         {editing && (
           <form action={async (fd: FormData) => { 'use server'; await updateDocument(fd) }} className="grid gap-3 md:grid-cols-6 items-end mt-4">
@@ -106,6 +72,11 @@ export default async function EditorIntegrationFilesPage({ searchParams }: { sea
             <div className="md:col-span-3">
               <label className="block text-sm mb-1">URL</label>
               <input name="path" defaultValue={editing.path} className="w-full rounded-xl border px-3 py-2 text-sm" placeholder="https://..." />
+            </div>
+            <div className="md:col-span-6">
+              <label className="block text-sm mb-1">Details (shown on user page)</label>
+              <textarea name="note" rows={3} defaultValue={getNote(editing.tags)} className="w-full rounded-xl border px-3 py-2 text-sm" placeholder="Optional guidance for this file" />
+              <p className="text-xs text-neutral-500 mt-1">Only shown when provided.</p>
             </div>
             <div className="flex items-center gap-2"><SubmitButton label="Update link" pendingLabel="Updating..." /><SaveStatus /></div>
           </form>
@@ -133,6 +104,10 @@ export default async function EditorIntegrationFilesPage({ searchParams }: { sea
             <div className="flex items-center gap-3 flex-wrap mt-1">
               <label className="text-sm"><input type="checkbox" name="tags" value="refscope:open" className="mr-2" /> Open Icecat</label>
               <label className="text-sm"><input type="checkbox" name="tags" value="refscope:full" className="mr-2" /> Full Icecat</label>
+            </div>
+            <div className="mt-3">
+              <label className="block text-sm mb-1">Details (shown on user page)</label>
+              <textarea name="note" rows={3} className="w-full rounded-xl border px-3 py-2 text-sm" placeholder="Optional guidance for this file" />
             </div>
           </div>
           <div className="flex items-center gap-2"><SubmitButton label="Add link" pendingLabel="Adding..." /><SaveStatus /></div>
@@ -195,3 +170,10 @@ function hasTag(m: any, t: string) {
   try { return Array.isArray(m.tags) && m.tags.includes(t) } catch { return false }
 }
 
+function getNote(tags: string[] = []): string {
+  try {
+    const t = (tags || []).find(t => typeof t === 'string' && t.startsWith('note:'))
+    if (!t) return ''
+    return decodeURIComponent(t.slice('note:'.length))
+  } catch { return '' }
+}

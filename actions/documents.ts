@@ -13,7 +13,13 @@ export async function createDocument(formData: FormData) {
 
   const title = String(formData.get('title') || '').trim()
   let filePath = String(formData.get('path') || '').trim()
-  const tags = (formData.getAll('tags') || []).map(String)
+  let tags = (formData.getAll('tags') || []).map(String)
+  const noteRaw = String(formData.get('note') || '').trim()
+  if (noteRaw) {
+    // Remove any prior note: entries from provided tags
+    tags = tags.filter(t => !t.startsWith('note:'))
+    tags.push(`note:${encodeURIComponent(noteRaw)}`)
+  }
   const file = formData.get('file') as any as File | null
 
   if (file && typeof file === 'object' && 'arrayBuffer' in file && (file as any).size > 0) {
@@ -46,11 +52,34 @@ export async function updateDocument(formData: FormData) {
   const id = String(formData.get('id') || '')
   const title = String(formData.get('title') || '').trim()
   const pathVal = String(formData.get('path') || '').trim()
+  const tagsInput = (formData.getAll('tags') || []).map(String)
+  const noteRaw = String(formData.get('note') || '').trim()
   if (!id) throw new Error('Missing id')
+  // Compute tags to update only if tagsInput provided or noteRaw present
+  let setTags: string[] | undefined
+  if (tagsInput.length > 0 || formData.has && (formData as any).has('note') || noteRaw) {
+    // Load current tags
+    let current: string[] = []
+    try {
+      const rec: any = await (db as any).documentFile.findUnique({ where: { id }, select: { tags: true } })
+      current = rec?.tags || []
+    } catch {
+      try {
+        const rec: any = await db.upload.findUnique({ where: { id }, select: { tags: true } as any })
+        current = rec?.tags || []
+      } catch {}
+    }
+    const base = tagsInput.length > 0 ? tagsInput : current
+    const withoutNote = base.filter(t => !t.startsWith('note:'))
+    setTags = [...withoutNote]
+    if (noteRaw) setTags.push(`note:${encodeURIComponent(noteRaw)}`)
+  }
+  const data: any = { ...(title?{title}:{}) , ...(pathVal?{path:pathVal}:{}) }
+  if (setTags) data.tags = setTags
   try {
-    await (db as any).documentFile.update({ where: { id }, data: { ...(title?{title}:{}) , ...(pathVal?{path:pathVal}:{}) } })
+    await (db as any).documentFile.update({ where: { id }, data })
   } catch {
-    await db.upload.update({ where: { id }, data: { ...(title?{title}:{}) , ...(pathVal?{path:pathVal}:{}) } })
+    await db.upload.update({ where: { id }, data })
   }
   revalidatePath('/documents')
   revalidatePath('/admin/documents')
