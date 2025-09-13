@@ -227,16 +227,16 @@ export default function WizardClient() {
           {(singleResult || singleError) && (
             <div className="md:col-span-3 grid gap-2">
               {singleResult && (
-                <div className="inline-block max-w-full rounded-xl border border-emerald-800 bg-emerald-700 text-white text-sm px-3 py-2">
+                <div className="inline-block max-w-full rounded-xl border border-emerald-200 bg-emerald-50 text-emerald-900 dark:border-emerald-700 dark:bg-emerald-800 dark:text-white text-sm px-3 py-2">
                   <div className="flex items-center gap-2">
                     <Download className="h-4 w-4" />
-                    <a className="underline text-white" href={singleResult} download>
+                    <a className="underline" href={singleResult} download>
                       {singleFmt === 'JSON' ? 'Download the JSON' : 'Download the XML'}
                     </a>
                   </div>
                   {singleUrl && (
                     <div className="pl-6 grid gap-1 mt-1">
-                      <a className="underline text-white break-all" href={singleUrl} target="_blank" rel="noreferrer">
+                      <a className="underline break-all" href={singleUrl} target="_blank" rel="noreferrer">
                         API link
                       </a>
                     </div>
@@ -350,19 +350,19 @@ export default function WizardClient() {
               </div>
                 {batchResult && (
                   <div className="md:col-span-3 grid gap-2">
-                    <div className="inline-block max-w-full rounded-xl border border-emerald-800 bg-emerald-700 text-white text-sm px-3 py-2">
+                    <div className="inline-block max-w-full rounded-xl border border-emerald-200 bg-emerald-50 text-emerald-900 dark:border-emerald-700 dark:bg-emerald-800 dark:text-white text-sm px-3 py-2">
                       <div className="flex items-center gap-2">
                         <Download className="h-4 w-4" />
-                        <a className="underline text-white" href={batchResult.path} download>Download ZIP</a>
+                        <a className="underline" href={batchResult.path} download>Download ZIP</a>
                       </div>
                       <div className="pl-6 grid gap-1 mt-1">
                         {batchResult.errorsXlsx && (
-                          <a className="inline-flex items-center gap-2 underline text-white" href={batchResult.errorsXlsx} download>
+                          <a className="inline-flex items-center gap-2 underline" href={batchResult.errorsXlsx} download>
                             <FileText className="h-4 w-4" /> Error logs (XLSX)
                           </a>
                         )}
                         {batchResult.linksXlsx && (
-                          <a className="inline-flex items-center gap-2 underline text-white" href={batchResult.linksXlsx} download>
+                          <a className="inline-flex items-center gap-2 underline" href={batchResult.linksXlsx} download>
                             <Link2 className="h-4 w-4" /> Links (XLSX)
                           </a>
                         )}
