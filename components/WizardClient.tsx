@@ -253,33 +253,26 @@ export default function WizardClient() {
             </form>
           ) : (
             <>
-              <div className="rounded-xl border bg-white p-3 text-sm overflow-auto">
-                <div className="font-medium mb-2">Preview (first 2 rows)</div>
-                {batchError && (
-                  <div className="mb-2 rounded-xl border border-red-200 bg-red-50 text-red-900 text-sm px-3 py-2">
-                    {batchError}
-                    {batchError.includes('Missing App Key') && (
-                      <>
-                        <span className="mx-2">—</span>
-                        <a href="/profile" className="underline">Go to Profile</a>
-                      </>
-                    )}
+              <div className="rounded-xl border bg-white text-sm min-w-0">
+                <div className="px-3 py-2 text-xs text-slate-500 border-b border-[hsl(var(--muted))]">Preview (first 2 rows)</div>
+                <div className="p-3 max-h-[70vh] overflow-auto overscroll-contain">
+                  <div className="overflow-x-auto">
+                    <table className="table-auto text-sm min-w-max">
+                      <thead>
+                        <tr>
+                          {batchPreview.headers.map((h,i)=>(<th key={i} className="px-2 py-1 text-left whitespace-nowrap">{h||`Col ${i+1}`}</th>))}
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {batchPreview.rows.map((r,ri)=>(
+                          <tr key={ri}>
+                            {batchPreview.headers.map((_,ci)=>(<td key={ci} className="px-2 py-1 whitespace-nowrap">{String(r[ci] ?? '')}</td>))}
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
                   </div>
-                )}
-                <table className="table-auto text-sm">
-                  <thead>
-                    <tr>
-                      {batchPreview.headers.map((h,i)=>(<th key={i} className="px-2 py-1 text-left">{h||`Col ${i+1}`}</th>))}
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {batchPreview.rows.map((r,ri)=>(
-                      <tr key={ri}>
-                        {batchPreview.headers.map((_,ci)=>(<td key={ci} className="px-2 py-1">{String(r[ci] ?? '')}</td>))}
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
+                </div>
               </div>
               <form action={onRunBatch} className="grid md:grid-cols-3 gap-3 items-end mt-3">
                 <div>
