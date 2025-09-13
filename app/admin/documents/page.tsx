@@ -1,6 +1,7 @@
 import Link from "next/link"
 import { db } from "@/lib/db"
 import { createDocument, updateDocument } from "@/actions/documents"
+import { syncRefsFromFrostKitty } from "@/actions/refs"
 import { SubmitButton, SaveStatus } from "@/components/FormSaveControls"
 
 const DOC_TAGS = [
@@ -61,6 +62,10 @@ export default async function AdminDocumentsPage({ searchParams }: { searchParam
             <Link key={t} className={`tag-chip ${tag===t? 'tag-chip--active':''}`} href={`/admin/documents?tag=${encodeURIComponent(t)}`}>{t}</Link>
           ))}
         </div>
+        <form action={async () => { 'use server'; await syncRefsFromFrostKitty() }} className="mt-3">
+          <SubmitButton label="Sync Icecat Refs (Index + Reference Files)" pendingLabel="Syncing..." />
+          <SaveStatus className="ml-2" />
+        </form>
         {editing && (
           <form action={async (fd: FormData) => { 'use server'; await updateDocument(fd) }} className="grid gap-3 md:grid-cols-6 items-end mt-4">
             <input type="hidden" name="id" defaultValue={editing.id} />
