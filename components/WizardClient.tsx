@@ -237,7 +237,7 @@ export default function WizardClient() {
           {(singleResult || singleError) && (
             <div className="md:col-span-3 grid gap-2">
               {singleResult && (
-                <div className="rounded-xl border border-emerald-800 bg-emerald-700 text-white text-sm px-3 py-2">
+                <div className="inline-block max-w-full rounded-xl border border-emerald-800 bg-emerald-700 text-white text-sm px-3 py-2">
                   <div className="flex items-center gap-2">
                     <Download className="h-4 w-4" />
                     <a className="underline text-white" href={singleResult} download>
@@ -254,7 +254,7 @@ export default function WizardClient() {
                 </div>
               )}
               {singleError && (
-                <div className="rounded-xl border border-red-200 bg-red-50 text-red-900 text-sm px-3 py-2">
+                <div className="inline-block max-w-full rounded-xl border border-red-200 bg-red-50 text-red-900 text-sm px-3 py-2">
                   {singleError}
                 </div>
               )}
@@ -360,7 +360,7 @@ export default function WizardClient() {
               </div>
                 {batchResult && (
                   <div className="md:col-span-3 grid gap-2">
-                    <div className="rounded-xl border border-emerald-800 bg-emerald-700 text-white text-sm px-3 py-2">
+                    <div className="inline-block max-w-full rounded-xl border border-emerald-800 bg-emerald-700 text-white text-sm px-3 py-2">
                       <div className="flex items-center gap-2">
                         <Download className="h-4 w-4" />
                         <a className="underline text-white" href={batchResult.path} download>Download ZIP</a>
@@ -379,7 +379,7 @@ export default function WizardClient() {
                       </div>
                     </div>
                     {batchResult.metrics && (
-                      <div className="rounded-xl border border-blue-200 bg-blue-50 text-blue-900 text-sm px-3 py-2">
+                      <div className="inline-block max-w-full rounded-xl border border-blue-200 bg-blue-50 text-blue-900 text-sm px-3 py-2">
                         <div>
                           Coverage: <span className="text-green-700 font-medium">{batchResult.metrics.success}/{batchResult.metrics.totalRows} matched ({batchResult.metrics.successRate}%)</span>
                         </div>
