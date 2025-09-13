@@ -8,9 +8,12 @@ const DOC_TAGS = [
   'Reference File',
 ] as const
 
-export default async function DocumentsPage({ searchParams }: { searchParams?: { tag?: string } }) {
+export default async function DocumentsPage({ searchParams }: { searchParams?: { tag?: string; ref?: string } }) {
   const tag = (searchParams?.tag || '').toString()
+  const ref = (searchParams?.ref || '').toString().toLowerCase()
   const where: any = tag ? { tags: { has: tag } } : {}
+  if (ref === 'open') where.tags = { hasEvery: [tag || 'Reference File', 'refscope:open'] }
+  if (ref === 'full') where.tags = { hasEvery: [tag || 'Reference File', 'refscope:full'] }
   let items: any[] = []
   try {
     items = await (db as any).documentFile.findMany({ where, orderBy: { title: 'asc' } })
@@ -48,6 +51,9 @@ export default async function DocumentsPage({ searchParams }: { searchParams?: {
         {DOC_TAGS.map((t) => (
           <Link key={t} className={`tag-chip ${tag===t? 'tag-chip--active':''}`} href={`/documents?tag=${encodeURIComponent(t)}`}>{t}</Link>
         ))}
+        <span className="ml-2 text-xs text-neutral-500">Reference scope:</span>
+        <Link className={`tag-chip ${ref==='open'? 'tag-chip--active':''}`} href={`/documents?tag=${encodeURIComponent('Reference File')}&ref=open`}>Open Icecat</Link>
+        <Link className={`tag-chip ${ref==='full'? 'tag-chip--active':''}`} href={`/documents?tag=${encodeURIComponent('Reference File')}&ref=full`}>Full Icecat</Link>
       </div>
 
       <section className="max-w-5xl">
@@ -81,7 +87,7 @@ export default async function DocumentsPage({ searchParams }: { searchParams?: {
                 {byGroup[group].map((m: any) => (
                   <tr key={m.id} className="align-middle">
                     <td className="py-2 px-3 text-sm font-normal text-neutral-900">{m.title}</td>
-                    <td className="py-2 px-3 border-l border-[hsl(var(--border))] whitespace-nowrap text-neutral-700">{m.path?.startsWith('/uploads/') ? 'Attachment' : 'Link'}</td>
+                    <td className="py-2 px-3 border-l border-[hsl(var(--border))] whitespace-nowrap text-neutral-700">{fmtType(m.path, m.path?.startsWith('/uploads/'))}</td>
                     <td className="py-2 px-3 border-l border-[hsl(var(--border))] whitespace-nowrap">
                       {m.path?.startsWith('/uploads/') ? (
                         <a className="underline font-medium" href={m.path} target="_blank" rel="noreferrer">Preview</a>
@@ -98,4 +104,15 @@ export default async function DocumentsPage({ searchParams }: { searchParams?: {
       ))}
     </div>
   )
+}
+
+function fmtType(path: string, isAttachment: boolean) {
+  const base = isAttachment ? 'Attachment' : 'Link'
+  try {
+    const name = (path || '').split('/').pop() || ''
+    const noGz = name.replace(/\.gz$/i, '')
+    const ext = (noGz.split('.').pop() || '').toUpperCase()
+    if (ext) return `${base} (${ext})`
+    return base
+  } catch { return base }
 }

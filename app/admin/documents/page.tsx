@@ -1,6 +1,7 @@
 import Link from "next/link"
 import { db } from "@/lib/db"
 import { createDocument, updateDocument } from "@/actions/documents"
+import { syncRefsFromIcecat } from "@/actions/refs"
 import { syncRefsFromFrostKitty } from "@/actions/refs"
 import { SubmitButton, SaveStatus } from "@/components/FormSaveControls"
 
@@ -64,10 +65,16 @@ export default async function AdminDocumentsPage({ searchParams }: { searchParam
             <Link key={t} className={`tag-chip ${tag===t? 'tag-chip--active':''}`} href={`/admin/documents?tag=${encodeURIComponent(t)}`}>{t}</Link>
           ))}
         </div>
-        <form action={async () => { 'use server'; await syncRefsFromFrostKitty() }} className="mt-3">
-          <SubmitButton label="Sync Icecat Refs (Index + Reference Files)" pendingLabel="Syncing..." />
-          <SaveStatus className="ml-2" />
-        </form>
+        <div className="mt-3 flex flex-wrap gap-3">
+          <form action={async () => { 'use server'; await syncRefsFromFrostKitty() }}>
+            <SubmitButton label="Sync Frost-Kitty (Index/Reference)" pendingLabel="Syncing..." />
+            <SaveStatus className="ml-2" />
+          </form>
+          <form action={async () => { 'use server'; await syncRefsFromIcecat() }}>
+            <SubmitButton label="Import Icecat Reference Files (Open & Full)" pendingLabel="Importing..." />
+            <SaveStatus className="ml-2" />
+          </form>
+        </div>
         {editing && (
           <form action={async (fd: FormData) => { 'use server'; await updateDocument(fd) }} className="grid gap-3 md:grid-cols-6 items-end mt-4">
             <input type="hidden" name="id" defaultValue={editing.id} />
@@ -100,6 +107,11 @@ export default async function AdminDocumentsPage({ searchParams }: { searchParam
               {DOC_TAGS.map((t) => (
                 <label key={t} className="text-sm"><input type="checkbox" name="tags" value={t} className="mr-2" /> {t}</label>
               ))}
+            </div>
+            <div className="mt-2 text-xs text-neutral-600">If you select "Reference File", you can optionally add a scope:</div>
+            <div className="flex items-center gap-3 flex-wrap mt-1">
+              <label className="text-sm"><input type="checkbox" name="tags" value="refscope:open" className="mr-2" /> Open Icecat</label>
+              <label className="text-sm"><input type="checkbox" name="tags" value="refscope:full" className="mr-2" /> Full Icecat</label>
             </div>
           </div>
           <div className="md:col-span-3">
