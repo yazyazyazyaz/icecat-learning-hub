@@ -253,11 +253,11 @@ export default function WizardClient() {
             </form>
           ) : (
             <>
-              <div className="rounded-xl border bg-white text-sm min-w-0">
+              <div className="rounded-xl border bg-white text-sm min-w-0 w-full max-w-full overflow-hidden">
                 <div className="px-3 py-2 text-xs text-slate-500 border-b border-[hsl(var(--muted))]">Preview (first 2 rows)</div>
-                <div className="p-3 max-h-[70vh] overflow-auto overscroll-contain">
-                  <div className="overflow-x-auto">
-                    <table className="table-auto text-sm min-w-max">
+                <div className="p-3 max-h-[70vh] overflow-y-auto overscroll-contain w-full max-w-full">
+                  <div className="overflow-x-auto w-full max-w-full">
+                    <table className="table-auto text-sm w-max">
                       <thead>
                         <tr>
                           {batchPreview.headers.map((h,i)=>(<th key={i} className="px-2 py-1 text-left whitespace-nowrap">{h||`Col ${i+1}`}</th>))}
