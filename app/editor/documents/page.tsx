@@ -12,6 +12,11 @@ export default async function EditorDocumentsPage({ searchParams }: { searchPara
   const tag = (searchParams?.tag || '').toString()
   const editId = (searchParams?.edit || '').toString()
   const where: any = tag ? { tags: { has: tag } } : {}
+  // Exclude Integration Files from Documents editor
+  where.NOT = [
+    { tags: { has: 'Index File' } },
+    { tags: { has: 'Reference File' } },
+  ]
   let items: any[] = []
   try {
     items = await (db as any).documentFile.findMany({ where, orderBy: { updatedAt: 'desc' } })
@@ -147,4 +152,3 @@ export default async function EditorDocumentsPage({ searchParams }: { searchPara
     </div>
   )
 }
-

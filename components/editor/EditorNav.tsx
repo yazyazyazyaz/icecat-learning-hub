@@ -7,6 +7,7 @@ import { cn } from "@/lib/utils"
 const items = [
   { href: "/editor/presentations", label: "Presentations" },
   { href: "/editor/documents", label: "Documents" },
+  { href: "/editor/integration", label: "Integration Files" },
   { href: "/editor/manuals", label: "Manuals" },
   { href: "/editor/onboarding", label: "Onboarding" },
   { href: "/editor/quizzes", label: "Quizzes" },
