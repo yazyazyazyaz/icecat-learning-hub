@@ -1,0 +1,415 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE ICECAT-interface SYSTEM "https://data.icecat.biz/dtd/ICECAT-interface_response.dtd">
+<!--source: Icecat.biz 2025-->
+<!--Language ID: 1-->
+<!--Version: v2-->
+<ICECAT-interface xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="https://data.icecat.biz/xsd/ICECAT-interface_response.xsd">
+ <Product Code="1" HighPic="https://inishop.com/img/gallery/fd7a7906800510d6a5c988b307b9222d36778f28.jpg" HighPicHeight="1553" HighPicSize="434122" HighPicWidth="954" ID="101927780" LowPic="https://inishop.com/img/gallery_lows/9736f55126873aafb25a54dfd82387f00c8a2647.jpg" LowPicHeight="200" LowPicSize="19499" LowPicWidth="123" Name="c/d Multicare Chicken Flavor Dog Food" IntName="10012" LocalName="c/d Multicare Chicken Flavor Dog Food" Pic500x500="https://inishop.com/img/gallery_mediums/a1d25a455b1aa2f1f8747ab8325dfcb0277f3002.jpg" Pic500x500Height="500" Pic500x500Size="76296" Pic500x500Width="307" Prod_id="10012" Quality="ICECAT" ReleaseDate="" ThumbPic="https://inishop.com/img/gallery_thumbs/82627f5923fc7631180d1689224f16fa1e9e17a4.jpg" ThumbPicSize="4694" Title="Hills c/d Multicare Chicken Flavor Dog Food" GeneratedIntTitle="Hills 10012 dogs dry food" GeneratedLocalTitle="Hills 10012 dogs dry food 12 kg Adult" BrandLocalTitle="Hills c/d Multicare Chicken Flavor Dog Food">
+  <CategoryFeatureGroup ID="66197" No="0">
+   <FeatureGroup ID="0">
+    <Name ID="5073" langid="1" Value="Technical details"/>
+   </FeatureGroup>
+  </CategoryFeatureGroup>
+  <CategoryFeatureGroup ID="47998" No="6">
+   <FeatureGroup ID="14">
+    <Name ID="5023" langid="1" Value="Weight &amp; dimensions"/>
+   </FeatureGroup>
+  </CategoryFeatureGroup>
+  <CategoryFeatureGroup ID="45590" No="0">
+   <FeatureGroup ID="76">
+    <Name ID="28540" langid="1" Value="Certificates"/>
+   </FeatureGroup>
+  </CategoryFeatureGroup>
+  <CategoryFeatureGroup ID="51549" No="0">
+   <FeatureGroup ID="116">
+    <Name ID="78852" langid="1" Value="Packaging content"/>
+   </FeatureGroup>
+  </CategoryFeatureGroup>
+  <CategoryFeatureGroup ID="57502" No="0">
+   <FeatureGroup ID="143">
+    <Name ID="618812" langid="1" Value="Battery"/>
+   </FeatureGroup>
+  </CategoryFeatureGroup>
+  <CategoryFeatureGroup ID="13305" No="10">
+   <FeatureGroup ID="185">
+    <Name ID="1219853" langid="1" Value="Features"/>
+   </FeatureGroup>
+  </CategoryFeatureGroup>
+  <CategoryFeatureGroup ID="39141" No="-1">
+   <FeatureGroup ID="198">
+    <Name ID="1788927" langid="1" Value="Logistics data"/>
+   </FeatureGroup>
+  </CategoryFeatureGroup>
+  <CategoryFeatureGroup ID="22475" No="8">
+   <FeatureGroup ID="200">
+    <Name ID="2069494" langid="1" Value="Nutrition facts"/>
+   </FeatureGroup>
+  </CategoryFeatureGroup>
+  <CategoryFeatureGroup ID="64094" No="0">
+   <FeatureGroup ID="232">
+    <Name ID="3464238" langid="1" Value="Supplier features"/>
+   </FeatureGroup>
+  </CategoryFeatureGroup>
+  <Category ID="3398">
+   <Name ID="3729913" langid="1" Value="Dogs Dry Food"/>
+  </Category>
+  <EANCode EAN="0052742000213" Format="GTIN-13" IsApproved="1"/>
+  <EANCode EAN="052742000213" Format="GTIN-12" IsApproved="1"/>
+  <ReleaseDate/>
+  <EndOfLifeDate/>
+  <ReasonsToBuy/>
+  <BulletPoints/>
+  <GeneratedBulletPoints/>
+  <ProductBundled/>
+  <ProductDescription ID="88432941" LongDesc="Bladder stones are collections of mineral crystals that combine together in the urinary tract. They can cause discomfort and lead to more serious problems that require the care of a veterinarian.&lt;br&gt;&lt;br&gt;Hill's nutritionists &amp; veterinarians developed Prescription Diet c/d Multicare clinical nutrition specially formulated to support a dog's urinary health and reduce the risk of struvite and calcium oxalate stones. This dry food has an irresistible chicken flavor that dogs will love.&lt;br&gt;&lt;br&gt;&lt;b&gt;How it works:&lt;/b&gt;&lt;br&gt;- Helps lower concentration of buidling blocks for bladder stones&lt;br&gt;- Controlled calcium, low sodium, &amp; added potassium citrate&lt;br&gt;- Fortified with Omega-3 fatty acids to support urinary health&lt;br&gt;- &lt;br&gt;&lt;b&gt;How it helps:&lt;/b&gt;&lt;br&gt;- Formulated to help dissolve struvite stones and lower recurrence risk&lt;br&gt;- Lowers risk for formation and recurrence of calcium oxalate stones&lt;br&gt;- Helps nourish and maintain a healthy bladder&lt;br&gt;- S+OXSHIELD: Formulated to promote a urinary environment that reduces the risk of developing struvite &amp; calcium oxalate crystals&lt;br&gt;- Recommended for lifelong feeding of adult dogs&lt;br&gt;&lt;br&gt;Hill's Prescription Diet c/d Multicare Chicken Flavor Dry Dog Food is a complete and balanced food that provides all the nutrition a dog needs. Please consult your veterinarian for further information on how our Prescription Diet foods can help a dog to continue to enjoy a happy and active life." ManualPDFSize="0" ManualPDFURL="" MiddleDesc="" PDFSize="0" PDFURL="" ShortDesc="c/d Multicare Chicken Flavor Dry Dog Food, 12kg" URL="https://www.hillspet.com/dog-food/pd-cd-multicare-canine-dry" WarrantyInfo="" langid="1"/>
+  <ProductFeature Localized="0" ID="503326873" Local_ID="0" Value="Adult (animal)" CategoryFeature_ID="122907" CategoryFeatureGroup_ID="13305" No="10100020" Optional="0" Presentation_Value="Adult" Translated="1" Mandatory="1" Searchable="1">
+   <LocalValue Value="Adult">
+    <Measure ID="29">
+     <Signs/>
+    </Measure>
+   </LocalValue>
+   <Feature ID="20700">
+    <Measure ID="29" Sign="">
+     <Signs/>
+    </Measure>
+    <Name ID="1627742" langid="1" Value="Pet life stage"/>
+   </Feature>
+  </ProductFeature>
+  <ProductFeature Localized="0" ID="503326860" Local_ID="0" Value="Chicken" CategoryFeature_ID="122918" CategoryFeatureGroup_ID="13305" No="10100017" Optional="0" Presentation_Value="Chicken" Translated="1" Mandatory="1" Searchable="1">
+   <LocalValue Value="Chicken">
+    <Measure ID="29">
+     <Signs/>
+    </Measure>
+   </LocalValue>
+   <Feature ID="20702">
+    <Measure ID="29" Sign="">
+     <Signs/>
+    </Measure>
+    <Name ID="1628031" langid="1" Value="Pet food flavor"/>
+   </Feature>
+  </ProductFeature>
+  <ProductFeature Localized="0" ID="503326861" Local_ID="0" Value="12000" CategoryFeature_ID="189213" CategoryFeatureGroup_ID="13305" No="100200" Optional="0" Presentation_Value="12 kg" Translated="0" Mandatory="1" Searchable="0">
+   <LocalValue Value="12">
+    <Measure ID="17">
+     <Signs>
+      <Sign ID="15505" langid="1"><![CDATA[kg]]></Sign>
+     </Signs>
+    </Measure>
+   </LocalValue>
+   <Feature ID="94">
+    <Measure ID="38" Sign="">
+     <Signs>
+      <Sign ID="22" langid="1"><![CDATA[g]]></Sign>
+     </Signs>
+    </Measure>
+    <Name ID="1525" langid="1" Value="Weight"/>
+   </Feature>
+  </ProductFeature>
+  <ProductFeature Localized="0" ID="835124685" Local_ID="0" Value="Urinary tract control" CategoryFeature_ID="122915" CategoryFeatureGroup_ID="13305" No="100185" Optional="0" Presentation_Value="Urinary tract control" Translated="1" Mandatory="0" Searchable="0">
+   <LocalValue Value="Urinary tract control">
+    <Measure ID="29">
+     <Signs/>
+    </Measure>
+   </LocalValue>
+   <Feature ID="20701">
+    <Measure ID="29" Sign="">
+     <Signs/>
+    </Measure>
+    <Name ID="1627854" langid="1" Value="Pet specific needs"/>
+   </Feature>
+  </ProductFeature>
+  <ProductFeature Localized="0" ID="835124690" Local_ID="0" Value="Omega-3,Vitamin A,Vitamin D,Vitamin E" CategoryFeature_ID="201495" CategoryFeatureGroup_ID="13305" No="100175" Optional="0" Presentation_Value="Omega-3, Vitamin A, Vitamin D, Vitamin E" Translated="1" Mandatory="0" Searchable="0">
+   <LocalValue Value="Omega-3, Vitamin A, Vitamin D, Vitamin E">
+    <Measure ID="29">
+     <Signs/>
+    </Measure>
+   </LocalValue>
+   <Feature ID="26607">
+    <Measure ID="29" Sign="">
+     <Signs/>
+    </Measure>
+    <Name ID="2282139" langid="1" Value="Includes vitamins"/>
+   </Feature>
+  </ProductFeature>
+  <ProductFeature Localized="0" ID="835124749" Local_ID="0" Value="Bladder treatment" CategoryFeature_ID="218723" CategoryFeatureGroup_ID="13305" No="100173" Optional="0" Presentation_Value="Bladder treatment" Translated="1" Mandatory="0" Searchable="0">
+   <LocalValue Value="Bladder treatment">
+    <Measure ID="29">
+     <Signs/>
+    </Measure>
+   </LocalValue>
+   <Feature ID="32454">
+    <Measure ID="29" Sign="">
+     <Signs/>
+    </Measure>
+    <Name ID="3330153" langid="1" Value="Health effects"/>
+   </Feature>
+  </ProductFeature>
+  <ProductFeature Localized="1" ID="0" Local_ID="548707121" Value="" CategoryFeature_ID="694052" CategoryFeatureGroup_ID="13305" No="100017" Optional="0" Presentation_Value="Whole Grain Corn, Brewers Rice, Chicken Meal, Chicken Fat, Corn Protein Meal, Soybean Meal, Egg Product, Chicken Liver Flavor, Soybean Oil, Flaxseed, Pork Liver Flavor, Lactic Acid, L-Lysine, Calcium Sulfate, Fish Oil, Potassium Chloride, Iodized Salt, Choline Chloride, Potassium Citrate, vitamins (Vitamin E Supplement, Niacin Supplement, Thiamine Mononitrate, Calcium Pantothenate, Pyridoxine Hydrochloride, Vitamin A Supplement, Biotin, Riboflavin Supplement, Vitamin B12 Supplement, Folic Acid, Vitamin D3 Supplement), Taurine, minerals (Ferrous Sulfate, Zinc Oxide, Copper Sulfate, Manganous Oxide, Calcium Iodate, Sodium Selenite), Mixed Tocopherols for freshness, L-Carnitine, Natural Flavors, Beta-Carotene" Translated="1" Mandatory="0" Searchable="0">
+   <LocalValue Value="Whole Grain Corn, Brewers Rice, Chicken Meal, Chicken Fat, Corn Protein Meal, Soybean Meal, Egg Product, Chicken Liver Flavor, Soybean Oil, Flaxseed, Pork Liver Flavor, Lactic Acid, L-Lysine, Calcium Sulfate, Fish Oil, Potassium Chloride, Iodized Salt, Choline Chloride, Potassium Citrate, vitamins (Vitamin E Supplement, Niacin Supplement, Thiamine Mononitrate, Calcium Pantothenate, Pyridoxine Hydrochloride, Vitamin A Supplement, Biotin, Riboflavin Supplement, Vitamin B12 Supplement, Folic Acid, Vitamin D3 Supplement), Taurine, minerals (Ferrous Sulfate, Zinc Oxide, Copper Sulfate, Manganous Oxide, Calcium Iodate, Sodium Selenite), Mixed Tocopherols for freshness, L-Carnitine, Natural Flavors, Beta-Carotene">
+    <Measure ID="29">
+     <Signs/>
+    </Measure>
+   </LocalValue>
+   <Feature ID="16908">
+    <Measure ID="29" Sign="">
+     <Signs/>
+    </Measure>
+    <Name ID="1216897" langid="1" Value="Ingredients"/>
+   </Feature>
+  </ProductFeature>
+  <ProductFeature Localized="1" ID="0" Local_ID="554059062" Value="" CategoryFeature_ID="694053" CategoryFeatureGroup_ID="13305" No="100016" Optional="0" Presentation_Value="Ask your veterinarian for specific feeding instructions for your pet. Daily Feeding Recommendations are only a guide and a place to start.Grams are the most accurate form of measurement; cups are estimated from grams.&#10;&#10;For best results:&#10;&#10;Gradually transition to this new food for 7 days or more&#10;Exclusively feed the recommended Prescription Diet dry and wet foods&#10;Keep fresh water available at all times&#10;Have your veterinarian monitor your pet's condition&#10;To prevent suffocation, keep the packaging out of the reach of pets &amp; children&#10;To increase chances of a successful outcome, continue feeding the food long-term as recommended by your veterinarian" Translated="1" Mandatory="0" Searchable="0">
+   <LocalValue Value="Ask your veterinarian for specific feeding instructions for your pet. Daily Feeding Recommendations are only a guide and a place to start.Grams are the most accurate form of measurement; cups are estimated from grams.&#10;&#10;For best results:&#10;&#10;Gradually transition to this new food for 7 days or more&#10;Exclusively feed the recommended Prescription Diet dry and wet foods&#10;Keep fresh water available at all times&#10;Have your veterinarian monitor your pet's condition&#10;To prevent suffocation, keep the packaging out of the reach of pets &amp; children&#10;To increase chances of a successful outcome, continue feeding the food long-term as recommended by your veterinarian">
+    <Measure ID="29">
+     <Signs/>
+    </Measure>
+   </LocalValue>
+   <Feature ID="43103">
+    <Measure ID="29" Sign="">
+     <Signs/>
+    </Measure>
+    <Name ID="7382511" langid="1" Value="Feeding instruction"/>
+   </Feature>
+  </ProductFeature>
+  <ProductFeature Localized="0" ID="835124271" Local_ID="0" Value="22.3" CategoryFeature_ID="122923" CategoryFeatureGroup_ID="22475" No="100100" Optional="0" Presentation_Value="22.3%" Translated="0" Mandatory="0" Searchable="0">
+   <LocalValue Value="22.3">
+    <Measure ID="64">
+     <Signs>
+      <Sign ID="47" langid="1"><![CDATA[%]]></Sign>
+     </Signs>
+    </Measure>
+   </LocalValue>
+   <Feature ID="20705">
+    <Measure ID="64" Sign="">
+     <Signs>
+      <Sign ID="47" langid="1"><![CDATA[%]]></Sign>
+     </Signs>
+    </Measure>
+    <Name ID="1628181" langid="1" Value="Protein"/>
+   </Feature>
+  </ProductFeature>
+  <ProductFeature Localized="0" ID="835124272" Local_ID="0" Value="17.2" CategoryFeature_ID="122924" CategoryFeatureGroup_ID="22475" No="100100" Optional="0" Presentation_Value="17.2%" Translated="0" Mandatory="0" Searchable="0">
+   <LocalValue Value="17.2">
+    <Measure ID="64">
+     <Signs>
+      <Sign ID="47" langid="1"><![CDATA[%]]></Sign>
+     </Signs>
+    </Measure>
+   </LocalValue>
+   <Feature ID="20706">
+    <Measure ID="64" Sign="">
+     <Signs>
+      <Sign ID="47" langid="1"><![CDATA[%]]></Sign>
+     </Signs>
+    </Measure>
+    <Name ID="1628246" langid="1" Value="Fat content"/>
+   </Feature>
+  </ProductFeature>
+  <ProductFeature Localized="0" ID="835124341" Local_ID="0" Value="1.5" CategoryFeature_ID="122926" CategoryFeatureGroup_ID="22475" No="100100" Optional="0" Presentation_Value="1.5%" Translated="0" Mandatory="0" Searchable="0">
+   <LocalValue Value="1.5">
+    <Measure ID="64">
+     <Signs>
+      <Sign ID="47" langid="1"><![CDATA[%]]></Sign>
+     </Signs>
+    </Measure>
+   </LocalValue>
+   <Feature ID="20708">
+    <Measure ID="64" Sign="">
+     <Signs>
+      <Sign ID="47" langid="1"><![CDATA[%]]></Sign>
+     </Signs>
+    </Measure>
+    <Name ID="1628361" langid="1" Value="Crude fibres"/>
+   </Feature>
+  </ProductFeature>
+  <ProductFeature Localized="0" ID="835124345" Local_ID="0" Value="0.57" CategoryFeature_ID="201489" CategoryFeatureGroup_ID="22475" No="100100" Optional="0" Presentation_Value="0.57%" Translated="0" Mandatory="0" Searchable="0">
+   <LocalValue Value="0.57">
+    <Measure ID="64">
+     <Signs>
+      <Sign ID="47" langid="1"><![CDATA[%]]></Sign>
+     </Signs>
+    </Measure>
+   </LocalValue>
+   <Feature ID="30405">
+    <Measure ID="64" Sign="">
+     <Signs>
+      <Sign ID="47" langid="1"><![CDATA[%]]></Sign>
+     </Signs>
+    </Measure>
+    <Name ID="2876158" langid="1" Value="Phosphorus"/>
+   </Feature>
+  </ProductFeature>
+  <ProductFeature Localized="0" ID="835124343" Local_ID="0" Value="0.63" CategoryFeature_ID="201490" CategoryFeatureGroup_ID="22475" No="100100" Optional="0" Presentation_Value="0.63%" Translated="0" Mandatory="0" Searchable="0">
+   <LocalValue Value="0.63">
+    <Measure ID="64">
+     <Signs>
+      <Sign ID="47" langid="1"><![CDATA[%]]></Sign>
+     </Signs>
+    </Measure>
+   </LocalValue>
+   <Feature ID="30404">
+    <Measure ID="64" Sign="">
+     <Signs>
+      <Sign ID="47" langid="1"><![CDATA[%]]></Sign>
+     </Signs>
+    </Measure>
+    <Name ID="2876106" langid="1" Value="Calcium"/>
+   </Feature>
+  </ProductFeature>
+  <ProductFeature Localized="0" ID="835124379" Local_ID="0" Value="0.25" CategoryFeature_ID="201491" CategoryFeatureGroup_ID="22475" No="100100" Optional="0" Presentation_Value="0.25%" Translated="0" Mandatory="0" Searchable="0">
+   <LocalValue Value="0.25">
+    <Measure ID="64">
+     <Signs>
+      <Sign ID="47" langid="1"><![CDATA[%]]></Sign>
+     </Signs>
+    </Measure>
+   </LocalValue>
+   <Feature ID="30406">
+    <Measure ID="64" Sign="">
+     <Signs>
+      <Sign ID="47" langid="1"><![CDATA[%]]></Sign>
+     </Signs>
+    </Measure>
+    <Name ID="2876210" langid="1" Value="Sodium"/>
+   </Feature>
+  </ProductFeature>
+  <ProductFeature Localized="0" ID="835124406" Local_ID="0" Value="0.1" CategoryFeature_ID="204245" CategoryFeatureGroup_ID="22475" No="100097" Optional="0" Presentation_Value="0.1%" Translated="0" Mandatory="0" Searchable="0">
+   <LocalValue Value="0.1">
+    <Measure ID="64">
+     <Signs>
+      <Sign ID="47" langid="1"><![CDATA[%]]></Sign>
+     </Signs>
+    </Measure>
+   </LocalValue>
+   <Feature ID="30418">
+    <Measure ID="64" Sign="">
+     <Signs>
+      <Sign ID="47" langid="1"><![CDATA[%]]></Sign>
+     </Signs>
+    </Measure>
+    <Name ID="2877018" langid="1" Value="Magnesium content"/>
+   </Feature>
+  </ProductFeature>
+  <ProductFeature Localized="0" ID="835124350" Local_ID="0" Value="0.7" CategoryFeature_ID="205019" CategoryFeatureGroup_ID="22475" No="100094" Optional="0" Presentation_Value="0.7%" Translated="0" Mandatory="0" Searchable="0">
+   <LocalValue Value="0.7">
+    <Measure ID="64">
+     <Signs>
+      <Sign ID="47" langid="1"><![CDATA[%]]></Sign>
+     </Signs>
+    </Measure>
+   </LocalValue>
+   <Feature ID="30417">
+    <Measure ID="64" Sign="">
+     <Signs>
+      <Sign ID="47" langid="1"><![CDATA[%]]></Sign>
+     </Signs>
+    </Measure>
+    <Name ID="2876966" langid="1" Value="Potassium content"/>
+   </Feature>
+  </ProductFeature>
+  <ProductFeature Localized="0" ID="835962837" Local_ID="0" Value="3820" CategoryFeature_ID="205024" CategoryFeatureGroup_ID="22475" No="100088" Optional="0" Presentation_Value="3820 kcal/kg" Translated="0" Mandatory="0" Searchable="0">
+   <LocalValue Value="3820">
+    <Measure ID="315">
+     <Signs>
+      <Sign ID="21220" langid="1"><![CDATA[kcal/kg]]></Sign>
+     </Signs>
+    </Measure>
+   </LocalValue>
+   <Feature ID="30773">
+    <Measure ID="315" Sign="">
+     <Signs>
+      <Sign ID="21220" langid="1"><![CDATA[kcal/kg]]></Sign>
+     </Signs>
+    </Measure>
+    <Name ID="3053294" langid="1" Value="Metabolisable Energy (ME)"/>
+   </Feature>
+  </ProductFeature>
+  <ProductFeature Localized="0" ID="835125109" Local_ID="0" Value="363.8" CategoryFeature_ID="205025" CategoryFeatureGroup_ID="22475" No="100085" Optional="0" Presentation_Value="363.8 mg/kg" Translated="0" Mandatory="0" Searchable="0">
+   <LocalValue Value="363.8">
+    <Measure ID="395">
+     <Signs>
+      <Sign ID="31867" langid="1"><![CDATA[mg/kg]]></Sign>
+     </Signs>
+    </Measure>
+   </LocalValue>
+   <Feature ID="30774">
+    <Measure ID="395" Sign="">
+     <Signs>
+      <Sign ID="31867" langid="1"><![CDATA[mg/kg]]></Sign>
+     </Signs>
+    </Measure>
+    <Name ID="3053348" langid="1" Value="L-carnitine content"/>
+   </Feature>
+  </ProductFeature>
+  <ProductFeature Localized="0" ID="835125094" Local_ID="0" Value="11839" CategoryFeature_ID="205036" CategoryFeatureGroup_ID="22475" No="100055" Optional="0" Presentation_Value="11839 IU/kg" Translated="0" Mandatory="0" Searchable="0">
+   <LocalValue Value="11839">
+    <Measure ID="394">
+     <Signs>
+      <Sign ID="31813" langid="1"><![CDATA[IU/kg]]></Sign>
+     </Signs>
+    </Measure>
+   </LocalValue>
+   <Feature ID="30787">
+    <Measure ID="394" Sign="">
+     <Signs>
+      <Sign ID="31813" langid="1"><![CDATA[IU/kg]]></Sign>
+     </Signs>
+    </Measure>
+    <Name ID="3054050" langid="1" Value="Vitamin A content"/>
+   </Feature>
+  </ProductFeature>
+  <ProductFeature Localized="0" ID="835124509" Local_ID="0" Value="748" CategoryFeature_ID="205038" CategoryFeatureGroup_ID="22475" No="100049" Optional="0" Presentation_Value="748 mg/kg" Translated="0" Mandatory="0" Searchable="0">
+   <LocalValue Value="748">
+    <Measure ID="395">
+     <Signs>
+      <Sign ID="31867" langid="1"><![CDATA[mg/kg]]></Sign>
+     </Signs>
+    </Measure>
+   </LocalValue>
+   <Feature ID="30789">
+    <Measure ID="395" Sign="">
+     <Signs>
+      <Sign ID="31867" langid="1"><![CDATA[mg/kg]]></Sign>
+     </Signs>
+    </Measure>
+    <Name ID="3054158" langid="1" Value="Vitamin E content"/>
+   </Feature>
+  </ProductFeature>
+  <ProductFeature Localized="0" ID="835124530" Local_ID="0" Value="0.8" CategoryFeature_ID="810603" CategoryFeatureGroup_ID="22475" No="100010" Optional="0" Presentation_Value="0.8%" Translated="0" Mandatory="0" Searchable="0">
+   <LocalValue Value="0.8">
+    <Measure ID="64">
+     <Signs>
+      <Sign ID="47" langid="1"><![CDATA[%]]></Sign>
+     </Signs>
+    </Measure>
+   </LocalValue>
+   <Feature ID="31078">
+    <Measure ID="64" Sign="">
+     <Signs>
+      <Sign ID="47" langid="1"><![CDATA[%]]></Sign>
+     </Signs>
+    </Measure>
+    <Name ID="3098136" langid="1" Value="Omega-3 fatty acids"/>
+   </Feature>
+  </ProductFeature>
+  <ProductGallery>
+   <ProductPicture IsMain="Y" LowPic="https://inishop.com/img/gallery_lows/9736f55126873aafb25a54dfd82387f00c8a2647.jpg" LowPicHeight="200" LowPicWidth="123" LowSize="19499" No="1" Original="https://inishop.com/img/gallery_raw/101927780_9401900890.jpeg" OriginalSize="115909" Pic="https://inishop.com/img/gallery/fd7a7906800510d6a5c988b307b9222d36778f28.jpg" Pic500x500="https://inishop.com/img/gallery_mediums/a1d25a455b1aa2f1f8747ab8325dfcb0277f3002.jpg" Pic500x500Height="500" Pic500x500Size="76296" Pic500x500Width="307" PicHeight="1553" PicWidth="954" ProductPicture_ID="66961968" Size="434122" ThumbPic="https://inishop.com/img/gallery_thumbs/82627f5923fc7631180d1689224f16fa1e9e17a4.jpg" ThumbSize="4694" Type="ProductImage" UpdatedDate="2025-09-08 15:59:02"/>
+   <ProductPicture LowPic="https://inishop.com/img/gallery_lows/663a1d0f73821de42b39df7724e0d1656e5c8fcf.jpg" LowPicHeight="200" LowPicWidth="123" LowSize="19852" No="2" Original="https://inishop.com/img/gallery_raw/101927780_5713364985.jpeg" OriginalSize="169754" Pic="https://inishop.com/img/gallery/2ec3f17b670f11303cfd5ea25513369141a45995.jpg" Pic500x500="https://inishop.com/img/gallery_mediums/472dee9d440ee11764e992338c625b28c1c502c2.jpg" Pic500x500Height="500" Pic500x500Size="88630" Pic500x500Width="307" PicHeight="1552" PicWidth="954" ProductPicture_ID="66961969" Size="593020" ThumbPic="https://inishop.com/img/gallery_thumbs/9550865e4cefeffac6efeb1535a4488735cf1408.jpg" ThumbSize="4787" Type="ProductImage" UpdatedDate="2025-09-08 15:59:10"/>
+   <ProductPicture LowPic="https://inishop.com/img/gallery_lows/101927780_3960643626.jpg" LowPicHeight="200" LowPicWidth="200" LowSize="16872" No="3" Original="https://inishop.com/img/gallery_raw/101927780_3960643626.jpeg" OriginalSize="23403" Pic="https://inishop.com/img/gallery/101927780_3960643626.jpg" Pic500x500="https://inishop.com/img/gallery_mediums/101927780_3960643626.jpg" Pic500x500Height="500" Pic500x500Size="49301" Pic500x500Width="500" PicHeight="500" PicWidth="500" ProductPicture_ID="117082999" Size="49301" ThumbPic="https://inishop.com/img/gallery_thumbs/101927780_3960643626.jpg" ThumbSize="4747" Type="ProductImageAnnotated" UpdatedDate="2025-09-08 15:58:29" langid="1"/>
+   <ProductPicture LowPic="https://inishop.com/img/gallery_lows/101927780_1571893642.jpg" LowPicHeight="200" LowPicWidth="200" LowSize="25084" No="4" Original="https://inishop.com/img/gallery_raw/101927780_1571893642.jpeg" OriginalSize="28933" Pic="https://inishop.com/img/gallery/101927780_1571893642.jpg" Pic500x500="https://inishop.com/img/gallery_mediums/101927780_1571893642.jpg" Pic500x500Height="500" Pic500x500Size="88432" Pic500x500Width="500" PicHeight="500" PicWidth="500" ProductPicture_ID="117083010" Size="88432" ThumbPic="https://inishop.com/img/gallery_thumbs/101927780_1571893642.jpg" ThumbSize="5652" Type="ProductImageAnnotated" UpdatedDate="2025-09-08 15:58:33" langid="1"/>
+   <ProductPicture LowPic="https://inishop.com/img/gallery_lows/101927780_6821406864.jpg" LowPicHeight="200" LowPicWidth="200" LowSize="37633" No="5" Original="https://inishop.com/img/gallery_raw/101927780_6821406864.jpeg" OriginalSize="48339" Pic="https://inishop.com/img/gallery/101927780_6821406864.jpg" Pic500x500="https://inishop.com/img/gallery_mediums/101927780_6821406864.jpg" Pic500x500Height="500" Pic500x500Size="124645" Pic500x500Width="500" PicHeight="500" PicWidth="500" ProductPicture_ID="117083019" Size="124645" ThumbPic="https://inishop.com/img/gallery_thumbs/101927780_6821406864.jpg" ThumbSize="8362" Type="ProductImageAnnotated" UpdatedDate="2025-09-08 15:58:37" langid="1"/>
+   <ProductPicture LowPic="https://inishop.com/img/gallery_lows/101927780_3382660524.jpg" LowPicHeight="200" LowPicWidth="200" LowSize="34668" No="6" Original="https://inishop.com/img/gallery_raw/101927780_3382660524.jpeg" OriginalSize="51960" Pic="https://inishop.com/img/gallery/101927780_3382660524.jpg" Pic500x500="https://inishop.com/img/gallery_mediums/101927780_3382660524.jpg" Pic500x500Height="500" Pic500x500Size="118862" Pic500x500Width="500" PicHeight="500" PicWidth="500" ProductPicture_ID="117083022" Size="118862" ThumbPic="https://inishop.com/img/gallery_thumbs/101927780_3382660524.jpg" ThumbSize="7754" Type="ProductImageAnnotated" UpdatedDate="2025-09-08 15:58:48" langid="1"/>
+   <ProductPicture LowPic="https://inishop.com/img/gallery_lows/101927780_3832473011.jpg" LowPicHeight="200" LowPicWidth="200" LowSize="28406" No="7" Original="https://inishop.com/img/gallery_raw/101927780_3832473011.jpeg" OriginalSize="51603" Pic="https://inishop.com/img/gallery/101927780_3832473011.jpg" Pic500x500="https://inishop.com/img/gallery_mediums/101927780_3832473011.jpg" Pic500x500Height="500" Pic500x500Size="120637" Pic500x500Width="500" PicHeight="500" PicWidth="500" ProductPicture_ID="117083031" Size="120637" ThumbPic="https://inishop.com/img/gallery_thumbs/101927780_3832473011.jpg" ThumbSize="5400" Type="ProductImageAnnotated" UpdatedDate="2025-09-08 15:58:56" langid="1"/>
+  </ProductGallery>
+  <ProductMultimediaObject>
+   <MultimediaObject ContentType="text/html" Date="2025-09-08 16:01:10" Description="Prescription Diet c/d Multicare" KeepAsURL="1" MultimediaObject_ID="69143285" Type="video/mp4" UUID="2B5419CA-B13B-4128-A7CA-8B15914F4D19" langid="1" OriginalMD5="fbad484a0a840ffbda0f5f70cdeed0a2" Height="0" PreviewHeight="0" PreviewSize="0" PreviewUrl="" PreviewWidth="0" Size="7826" URL="https://inishop.com/objects/mmo-101927780-69143285.html" Width="0"/>
+  </ProductMultimediaObject>
+  <ProductRelated/>
+  <SummaryDescription>
+   <ShortSummaryDescription langid="1">Hills c/d Multicare Chicken Flavor Dog Food, Adult, Chicken, 12 kg</ShortSummaryDescription>
+   <LongSummaryDescription langid="1">Hills c/d Multicare Chicken Flavor Dog Food. Pet life stage: Adult, Pet food flavor: Chicken, Weight: 12 kg</LongSummaryDescription>
+  </SummaryDescription>
+  <Supplier ID="21320" Name="Hills"/>
+  <CatalogObjectCloud/>
+  <BrandOrganizations/>
+ </Product>
+</ICECAT-interface>

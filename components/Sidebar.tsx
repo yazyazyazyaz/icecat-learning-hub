@@ -21,7 +21,7 @@ type NavItem = {
   sub?: { href: string; label: string }[]
 }
 
-const navItems: NavItem[] = [
+const baseNavItems: NavItem[] = [
   { href: "/", label: "Homepage", icon: LayoutDashboard },
   { href: "/manuals", label: "Manuals", icon: BookOpen },
   {
@@ -54,6 +54,9 @@ export function Sidebar({ className = "" }: { className?: string }) {
   const { data: session } = useSession()
   const role = (session?.user as any)?.role as string | undefined
   const extra = role === 'EMPLOYEE' ? [{ href: '/user', label: 'User', icon: LayoutDashboard }] : []
+  const labsOn = typeof process !== 'undefined' && process.env.NEXT_PUBLIC_FEATURE_LABS === 'true'
+  const labs = labsOn ? [{ href: '/labs/live', label: 'Labs', icon: Wand2 }] : []
+  const navItems: NavItem[] = [...baseNavItems, ...labs]
   const items = [...navItems, ...extra]
   return (
     <aside className={cn("h-full w-full p-2", className)} aria-label="Primary">

@@ -51,7 +51,8 @@ const quizSchema = z.object({
   passThreshold: z.coerce.number().int().min(0).max(100).default(70),
 })
 
-import { revalidatePath } from 'next/cache'
+import { revalidatePath, revalidateTag } from 'next/cache'
+import { TAG } from '@/lib/tags'
 
 export async function createQuiz(formData: FormData) {
   await requireTrainerOrAdmin()
@@ -63,6 +64,7 @@ export async function createQuiz(formData: FormData) {
   })
   const quiz = await db.quiz.create({ data: parsed })
   revalidatePath('/admin/quizzes')
+  try { revalidateTag(TAG.QUIZ(quiz.id)) } catch {}
   return { ok: true, quiz }
 }
 
@@ -70,6 +72,7 @@ export async function updateQuiz(id: string, input: unknown) {
   await requireTrainerOrAdmin()
   const data = quizSchema.partial().parse(input)
   const quiz = await db.quiz.update({ where: { id }, data })
+  try { revalidateTag(TAG.QUIZ(quiz.id)) } catch {}
   return { ok: true, quiz }
 }
 
@@ -77,6 +80,7 @@ export async function deleteQuiz(id: string) {
   await requireTrainerOrAdmin()
   await db.question.deleteMany({ where: { quizId: id } })
   await db.quiz.delete({ where: { id } })
+  try { revalidateTag(TAG.QUIZ(id)) } catch {}
   return { ok: true }
 }
 
@@ -132,6 +136,7 @@ export async function createLesson(formData: FormData) {
   // Determine next order within the module
   const count = await db.lesson.count({ where: { moduleId: data.moduleId } })
   const lesson = await db.lesson.create({ data: { ...data, order: count + 1 } })
+  try { revalidateTag(TAG.LESSON(data.slug)) } catch {}
   revalidatePath('/admin/lessons')
   return { ok: true, lesson }
 }
@@ -140,12 +145,14 @@ export async function updateLesson(id: string, input: unknown) {
   await requireTrainerOrAdmin()
   const data = lessonCreateSchema.partial().parse(input)
   const lesson = await db.lesson.update({ where: { id }, data })
+  try { if ((lesson as any)?.slug) revalidateTag(TAG.LESSON((lesson as any).slug)) } catch {}
   return { ok: true, lesson }
 }
 
 export async function deleteLesson(id: string) {
   await requireTrainerOrAdmin()
-  await db.lesson.delete({ where: { id } })
+  const deleted = await db.lesson.delete({ where: { id }, select: { slug: true } as any })
+  try { if (deleted?.slug) revalidateTag(TAG.LESSON(deleted.slug)) } catch {}
   return { ok: true }
 }
 
