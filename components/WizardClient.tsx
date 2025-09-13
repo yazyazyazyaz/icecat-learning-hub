@@ -245,7 +245,7 @@ export default function WizardClient() {
               )}
               {singleError && (
                 <div className="inline-block max-w-full rounded-xl border border-red-200 bg-red-50 text-red-900 text-sm px-3 py-2">
-                  {singleError}
+                  <em>{singleError}</em>
                 </div>
               )}
               <div>
