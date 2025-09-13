@@ -227,7 +227,7 @@ export default function WizardClient() {
           {(singleResult || singleError) && (
             <div className="md:col-span-3 grid gap-2">
               {singleResult && (
-                <div className="inline-block max-w-full rounded-xl border border-emerald-200 bg-emerald-50 text-emerald-900 dark:border-emerald-700 dark:bg-emerald-800 dark:text-white text-sm px-3 py-2">
+                <div className="inline-block max-w-full rounded-xl border border-emerald-300 bg-emerald-100 text-emerald-900 dark:border-emerald-700 dark:bg-emerald-800 dark:text-white text-sm px-3 py-2">
                   <div className="flex items-center gap-2">
                     <Download className="h-4 w-4" />
                     <a className="underline" href={singleResult} download>
@@ -350,7 +350,7 @@ export default function WizardClient() {
               </div>
                 {batchResult && (
                   <div className="md:col-span-3 grid gap-2">
-                    <div className="inline-block max-w-full rounded-xl border border-emerald-200 bg-emerald-50 text-emerald-900 dark:border-emerald-700 dark:bg-emerald-800 dark:text-white text-sm px-3 py-2">
+                    <div className="inline-block max-w-full rounded-xl border border-emerald-300 bg-emerald-100 text-emerald-900 dark:border-emerald-700 dark:bg-emerald-800 dark:text-white text-sm px-3 py-2">
                       <div className="flex items-center gap-2">
                         <Download className="h-4 w-4" />
                         <a className="underline" href={batchResult.path} download>Download ZIP</a>
