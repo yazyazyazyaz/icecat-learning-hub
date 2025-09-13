@@ -178,17 +178,7 @@ export default function WizardClient() {
 
       {mode === 'single' && matchBy && (
         <form action={onSingle} className="grid md:grid-cols-3 gap-3 items-end mt-4">
-          {singleError && (
-            <div className="md:col-span-3 rounded-xl border border-red-200 bg-red-50 text-red-900 text-sm px-3 py-2">
-              {singleError}
-              {singleError.includes('Missing App Key') && (
-                <>
-                  <span className="mx-2">—</span>
-                  <a href="/profile" className="underline">Go to Profile</a>
-                </>
-              )}
-            </div>
-          )}
+          {/* Removed inline error here to avoid duplicate messaging; error shows below in a single bracket */}
           {matchBy==='EAN' && (
           <div>
             <label className="block text-sm mb-1">EAN</label>
