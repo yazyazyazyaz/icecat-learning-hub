@@ -12,7 +12,7 @@ export default function LinkActions({ href }: { href: string }) {
     } catch {}
   }
   return (
-    <div className="flex items-center gap-3">
+    <div className="inline-flex items-center gap-2 whitespace-nowrap">
       <button type="button" onClick={copy} className="px-2 py-1 rounded-full border text-xs">
         {copied ? 'Copied' : 'Copy link'}
       </button>
@@ -22,4 +22,3 @@ export default function LinkActions({ href }: { href: string }) {
     </div>
   )
 }
-

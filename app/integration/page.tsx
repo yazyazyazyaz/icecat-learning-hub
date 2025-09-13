@@ -5,13 +5,21 @@ import LinkActions from "@/components/LinkActions"
 const GROUPS = ['Index File','Reference File'] as const
 
 export default async function IntegrationFilesPage({ searchParams }: { searchParams?: { group?: string; scope?: string } }) {
-  const group = (searchParams?.group || '').toString()
+  const groupRaw = (searchParams?.group || '').toString()
+  const group = groupRaw || 'All'
   const rawScope = (searchParams?.scope || '').toString().toLowerCase()
   const scope = rawScope || 'open'
   const where: any = {}
-  if (group && GROUPS.includes(group as any)) where.tags = { has: group }
-  if (scope === 'open') where.tags = { hasEvery: ['Reference File','refscope:open'] }
-  if (scope === 'full') where.tags = { hasEvery: ['Reference File','refscope:full'] }
+  if (group === 'Index File') {
+    where.tags = { has: 'Index File' }
+  } else if (group === 'Reference File') {
+    where.tags = { hasEvery: ['Reference File', scope === 'full' ? 'refscope:full' : 'refscope:open'] }
+  } else { // All
+    where.OR = [
+      { tags: { has: 'Index File' } },
+      { tags: { hasEvery: ['Reference File', scope === 'full' ? 'refscope:full' : 'refscope:open'] } },
+    ]
+  }
 
   let items: any[] = []
   try {
@@ -42,23 +50,29 @@ export default async function IntegrationFilesPage({ searchParams }: { searchPar
         <span className="text-xs text-neutral-500">Access level:</span>
         <Link
           className={`tag-chip ${scope==='open'? 'tag-chip--active':''} ${scope==='open' ? 'bg-emerald-50 border-emerald-300 text-emerald-800' : 'hover:border-emerald-300 hover:text-emerald-800'}`}
-          href={`/integration?scope=open`}
+          href={`/integration?scope=open&group=${encodeURIComponent(group)}`}
         >
           Open Icecat
         </Link>
         <Link
-          className={`tag-chip ${scope==='full'? 'tag-chip--active':''} ${scope==='full' ? 'bg-sky-50 border-sky-300 text-sky-800' : 'hover:border-sky-300 hover:text-sky-800'}`}
-          href={`/integration?scope=full`}
+          className={`tag-chip ${scope==='full'? 'tag-chip--active':''} ${scope==='full' ? 'bg-emerald-50 border-emerald-300 text-emerald-800' : 'hover:border-emerald-300 hover:text-emerald-800'}`}
+          href={`/integration?scope=full&group=${encodeURIComponent(group)}`}
         >
           Full Icecat
         </Link>
       </div>
       <div className="flex items-center gap-2 flex-wrap max-w-5xl">
         <span className="text-xs text-neutral-500">Groups:</span>
+        <Link
+          className={`tag-chip ${group==='All'? 'tag-chip--active':''} ${group==='All' ? 'bg-amber-50 border-amber-300 text-amber-800' : 'hover:border-amber-300 hover:text-amber-800'}`}
+          href={`/integration?scope=${scope}`}
+        >
+          All
+        </Link>
         {GROUPS.map((g) => (
           <Link
             key={g}
-            className={`tag-chip ${group===g? 'tag-chip--active':''} ${g==='Index File' ? (group===g ? 'bg-amber-50 border-amber-300 text-amber-800' : 'hover:border-amber-300 hover:text-amber-800') : (group===g ? 'bg-teal-50 border-teal-300 text-teal-800' : 'hover:border-teal-300 hover:text-teal-800')}`}
+            className={`tag-chip ${group===g? 'tag-chip--active':''} ${group===g ? 'bg-amber-50 border-amber-300 text-amber-800' : 'hover:border-amber-300 hover:text-amber-800'}`}
             href={`/integration?scope=${scope}&group=${encodeURIComponent(g)}`}
           >
             {g}
@@ -67,51 +81,35 @@ export default async function IntegrationFilesPage({ searchParams }: { searchPar
       </div>
 
       <section className="max-w-5xl">
-        <table className="w-full table-auto text-sm">
-          <colgroup>
-            <col />
-            <col className="w-56" />
-            <col className="w-48" />
-          </colgroup>
-          <thead className="bg-neutral-50/80 text-neutral-600">
-            <tr>
-              <th className="py-2 px-3 text-left text-xs font-medium">Title</th>
-              <th className="py-2 px-3 text-left text-xs font-medium border-l border-[hsl(var(--border))]">Type</th>
-              <th className="py-2 px-3 text-left text-xs font-medium border-l border-[hsl(var(--border))]">Link</th>
-            </tr>
-          </thead>
-        </table>
+        <div className="grid grid-cols-[1fr_16rem_16rem] text-xs text-neutral-600 bg-neutral-50/80">
+          <div className="py-2 px-3">Title</div>
+          <div className="py-2 px-3 border-l border-[hsl(var(--border))]">Type</div>
+          <div className="py-2 px-3 border-l border-[hsl(var(--border))]">Link</div>
+        </div>
       </section>
 
       {groupsOrder.map((g) => (
         byGroup[g] && byGroup[g].length > 0 ? (
           <section key={g} className="bg-white border rounded-2xl shadow-sm p-0 overflow-hidden max-w-5xl">
             <div className="px-3 py-2 bg-neutral-100 text-xs font-medium text-neutral-600">{g}</div>
-            <table className="w-full table-fixed text-sm">
-              <colgroup>
-                <col />
-                <col className="w-28" />
-                <col className="w-40" />
-              </colgroup>
-              <tbody className="divide-y divide-[hsl(var(--border))]">
-                {byGroup[g].map((m: any) => (
-                  <tr key={m.id} className="align-middle">
-                    <td className="py-2 px-3 text-sm font-normal text-neutral-900">{m.title}</td>
-                    <td className="py-2 px-3 border-l border-[hsl(var(--border))] whitespace-nowrap text-neutral-700">
-                      <span className="inline-flex items-center gap-1 text-[11px] px-2 py-0.5 rounded-full border mr-2 align-middle" aria-label="Access level">
-                        <span className={`h-2 w-2 rounded-full ${hasTag(m,'refscope:open') ? 'bg-emerald-600' : hasTag(m,'refscope:full') ? 'bg-sky-600' : 'bg-neutral-400'}`}></span>
-                        {hasTag(m,'refscope:open') ? 'Open Icecat' : hasTag(m,'refscope:full') ? 'Full Icecat' : '—'}
-                      </span>
-                      <span className="align-middle">{fileType(m.path)}</span>
-                    </td>
-                    <td className="py-2 px-3 border-l border-[hsl(var(--border))] whitespace-nowrap text-right">
-                      <LinkActions href={m.path} />
-                    </td>
-                </tr>
+            <ul className="divide-y divide-[hsl(var(--border))]">
+              {byGroup[g].map((m: any) => (
+                <li key={m.id} className="grid grid-cols-[1fr_16rem_16rem] items-center text-sm">
+                  <div className="py-2 px-3 text-neutral-900 truncate" title={m.title}>{m.title}</div>
+                  <div className="py-2 px-3 border-l border-[hsl(var(--border))] text-neutral-700">
+                    <span className="inline-flex items-center gap-1 text-[11px] px-2 py-0.5 rounded-full border mr-2 align-middle" aria-label="Access level">
+                      <span className={`h-2 w-2 rounded-full ${hasTag(m,'refscope:open') ? 'bg-emerald-600' : hasTag(m,'refscope:full') ? 'bg-emerald-600' : 'bg-neutral-400'}`}></span>
+                      {hasTag(m,'refscope:open') ? 'Open Icecat' : hasTag(m,'refscope:full') ? 'Full Icecat' : '—'}
+                    </span>
+                    <span className="align-middle">{fileType(m.path)}</span>
+                  </div>
+                  <div className="py-2 px-3 border-l border-[hsl(var(--border))] text-right">
+                    <LinkActions href={m.path} />
+                  </div>
+                </li>
               ))}
-            </tbody>
-          </table>
-        </section>
+            </ul>
+          </section>
       ) : null
       ))}
     </div>
