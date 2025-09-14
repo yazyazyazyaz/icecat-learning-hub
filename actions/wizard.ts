@@ -85,8 +85,8 @@ async function fetchJson(url: string): Promise<Buffer> {
   // Some Icecat responses may be HTTP 200 but contain a Message indicating not found
   try {
     const j = JSON.parse(bodyText)
-    const maybeMsg = (j.Message || j.message || '').toString()
-    if (maybeMsg && /not\s+present|not\s+found|no\s+match/i.test(maybeMsg)) {
+    const maybeMsg = (j.Message || j.message || j.ErrorMessage || '').toString()
+    if (maybeMsg && /not\s+present|not\s+found|no\s+match|does\s+not\s+exist|invalid|unauthori|denied/i.test(maybeMsg)) {
       throw new Error(maybeMsg)
     }
   } catch {
@@ -112,12 +112,19 @@ async function fetchXml(url: string, auth: { user?: string; pass?: string }): Pr
     throw new Error(`XML ${res.status}: ${msg || 'request failed'}`)
   }
   // Detect embedded error despite 200
-  if (/requested\s+product\s+is\s+not\s+present|not\s+found|no\s+match/i.test(bodyText)) {
-    // Try get clearer message
-    let msg = 'The requested product is not present in the Icecat database'
-    const m = bodyText.match(/Message\"?>([^<]+)</i) || bodyText.match(/ErrorMessage=\"([^\"]+)/i)
-    if (m && m[1]) msg = m[1]
-    throw new Error(msg)
+  {
+    // If ErrorMessage or <Message> is present, treat as error
+    const m = bodyText.match(/ErrorMessage=\"([^\"]+)/i) || bodyText.match(/<Message[^>]*>([^<]+)</i)
+    if (m && m[1]) {
+      const msg = m[1]
+      throw new Error(msg)
+    }
+    if (/requested\s+product\s+is\s+not\s+present|not\s+found|no\s+match|does\s+not\s+exist|invalid|unauthori|denied/i.test(bodyText)) {
+      let msg = 'The requested product is not present in the Icecat database'
+      const mm = bodyText.match(/Message\"?>([^<]+)</i) || bodyText.match(/ErrorMessage=\"([^\"]+)/i)
+      if (mm && mm[1]) msg = mm[1]
+      throw new Error(msg)
+    }
   }
   return Buffer.from(bodyText, 'utf8')
 }
@@ -156,13 +163,13 @@ export async function runSingle(formData: FormData) {
       url = buildJsonUrlByMpnBrand({ shop, lang, brand, mpn, appKey })
       filename = fileNameJsonByMpnBrand(mpn, brand, lang)
     }
-    const buf = await fetchJson(url)
-    const dir = safeUploadDir('wizard')
-    await fs.mkdir(dir, { recursive: true })
-    const outPath = path.join(dir, filename)
-    await fs.writeFile(outPath, buf)
-    revalidatePath('/wizard')
-    return { ok: true, path: `/uploads/wizard/${filename}` }
+      const buf = await fetchJson(url)
+      const dir = safeUploadDir('wizard')
+      await fs.mkdir(dir, { recursive: true })
+      const outPath = path.join(dir, filename)
+      await fs.writeFile(outPath, buf)
+      revalidatePath('/wizard')
+      return { ok: true, path: `/uploads/wizard/${filename}`, request: url }
   } else {
     const auth = { user, pass }
     let url = ''
@@ -176,13 +183,13 @@ export async function runSingle(formData: FormData) {
       url = buildXmlUrlByMpnBrand({ lang, brand, mpn })
       filename = fileNameXmlByMpnBrand(mpn, brand, lang)
     }
-    const buf = await fetchXml(url, auth)
-    const dir = safeUploadDir('wizard')
-    await fs.mkdir(dir, { recursive: true })
-    const outPath = path.join(dir, filename)
-    await fs.writeFile(outPath, buf)
-    revalidatePath('/wizard')
-    return { ok: true, path: `/uploads/wizard/${filename}` }
+      const buf = await fetchXml(url, auth)
+      const dir = safeUploadDir('wizard')
+      await fs.mkdir(dir, { recursive: true })
+      const outPath = path.join(dir, filename)
+      await fs.writeFile(outPath, buf)
+      revalidatePath('/wizard')
+      return { ok: true, path: `/uploads/wizard/${filename}`, request: url }
   }
 }
 

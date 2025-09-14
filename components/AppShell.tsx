@@ -2,7 +2,6 @@
 
 import { usePathname } from "next/navigation"
 import Header from "@/components/Header"
-import Breadcrumbs from "@/components/Breadcrumbs"
 import { Sidebar } from "@/components/Sidebar"
 
 export default function AppShell({ children }: { children: React.ReactNode }) {
@@ -29,7 +28,6 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
           </div>
         </aside>
         <div>
-          <Breadcrumbs />
           <main id="main" className="min-h-[calc(100vh-var(--header-h))] px-4 py-6 text-[15px] animate-in fade-in-0 duration-300">
             {children}
           </main>

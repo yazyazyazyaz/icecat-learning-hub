@@ -8,15 +8,22 @@ const DOC_TAGS = [
 
 export default async function DocumentsPage({ searchParams }: { searchParams?: { tag?: string } }) {
   const tag = (searchParams?.tag || '').toString()
-  const where: any = tag ? { tags: { has: tag } } : {}
+  const notIntegration = { OR: [ { tags: { has: 'Index File' } }, { tags: { has: 'Reference File' } } ] }
+  const where: any = tag ? { AND: [ { tags: { has: tag } }, { NOT: notIntegration } ] } : { NOT: notIntegration }
   let items: any[] = []
   try {
     items = await (db as any).documentFile.findMany({ where, orderBy: { title: 'asc' } })
   } catch (e) {
     try {
-      // Fallback to legacy Upload model if migration not applied (exclude manuals)
-      const legacyWhere: any = { kind: 'DOCUMENT', NOT: { tags: { has: 'manual' } } }
-      if (tag) legacyWhere.tags = { has: tag }
+      // Fallback to legacy Upload model if migration not applied (exclude manuals and integration)
+      const legacyWhere: any = {
+        kind: 'DOCUMENT',
+        AND: [
+          { NOT: { tags: { has: 'manual' } } },
+          { NOT: { OR: [ { tags: { has: 'Index File' } }, { tags: { has: 'Reference File' } } ] } },
+        ],
+      }
+      if (tag) legacyWhere.AND.push({ tags: { has: tag } })
       items = await db.upload.findMany({ where: legacyWhere, orderBy: { title: 'asc' } })
     } catch (e2) {
       console.error('DocumentsPage: DB unavailable', e2)
@@ -42,14 +49,14 @@ export default async function DocumentsPage({ searchParams }: { searchParams?: {
   return (
     <div className="grid gap-4">
       <div className="flex items-center gap-2 flex-wrap max-w-5xl">
-        <Link className={`tag-chip ${!tag? 'tag-chip--active':''}`} href={`/documents`}>All</Link>
+        <Link className={`tag-chip ${!tag? 'bg-sky-100 border-sky-400 text-sky-900':''}`} href={`/documents`}>All</Link>
         {DOC_TAGS.map((t) => (
-          <Link key={t} className={`tag-chip ${tag===t? 'tag-chip--active':''}`} href={`/documents?tag=${encodeURIComponent(t)}`}>{t}</Link>
+          <Link key={t} className={`tag-chip ${tag===t? 'bg-sky-100 border-sky-400 text-sky-900':''}`} href={`/documents?tag=${encodeURIComponent(t)}`}>{t}</Link>
         ))}
       </div>
 
       <section className="max-w-5xl">
-        <table className="w-full table-fixed text-sm">
+        <table className="w-full table-fixed text-xs">
           <colgroup>
             <col />
             <col className="w-28" />
@@ -69,7 +76,7 @@ export default async function DocumentsPage({ searchParams }: { searchParams?: {
         byGroup[group] && byGroup[group].length > 0 ? (
           <section key={group} className="bg-white border rounded-2xl shadow-sm p-0 overflow-hidden max-w-5xl">
             <div className="px-3 py-2 bg-neutral-100 text-xs font-medium text-neutral-600">{group}</div>
-            <table className="w-full table-fixed text-sm">
+            <table className="w-full table-fixed text-xs">
               <colgroup>
                 <col />
                 <col className="w-28" />
@@ -78,7 +85,7 @@ export default async function DocumentsPage({ searchParams }: { searchParams?: {
               <tbody className="divide-y divide-[hsl(var(--border))]">
                 {byGroup[group].map((m: any) => (
                   <tr key={m.id} className="align-middle">
-                    <td className="py-2 px-3 text-sm font-normal text-neutral-900">{m.title}</td>
+                    <td className="py-2 px-3 text-xs font-normal text-neutral-900">{m.title}</td>
                     <td className="py-2 px-3 border-l border-[hsl(var(--border))] whitespace-nowrap text-neutral-700">{m.path?.startsWith('/uploads/') ? 'Attachment' : 'Link'}</td>
                     <td className="py-2 px-3 border-l border-[hsl(var(--border))] whitespace-nowrap">
                       {m.path?.startsWith('/uploads/') ? (

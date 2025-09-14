@@ -83,7 +83,7 @@ export default async function FilesHubPage({ searchParams }: { searchParams?: { 
       </div>
 
       <div className="rounded-2xl border border-[hsl(var(--border))] bg-[hsl(var(--surface))] shadow-sm">
-        <Table>
+        <Table className="text-xs">
           <TableCaption>{type ? `${type} only` : 'All types'}</TableCaption>
           <TableHeader>
             <TableRow>

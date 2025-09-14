@@ -6,6 +6,7 @@ import { cn } from "@/lib/utils"
 
 const items = [
   { href: "/admin/users", label: "Users" },
+  { href: "/editor/integration", label: "Integration Files" },
 ]
 
 export default function AdminNav() {
@@ -20,6 +21,7 @@ export default function AdminNav() {
               <li key={it.href}>
                 <Link
                   href={it.href}
+                  prefetch={false}
                   className={cn(
                     "inline-flex h-10 items-center rounded-t-md px-3 text-sm",
                     active ? "border-b-2 border-[hsl(var(--accent))] text-[hsl(var(--fg))]" : "text-neutral-600 hover:text-[hsl(var(--fg))]"

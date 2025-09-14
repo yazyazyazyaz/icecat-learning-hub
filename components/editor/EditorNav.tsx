@@ -7,6 +7,7 @@ import { cn } from "@/lib/utils"
 const items = [
   { href: "/editor/presentations", label: "Presentations" },
   { href: "/editor/documents", label: "Documents" },
+  { href: "/editor/integration", label: "Integration Files" },
   { href: "/editor/manuals", label: "Manuals" },
   { href: "/editor/onboarding", label: "Onboarding" },
   { href: "/editor/quizzes", label: "Quizzes" },
@@ -24,6 +25,7 @@ export default function EditorNav() {
               <li key={it.href}>
                 <Link
                   href={it.href}
+                  prefetch={false}
                   className={cn(
                     "inline-flex h-10 items-center rounded-t-md px-3 text-sm",
                     active ? "border-b-2 border-[hsl(var(--accent))] text-[hsl(var(--fg))]" : "text-neutral-600 hover:text-[hsl(var(--fg))]"

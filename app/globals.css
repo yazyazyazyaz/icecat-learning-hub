@@ -38,7 +38,7 @@ a { @apply underline-offset-4 hover:underline; }
   code, kbd, pre { @apply font-mono; }
 }
 
-/* Headings also use Roboto Mono */
+/* Headings use monospace to match Roboto Mono */
 body { --font-heading: var(--font-mono); }
 
 button:focus-visible, a:focus-visible, input:focus-visible, textarea:focus-visible, [role="button"]:focus-visible {
@@ -75,8 +75,8 @@ button:focus-visible, a:focus-visible, input:focus-visible, textarea:focus-visib
   .soft-section { @apply rounded-2xl border border-[hsl(var(--border))] p-6; background-color: hsl(var(--surface)); }
   /* Consistent tag chip styling */
   .tag-chip { @apply inline-flex items-center gap-2 px-3 py-1.5 rounded-full border text-xs transition bg-white border-[hsl(var(--border))] text-gray-700 hover:bg-gray-50; }
-  .tag-chip--active { @apply bg-blue-100 border-blue-200 text-blue-900; }
-  .dark .tag-chip--active { @apply bg-blue-700 border-blue-600 text-white; }
+  .tag-chip--active { @apply bg-amber-50 border-amber-300 text-amber-800; }
+  .dark .tag-chip--active { @apply bg-amber-700 border-amber-600 text-white; }
 }
 
 @layer utilities {

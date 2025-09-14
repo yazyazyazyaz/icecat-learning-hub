@@ -1,6 +1,8 @@
 import Link from "next/link"
 import { db } from "@/lib/db"
-import { createDocument, updateDocument } from "@/actions/documents"
+import { createDocument, updateDocument, moveToIntegration, deleteDocument } from "@/actions/documents"
+import ConfirmDelete from "@/components/ConfirmDelete"
+import ToggleDetails from "@/components/ToggleDetails"
 import { SubmitButton, SaveStatus } from "@/components/FormSaveControls"
 
 const DOC_TAGS = [
@@ -11,14 +13,21 @@ const DOC_TAGS = [
 export default async function EditorDocumentsPage({ searchParams }: { searchParams?: { tag?: string; edit?: string } }) {
   const tag = (searchParams?.tag || '').toString()
   const editId = (searchParams?.edit || '').toString()
-  const where: any = tag ? { tags: { has: tag } } : {}
+  const notIntegration = { OR: [ { tags: { has: 'Index File' } }, { tags: { has: 'Reference File' } } ] }
+  const where: any = tag ? { AND: [ { tags: { has: tag } }, { NOT: notIntegration } ] } : { NOT: notIntegration }
   let items: any[] = []
   try {
     items = await (db as any).documentFile.findMany({ where, orderBy: { updatedAt: 'desc' } })
   } catch {
     try {
-      const legacyWhere: any = { kind: 'DOCUMENT', NOT: { tags: { has: 'manual' } } }
-      if (tag) legacyWhere.tags = { has: tag }
+      const legacyWhere: any = {
+        kind: 'DOCUMENT',
+        AND: [
+          { NOT: { tags: { has: 'manual' } } },
+          { NOT: { OR: [ { tags: { has: 'Index File' } }, { tags: { has: 'Reference File' } } ] } },
+        ],
+      }
+      if (tag) legacyWhere.AND.push({ tags: { has: tag } })
       items = await db.upload.findMany({ where: legacyWhere, orderBy: { updatedAt: 'desc' } })
     } catch (e) {
       console.error('EditorDocumentsPage: DB unavailable', e)
@@ -53,28 +62,7 @@ export default async function EditorDocumentsPage({ searchParams }: { searchPara
   return (
     <div className="space-y-4">
       <section className="bg-white border rounded-2xl shadow-sm p-6">
-        <h1 className="text-2xl font-semibold">Documents</h1>
-        <p className="text-sm text-gray-600 mt-1">Add documents via URL or file upload. Shown on the Documents page.</p>
-        <div className="mt-4 flex items-center gap-2 flex-wrap max-w-5xl">
-          <Link className={`tag-chip ${!tag? 'tag-chip--active':''}`} href={`/editor/documents`}>All</Link>
-          {DOC_TAGS.map((t) => (
-            <Link key={t} className={`tag-chip ${tag===t? 'tag-chip--active':''}`} href={`/editor/documents?tag=${encodeURIComponent(t)}`}>{t}</Link>
-          ))}
-        </div>
-        {editing && (
-          <form action={async (fd: FormData) => { 'use server'; await updateDocument(fd) }} className="grid gap-3 md:grid-cols-6 items-end mt-4">
-            <input type="hidden" name="id" defaultValue={editing.id} />
-            <div className="md:col-span-2">
-              <label className="block text-sm mb-1">Title</label>
-              <input name="title" defaultValue={editing.title} required className="w-full rounded-xl border px-3 py-2 text-sm" />
-            </div>
-            <div className="md:col-span-3">
-              <label className="block text-sm mb-1">URL</label>
-              <input name="path" defaultValue={editing.path} className="w-full rounded-xl border px-3 py-2 text-sm" placeholder="https://..." />
-            </div>
-            <div className="flex items-center gap-2"><SubmitButton label="Update document" pendingLabel="Updating..." /><SaveStatus /></div>
-          </form>
-        )}
+        <h2 className="text-lg font-medium">Add new</h2>
         <form
           action={async (fd: FormData) => { 'use server'; await createDocument(fd) }}
           className="grid gap-3 md:grid-cols-6 items-end mt-4"
@@ -108,20 +96,21 @@ export default async function EditorDocumentsPage({ searchParams }: { searchPara
         byGroup[group] && byGroup[group].length > 0 ? (
           <section key={group} className="bg-white border rounded-2xl shadow-sm p-0 overflow-hidden max-w-5xl">
             <div className="px-3 py-2 border-b bg-neutral-100 text-[11px] uppercase tracking-wide text-neutral-700">{group}</div>
-            <table className="w-full table-auto text-sm">
+            <table className="w-full table-auto text-xs">
               <thead className="bg-neutral-50/80 text-neutral-600">
                 <tr>
                   <th className="py-2 px-3 text-left text-xs font-medium">Title</th>
                   <th className="py-2 px-3 text-left text-xs font-medium w-24 border-l border-[hsl(var(--border))]">Type</th>
                   <th className="py-2 px-3 text-left text-xs font-medium w-36 border-l border-[hsl(var(--border))]">Link</th>
                   <th className="py-2 px-3 text-left text-xs font-medium w-28 border-l border-[hsl(var(--border))]">Updated</th>
-                  <th className="py-2 px-3 text-right text-xs font-medium w-[200px] border-l border-[hsl(var(--border))]">Actions</th>
+                  <th className="py-2 px-3 text-right text-xs font-medium w-[320px] border-l border-[hsl(var(--border))]">Actions</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-[hsl(var(--border))]">
                 {byGroup[group].map((m: any) => (
+                  <>
                   <tr key={m.id} className="align-middle">
-                    <td className="py-2 px-3 text-[15px] text-neutral-900">{m.title}</td>
+                    <td className="py-2 px-3 text-xs text-neutral-900">{m.title}</td>
                     <td className="py-2 px-3 border-l border-[hsl(var(--border))] whitespace-nowrap text-neutral-700">{m.path?.startsWith('/uploads/') ? 'Attachment' : 'Link'}</td>
                     <td className="py-2 px-3 border-l border-[hsl(var(--border))] whitespace-nowrap">
                       {m.path?.startsWith('/uploads/') ? (
@@ -133,11 +122,54 @@ export default async function EditorDocumentsPage({ searchParams }: { searchPara
                         <a className="underline font-medium" href={m.path} target="_blank" rel="noreferrer">Open</a>
                       )}
                     </td>
-                    <td className="py-2 px-3 border-l border-[hsl(var(--border))] text-neutral-600 whitespace-nowrap">{m.updatedAt.toISOString().slice(0,10)}</td>
+                    <td className="py-2 px-3 border-l border-[hsl(var(--border))] text-neutral-600 whitespace-nowrap">{fmtDate(m.updatedAt)}</td>
                     <td className="py-2 px-3 border-l border-[hsl(var(--border))] text-right">
-                      <Link href={`/editor/documents?edit=${m.id}`} className="px-3 py-1 rounded-full border text-xs">Edit</Link>
+                        <div className="flex items-center justify-end gap-2 whitespace-nowrap overflow-x-auto">
+                          <ToggleDetails targetId={`edit-${m.id}`} />
+                          <form action={async () => { 'use server'; await deleteDocument(m.id) }}>
+                            <ConfirmDelete />
+                          </form>
+                        <form action={async (fd: FormData) => { 'use server'; await moveToIntegration(fd) }} className="inline-flex items-center gap-1">
+                          <input type="hidden" name="id" defaultValue={m.id} />
+                          <select name="group" className="h-7 rounded-full border text-xs px-2">
+                            <option value="Index File">Index</option>
+                            <option value="Reference File">Reference</option>
+                          </select>
+                          <select name="scope" className="h-7 rounded-full border text-xs px-2" defaultValue="open" title="Access (for Reference only)">
+                            <option value="open">Open</option>
+                            <option value="full">Full</option>
+                          </select>
+                          <button className="px-2 py-1 rounded-full border text-xs" title="Move to Integration Files">Move</button>
+                        </form>
+                      </div>
                     </td>
                   </tr>
+                    <tr>
+                      <td colSpan={5} className="bg-neutral-50">
+                        <details id={`edit-${m.id}`} open={editId === m.id}>
+                          <summary className="hidden">Edit</summary>
+                          <div className="p-3 border-t border-[hsl(var(--border))] bg-neutral-50">
+                            <form action={async (fd: FormData) => { 'use server'; await updateDocument(fd) }} className="grid gap-3 md:grid-cols-6 items-end">
+                              <input type="hidden" name="id" defaultValue={m.id} />
+                              <div className="md:col-span-2">
+                                <label className="block text-sm mb-1">Title</label>
+                                <input name="title" defaultValue={m.title} required className="w-full rounded-xl border px-3 py-2 text-sm bg-white" />
+                              </div>
+                              <div className="md:col-span-3">
+                                <label className="block text-sm mb-1">URL</label>
+                                <input name="path" defaultValue={m.path} className="w-full rounded-xl border px-3 py-2 text-sm bg-white" placeholder="https://..." />
+                              </div>
+                              <div className="flex items-center gap-2">
+                                <SubmitButton label="Update" pendingLabel="Updating..." className="bg-emerald-600 text-white hover:bg-emerald-700 border-emerald-700" />
+                                <SaveStatus />
+                                <Link href={`/editor/documents${tag?`?tag=${encodeURIComponent(tag)}`:''}`} className="px-3 py-1 rounded-full border text-xs">Cancel</Link>
+                              </div>
+                            </form>
+                          </div>
+                        </details>
+                      </td>
+                    </tr>
+                  </>
                 ))}
               </tbody>
             </table>
@@ -146,5 +178,15 @@ export default async function EditorDocumentsPage({ searchParams }: { searchPara
       ))}
     </div>
   )
+}
+
+function fmtDate(d: any) {
+  try {
+    const dt = d instanceof Date ? d : new Date(d)
+    const iso = dt.toISOString()
+    return iso.slice(0, 10)
+  } catch {
+    return ''
+  }
 }
 

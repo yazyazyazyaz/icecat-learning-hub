@@ -13,7 +13,6 @@ const schema = z.object({
   path: z.string().min(2),
   tags: z.array(z.string()).default([]),
   kind: z.enum(["PRESENTATION", "DOCUMENT"]),
-  useCase: z.string().optional(),
 })
 
 export async function createUpload(formData: FormData | unknown) {
@@ -28,8 +27,8 @@ export async function createUpload(formData: FormData | unknown) {
     const file = formData.get('file') as unknown as File | null
     // Optional use case support for manuals/documents
     const uc = String(formData.get('usecase') || '').trim()
-    const ucNew = String(formData.get('usecase_new') || '').trim()
-    const ucFinal = uc === 'custom' ? ucNew : uc
+    // No custom support: ignore any auxiliary inputs and treat 'custom' as none
+    const ucFinal = uc === 'custom' ? '' : uc
     // Add manual tag only if explicitly flagged via isManual hidden field or tag already included
     const isManualFlag = String(formData.get('isManual') || '').trim() !== ''
     if (isManualFlag && !tags.includes('manual')) tags.push('manual')
@@ -51,17 +50,18 @@ export async function createUpload(formData: FormData | unknown) {
       await fs.writeFile(abs, bytes)
       filePath = `/uploads/${targetFolder}/${fileName}`
     }
-    data = schema.parse({ title, path: filePath, tags, kind, useCase: ucFinal || undefined })
+    data = schema.parse({ title, path: filePath, tags, kind })
   } else {
     data = schema.parse(formData as any)
   }
+  const safeData: any = { ...data, kind: (data as any).kind as any }
+  delete safeData.useCase
   try {
-    await db.upload.create({ data: { ...data, kind: data.kind as any } })
+    await db.upload.create({ data: safeData, select: { id: true } })
   } catch (e: any) {
-    const msg = String(e?.message || '')
-    if (msg.includes('Unknown') && msg.toLowerCase().includes('usecase')) {
-      const { useCase, ...rest } = data as any
-      await db.upload.create({ data: { ...rest, kind: data.kind as any } })
+    const msg = String(e?.message || '').toLowerCase()
+    if (msg.includes('usecase') || msg.includes('upload.usecase') || msg.includes('does not exist')) {
+      await db.upload.create({ data: safeData, select: { id: true } })
     } else {
       throw e
     }
@@ -89,15 +89,14 @@ export async function updateUpload(formData: FormData | unknown) {
         title: String(formData.get('title') || ''),
         path: String(formData.get('path') || ''),
         usecase: String(formData.get('usecase') || ''),
-        usecase_new: String(formData.get('usecase_new') || ''),
       }
     : (formData as any)
   const parsed = updateSchema.parse(raw)
-  const ucFinal = parsed.usecase === 'custom' ? (parsed.usecase_new || '') : (parsed.usecase || '')
+  const ucFinal = parsed.usecase === 'custom' ? '' : (parsed.usecase || '')
   const data: any = {}
   if (parsed.title) data.title = parsed.title
   if (parsed.path) data.path = parsed.path
-  data.useCase = ucFinal || null
+  // Do not set useCase column; keep value encoded in tags only
   // Maintain tags: preserve existing manual tag only if present; replace any usecase:* tag
   const existing = await db.upload.findUnique({ where: { id: parsed.id }, select: { tags: true } })
   let tags = existing?.tags ?? []
@@ -107,12 +106,12 @@ export async function updateUpload(formData: FormData | unknown) {
   if (hasManual && !tags.includes('manual')) tags.push('manual')
   data.tags = tags
   try {
-    await db.upload.update({ where: { id: parsed.id }, data })
+    await db.upload.update({ where: { id: parsed.id }, data, select: { id: true } })
   } catch (e: any) {
-    const msg = String(e?.message || '')
-    if (msg.includes('Unknown') && msg.toLowerCase().includes('usecase')) {
+    const msg = String(e?.message || '').toLowerCase()
+    if (msg.includes('usecase') || msg.includes('upload.usecase') || msg.includes('does not exist')) {
       const { useCase, ...rest } = data
-      await db.upload.update({ where: { id: parsed.id }, data: rest })
+      await db.upload.update({ where: { id: parsed.id }, data: rest, select: { id: true } })
     } else {
       throw e
     }
@@ -122,4 +121,56 @@ export async function updateUpload(formData: FormData | unknown) {
   revalidatePath('/documents')
   revalidatePath('/admin/documents')
   return { ok: true }
+}
+
+export async function deleteUpload(id: string) {
+  const session = await getServerSession(authOptions)
+  if (!session?.user) throw new Error("Unauthorized")
+  if (!id) throw new Error('Missing id')
+  await db.upload.delete({ where: { id }, select: { id: true } })
+  revalidatePath('/manuals')
+  revalidatePath('/admin/manuals')
+  revalidatePath('/documents')
+  revalidatePath('/admin/documents')
+  revalidatePath('/editor/manuals')
+  return { ok: true }
+}
+
+// Bulk import manuals from a newline-separated list of URLs.
+export async function importManualsFromUrls(formData: FormData | unknown) {
+  const session = await getServerSession(authOptions)
+  if (!session?.user) throw new Error('Unauthorized')
+  const raw = formData instanceof FormData
+    ? String(formData.get('urls') || '')
+    : String((formData as any)?.urls || '')
+  const lines = raw
+    .split(/\r?\n/)
+    .map((s) => s.trim())
+    .filter((s) => s.length > 0)
+  const results: Array<{ url: string; id?: string; skipped?: boolean; error?: string }> = []
+  for (const url of lines) {
+    try {
+      // Skip if already exists by exact path
+      const existing = await db.upload.findFirst({ where: { path: url, kind: 'DOCUMENT' as any } as any, select: { id: true } })
+      if (existing) { results.push({ url, skipped: true }); continue }
+      // Fetch and infer title
+      let title = url
+      try {
+        const res = await fetch(url, { method: 'GET' })
+        const html = await res.text()
+        const og = /<meta[^>]+property=["']og:title["'][^>]*content=["']([^"']+)/i.exec(html) || /<meta[^>]+content=["']([^"']+)["'][^>]*property=["']og:title["']/i.exec(html)
+        const t = og?.[1] || /<title[^>]*>([\s\S]*?)<\/title>/i.exec(html)?.[1] || ''
+        const cleaned = t.replace(/\s*[|\u2013\u2014\-]\s*Iceclog.*$/i, '').replace(/\s*[|\u2013\u2014\-]\s*Icecat.*$/i, '').trim()
+        if (cleaned) title = cleaned
+      } catch {}
+      const rec = await db.upload.create({ data: { title, path: url, tags: ['manual'], kind: 'DOCUMENT' as any }, select: { id: true } })
+      results.push({ url, id: rec.id })
+    } catch (e: any) {
+      results.push({ url, error: String(e?.message || 'Failed') })
+    }
+  }
+  revalidatePath('/editor/manuals')
+  revalidatePath('/manuals')
+  revalidatePath('/admin/manuals')
+  return { ok: true, results }
 }

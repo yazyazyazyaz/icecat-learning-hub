@@ -42,5 +42,13 @@ export async function middleware(req: NextRequest) {
 }
 
 export const config = {
-  matcher: ['/((?!_next|api/auth|static|favicon.ico).*)'],
+  matcher: [
+    '/dashboard/:path*',
+    '/trainings/:path*',
+    '/lessons/:path*',
+    '/quizzes/:path*',
+    '/admin/:path*',
+    '/editor/:path*',
+    '/user/:path*',
+  ],
 }

@@ -5,7 +5,6 @@ import { SubmitButton, SaveStatus } from "@/components/FormSaveControls"
 
 const DEFAULT_USE_CASES = [
   'APIs',
-  'Reference files',
   'Social Media',
   'Icecat Commerce',
   'Various',
@@ -22,9 +21,12 @@ export default async function AdminManualsPage({ searchParams }: { searchParams?
     console.error('AdminManualsPage: DB unavailable', e)
     itemsRaw = []
   }
-  const normalizeUC = (m: any) => m.useCase ?? ((m.tags || []).find((t: string) => t.startsWith('usecase:'))?.slice('usecase:'.length) ?? '')
+  const normalizeUC = (m: any) => {
+    const v = m.useCase ?? ((m.tags || []).find((t: string) => t.startsWith('usecase:'))?.slice('usecase:'.length) ?? '')
+    return v === 'Reference files' ? '' : v
+  }
   const items = itemsRaw.map((m) => ({ ...m, _uc: normalizeUC(m) }))
-  const dynamicUC = Array.from(new Set(items.map((a: any) => a._uc).filter(Boolean)))
+  const dynamicUC = Array.from(new Set(items.map((a: any) => a._uc).filter((v: string) => Boolean(v) && v !== 'Reference files')))
   const useCases = Array.from(new Set<string>([...DEFAULT_USE_CASES, ...dynamicUC]))
   const filtered = uc ? items.filter((m: any) => m._uc === uc) : items
 
@@ -38,7 +40,7 @@ export default async function AdminManualsPage({ searchParams }: { searchParams?
 
   let editing: any = null
   if (editId) {
-    try { editing = await db.upload.findUnique({ where: { id: editId } }) } catch {}
+    try { editing = await db.upload.findUnique({ where: { id: editId }, select: { id:true, title:true, path:true, tags:true, updatedAt:true } as any }) } catch {}
   }
 
   return (
@@ -71,13 +73,9 @@ export default async function AdminManualsPage({ searchParams }: { searchParams?
               <select name="usecase" defaultValue={normalizeUC(editing) || ''} className="w-full rounded-xl border px-3 py-2 text-sm bg-white">
                 <option value="">(none)</option>
                 {useCases.map((c) => (<option key={c} value={c}>{c}</option>))}
-                <option value="custom">Custom.</option>
               </select>
             </div>
-            <div className="md:col-span-2">
-              <label className="block text-sm mb-1">Custom Use Case (optional)</label>
-              <input name="usecase_new" className="w-full rounded-xl border px-3 py-2 text-sm" placeholder="e.g. Integrations" />
-            </div>
+            
             <div>
               <button className="rounded-full border px-4 py-2 text-sm">Update manual</button>
             </div>
@@ -150,7 +148,7 @@ export default async function AdminManualsPage({ searchParams }: { searchParams?
                     </td>
                     <td className="py-2 px-3 border-l border-[hsl(var(--border))] text-neutral-600 whitespace-nowrap">{m.updatedAt.toISOString().slice(0,10)}</td>
                     <td className="py-2 px-3 border-l border-[hsl(var(--border))]">
-                      <form action={async (fd: FormData) => { 'use server'; await updateUpload(fd) }} className="flex items-center justify-end gap-2">
+                      <form action={async (fd: FormData) => { 'use server'; await updateUpload(fd) }} className="flex items-center justify-end gap-2 whitespace-nowrap overflow-x-auto">
                         <input type="hidden" name="id" defaultValue={m.id} />
                         <select name="usecase" defaultValue={m._uc || ''} className="rounded-xl border px-2 py-1 text-xs bg-white">
                           <option value="">(none)</option>

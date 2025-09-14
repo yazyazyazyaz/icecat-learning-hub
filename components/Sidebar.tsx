@@ -10,6 +10,7 @@ import {
   GraduationCap,
   LayoutDashboard,
   Wand2,
+  Link2,
 } from "lucide-react"
 import { cn } from "@/lib/utils"
 import { useSession } from "next-auth/react"
@@ -36,6 +37,7 @@ const navItems: NavItem[] = [
     ],
   },
   { href: "/documents", label: "Documents", icon: Folder },
+  { href: "/integration", label: "Integration Files", icon: Link2 },
   { href: "/quizzes", label: "Quizzes", icon: HelpCircle },
   {
     href: "/training",
@@ -66,6 +68,7 @@ export function Sidebar({ className = "" }: { className?: string }) {
               <Link
                 key={item.href}
                 href={item.href}
+                prefetch={false}
                 className={cn(
                   "flex items-center gap-3 rounded-xl px-2.5 py-2.5 text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[hsl(var(--accent))] focus-visible:ring-offset-2 transition-colors transform",
                   "hover:translate-x-0.5",

@@ -40,15 +40,15 @@ export default async function PresentationsPage({
   return (
     <div className="grid gap-4">
       <div className="flex items-center gap-2 flex-wrap max-w-5xl">
-        <Link className={`tag-chip ${!tag? 'tag-chip--active':''}`} href={`/presentations`}>All</Link>
+        <Link className={`tag-chip ${!tag? 'bg-sky-100 border-sky-400 text-sky-900':''}`} href={`/presentations`}>All</Link>
         {TAGS.map((t) => (
-          <Link key={t} className={`tag-chip ${tag===t? 'tag-chip--active':''}`} href={`/presentations?tag=${encodeURIComponent(t)}`}>{t}</Link>
+          <Link key={t} className={`tag-chip ${tag===t? 'bg-sky-100 border-sky-400 text-sky-900':''}`} href={`/presentations?tag=${encodeURIComponent(t)}`}>{t}</Link>
         ))}
       </div>
 
       {/* Column header once for all groups */}
       <section className="max-w-5xl">
-        <table className="w-full table-fixed text-sm">
+        <table className="w-full table-fixed text-xs">
           <colgroup>
             <col />
             <col className="w-28" />
@@ -68,7 +68,7 @@ export default async function PresentationsPage({
         byGroup[group] && byGroup[group].length > 0 ? (
           <section key={group} className="bg-white border rounded-2xl shadow-sm p-0 overflow-hidden max-w-5xl">
             <div className="px-3 py-2 bg-neutral-100 text-xs font-medium text-neutral-600">{group}</div>
-            <table className="w-full table-fixed text-sm">
+            <table className="w-full table-fixed text-xs">
               <colgroup>
                 <col />
                 <col className="w-28" />
@@ -77,7 +77,7 @@ export default async function PresentationsPage({
               <tbody className="divide-y divide-[hsl(var(--border))]">
                 {byGroup[group].map((p: any) => (
                   <tr key={p.id} className="align-middle">
-                    <td className="py-2 px-3 text-sm font-normal text-neutral-900">{p.title}</td>
+                    <td className="py-2 px-3 text-xs font-normal text-neutral-900">{p.title}</td>
                     <td className="py-2 px-3 border-l border-[hsl(var(--border))] whitespace-nowrap text-neutral-700">{p.path?.startsWith('/uploads/') ? 'Attachment' : 'Link'}</td>
                     <td className="py-2 px-3 border-l border-[hsl(var(--border))] whitespace-nowrap">
                       {p.path?.startsWith('/uploads/') ? (
