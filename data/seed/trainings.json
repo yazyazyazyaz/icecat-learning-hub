@@ -1,0 +1,56 @@
+[
+  {
+    "slug": "onboarding",
+    "title": "Icecat Onboarding",
+    "summary": "Welcome to Icecat. Learn the basics and policies.",
+    "isMandatory": true,
+    "durationMinutes": 30,
+    "tags": [
+      "onboarding",
+      "policies"
+    ],
+    "modules": [
+      {
+        "title": "Getting Started",
+        "order": 1,
+        "lessons": [
+          {
+            "title": "Company Introduction",
+            "slug": "intro",
+            "bodyMdx": null,
+            "externalUrl": null,
+            "order": 1
+          },
+          {
+            "title": "Tools Overview",
+            "slug": "tools",
+            "bodyMdx": null,
+            "externalUrl": null,
+            "order": 2
+          }
+        ]
+      },
+      {
+        "title": "Policies",
+        "order": 2,
+        "lessons": [
+          {
+            "title": "Security & Compliance",
+            "slug": "policies",
+            "bodyMdx": null,
+            "externalUrl": null,
+            "order": 1
+          }
+        ]
+      }
+    ],
+    "quizzes": [
+      {
+        "title": "Onboarding Quiz",
+        "description": "Check your understanding",
+        "timeLimitSeconds": 600,
+        "passThreshold": 70
+      }
+    ]
+  }
+]

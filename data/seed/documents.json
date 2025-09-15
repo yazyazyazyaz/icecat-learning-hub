@@ -1,0 +1,345 @@
+[
+  {
+    "title": "Categories List",
+    "path": "https://data.icecat.biz/export/freexml.int/refs/CategoriesList.xml.gz",
+    "tags": [
+      "Reference File",
+      "refscope:open"
+    ]
+  },
+  {
+    "title": "Category Feature Intervals List",
+    "path": "https://data.icecat.biz/export/freexml.int/refs/CategoryFeatureIntervalsList.xml",
+    "tags": [
+      "Reference File",
+      "refscope:open"
+    ]
+  },
+  {
+    "title": "Category Features List",
+    "path": "https://data.icecat.biz/export/freexml.int/refs/CategoryFeaturesList.xml.gz",
+    "tags": [
+      "Reference File",
+      "refscope:open"
+    ]
+  },
+  {
+    "title": "Distributor List",
+    "path": "https://data.icecat.biz/export/freexml.int/refs/DistributorList.xml.gz",
+    "tags": [
+      "Reference File",
+      "refscope:open"
+    ]
+  },
+  {
+    "title": "Feature Groups List",
+    "path": "https://data.icecat.biz/export/freexml.int/refs/FeatureGroupsList.xml.gz",
+    "tags": [
+      "Reference File",
+      "refscope:open"
+    ]
+  },
+  {
+    "title": "Feature Logos List",
+    "path": "https://data.icecat.biz/export/freexml.int/refs/FeatureLogosList.xml.gz",
+    "tags": [
+      "Reference File",
+      "refscope:open"
+    ]
+  },
+  {
+    "title": "Feature Values Vocabulary List",
+    "path": "https://data.icecat.biz/export/freexml.int/refs/FeatureValuesVocabularyList.xml.gz",
+    "tags": [
+      "Reference File",
+      "refscope:open"
+    ]
+  },
+  {
+    "title": "Features List",
+    "path": "https://data.icecat.biz/export/freexml.int/refs/FeaturesList.xml.gz",
+    "tags": [
+      "Reference File",
+      "refscope:open"
+    ]
+  },
+  {
+    "title": "Language List",
+    "path": "https://data.icecat.biz/export/freexml.int/refs/LanguageList.xml.gz",
+    "tags": [
+      "Reference File",
+      "refscope:open"
+    ]
+  },
+  {
+    "title": "Measures List",
+    "path": "https://data.icecat.biz/export/freexml.int/refs/MeasuresList.xml.gz",
+    "tags": [
+      "Reference File",
+      "refscope:open"
+    ]
+  },
+  {
+    "title": "Relations List",
+    "path": "https://data.icecat.biz/export/freexml.int/refs/RelationsList.xml",
+    "tags": [
+      "Reference File",
+      "refscope:open"
+    ]
+  },
+  {
+    "title": "Supplier Product Families List Request",
+    "path": "https://data.icecat.biz/export/freexml.int/refs/SupplierProductFamiliesListRequest.xml.gz",
+    "tags": [
+      "Reference File",
+      "refscope:open"
+    ]
+  },
+  {
+    "title": "Suppliers List",
+    "path": "https://data.icecat.biz/export/freexml.int/refs/SuppliersList.xml.gz",
+    "tags": [
+      "Reference File",
+      "refscope:open"
+    ]
+  },
+  {
+    "title": "Brand Organizations",
+    "path": "https://data.icecat.biz/export/level4/refs/BrandOrganizations.csv.gz",
+    "tags": [
+      "Reference File",
+      "refscope:full"
+    ]
+  },
+  {
+    "title": "Categories List",
+    "path": "https://data.icecat.biz/export/level4/refs/CategoriesList.xml.gz",
+    "tags": [
+      "Reference File",
+      "refscope:full"
+    ]
+  },
+  {
+    "title": "Category Feature Intervals List",
+    "path": "https://data.icecat.biz/export/level4/refs/CategoryFeatureIntervalsList.xml",
+    "tags": [
+      "Reference File",
+      "refscope:full"
+    ]
+  },
+  {
+    "title": "Category Features List",
+    "path": "https://data.icecat.biz/export/level4/refs/CategoryFeaturesList.xml.gz",
+    "tags": [
+      "Reference File",
+      "refscope:full"
+    ]
+  },
+  {
+    "title": "Distributor List",
+    "path": "https://data.icecat.biz/export/level4/refs/DistributorList.xml.gz",
+    "tags": [
+      "Reference File",
+      "refscope:full"
+    ]
+  },
+  {
+    "title": "Feature Groups List",
+    "path": "https://data.icecat.biz/export/level4/refs/FeatureGroupsList.xml.gz",
+    "tags": [
+      "Reference File",
+      "refscope:full"
+    ]
+  },
+  {
+    "title": "Feature Logos List",
+    "path": "https://data.icecat.biz/export/level4/refs/FeatureLogosList.xml.gz",
+    "tags": [
+      "Reference File",
+      "refscope:full"
+    ]
+  },
+  {
+    "title": "Feature Values Vocabulary List",
+    "path": "https://data.icecat.biz/export/level4/refs/FeatureValuesVocabularyList.xml.gz",
+    "tags": [
+      "Reference File",
+      "refscope:full"
+    ]
+  },
+  {
+    "title": "Features List",
+    "path": "https://data.icecat.biz/export/level4/refs/FeaturesList.xml.gz",
+    "tags": [
+      "Reference File",
+      "refscope:full"
+    ]
+  },
+  {
+    "title": "Language List",
+    "path": "https://data.icecat.biz/export/level4/refs/LanguageList.xml.gz",
+    "tags": [
+      "Reference File",
+      "refscope:full"
+    ]
+  },
+  {
+    "title": "Measures List",
+    "path": "https://data.icecat.biz/export/level4/refs/MeasuresList.xml.gz",
+    "tags": [
+      "Reference File",
+      "refscope:full"
+    ]
+  },
+  {
+    "title": "Relations List",
+    "path": "https://data.icecat.biz/export/level4/refs/RelationsList.xml",
+    "tags": [
+      "Reference File",
+      "refscope:full"
+    ]
+  },
+  {
+    "title": "Supplier Product Families List Request",
+    "path": "https://data.icecat.biz/export/level4/refs/SupplierProductFamiliesListRequest.xml.gz",
+    "tags": [
+      "Reference File",
+      "refscope:full"
+    ]
+  },
+  {
+    "title": "Suppliers List",
+    "path": "https://data.icecat.biz/export/level4/refs/SuppliersList.xml.gz",
+    "tags": [
+      "Reference File",
+      "refscope:full"
+    ]
+  },
+  {
+    "title": "Brand Organizations",
+    "path": "https://data.icecat.biz/export/freexml.int/refs/BrandOrganizations.csv.gz",
+    "tags": [
+      "Reference File",
+      "refscope:open",
+      "note:GPSR%20related.%20You%20must%20activate%20the%20setting%20on%20User%20Profile%20to%20be%20able%20to%20receive%20it%20in%20the%20export%20files.%20Consult%20with%20the%20Sustainability%20team%20for%20more%20information.",
+      "desc:For GPSR. Setting should be activated on a User Profile in order to show the Organizations in the individual product output formats. Consult with the Sustainability team for more information."
+    ]
+  },
+  {
+    "title": "Daily index file",
+    "path": "https://data.Icecat.biz/export/freexml/EN/daily.index.xml.gz",
+    "tags": [
+      "Index File",
+      "refscope:open",
+      "freexml"
+    ]
+  },
+  {
+    "title": "Full index file",
+    "path": "http://data.Icecat.biz/export/freexml/EN/files.index.xml",
+    "tags": [
+      "Index File",
+      "refscope:open",
+      "freexml"
+    ]
+  },
+  {
+    "title": "Daily index file",
+    "path": "https://data.icecat.biz/export/level4/EN/daily.index.xml.gz",
+    "tags": [
+      "Index File",
+      "refscope:full",
+      "level4"
+    ]
+  },
+  {
+    "title": "Full index file",
+    "path": "https://data.icecat.biz/export/level4/EN/files.index.xml.gz",
+    "tags": [
+      "level4",
+      "Index File",
+      "refscope:full"
+    ]
+  },
+  {
+    "title": "Content License",
+    "path": "https://iceclog.com/content-license-icecat/",
+    "tags": [
+      "Various documents",
+      "General",
+      "desc:For full icecat users"
+    ]
+  },
+  {
+    "title": "Icecat terms and conditions T&C",
+    "path": "https://iceclog.com/general-terms-conditions-icecat/",
+    "tags": [
+      "Various documents",
+      "General",
+      "desc:For Open brands & users & any other company/service of icecat"
+    ]
+  },
+  {
+    "title": "Lead agency afflitiate program",
+    "path": "https://v5.airtableusercontent.com/v3/u/45/45/1757872800000/xdpBrUmwrErJWt0S9R96jQ/JdGYzuC_a3Oyoq_TcdzlNSfzTst5lpUirTy3uV-KCMth8DJYo18LCg_HK4eVqXG2PKy-zu06ph9lTx354SBPbyEJtbe0Pm6KaVH13QiOPeJp3Mmn8DlLWrLrapCkos4DER0kUyOk_KxkiDWRexBo_vPn4SULp9l8bf8vYmO_0tHyz6Y2ufqe2qX4Din1YEJV/mFXM4jceC8cO2t4HPzvuN7KEDJYl8QtGdMcQENfL0UQ",
+    "tags": [
+      "General",
+      "Various documents"
+    ]
+  },
+  {
+    "title": "Bank details and financial identification",
+    "path": "https://v5.airtableusercontent.com/v3/u/45/45/1757872800000/UgV6333yNOphklxL17xlZQ/ltEljFeW76_LiM6AH3cQ4L-1JGCqDZIcWJoC6nXq7SLT2oHAKHHLGhA0elOv8G4Ach4Q5s0XBY2PF1pMEYSL-gY3t8pteB67IMyvNd5RODtC2YjNjGfhRfsuuWmBEKcBMf3Ftq1pP97rBEjG2bPlvhtwX0bt_Ok3luXxkwK9iEjszBn6RAPEZ8Tclni8cYfx/vguHtzHC6NXa69zpjhYiQrqkecC5ckaff9SFuhcjGtQ",
+    "tags": [
+      "General",
+      "Internal documents"
+    ]
+  },
+  {
+    "title": "Icecat letterhead",
+    "path": "https://v5.airtableusercontent.com/v3/u/45/45/1757872800000/8zjebke6FLM39FcNjFSVeg/VqAZHXormwy37dHXDZhN8INR8KJR0sDLBhatxtNwqqKS7JPjQ8zf_L17mhZcAjgdq_ZG_E9U8ujRLYS5jEjiTU_hxDlLp2ADdNJBFRl2uRP-nyOo-dQT1ik2Zyb-jGckhV1foWI_idEw1RAgey-jXrmVBISopU8jYz-IDF2WBNY/LFtv1Ivxxg0k9DuMXMdPB6P3WzTquN2O1D8VJy-8nWU",
+    "tags": [
+      "General",
+      "Contracts"
+    ]
+  },
+  {
+    "title": "Non disclosure agreement of Icecat",
+    "path": "https://v5.airtableusercontent.com/v3/u/45/45/1757872800000/HFm-jWzdP0lCWcUGQpfv4g/N41zRt8M2vFdtErLs7ZiWBd7AxaH6TC_ixX2sp0sDtNZeGvTsBR6aiUGmpFmyUp9GCnidiXzoiTHpMGe1GPUFDbTT-jtNLQHQ0Vrq2UTT0rGlAXfmzIiTVDD-ZwqigKVXpVBYlQ1eF9Vb-TLNuv0gNzcXR9ofKS9ZKCJ9dbKvTU/iTC78RiBoOujTQKC48z5I9m1Qku8ThdoQNw_Fv88UU4",
+    "tags": [
+      "General",
+      "Various documents"
+    ]
+  },
+  {
+    "title": "Price calculator",
+    "path": "https://docs.google.com/spreadsheets/d/1mtIRzwfE1Qfk4-_FJlr0XEm4kC6TQCoMQVGDKWN3fu8/edit?gid=0#gid=0",
+    "tags": [
+      "Internal documents"
+    ]
+  },
+  {
+    "title": "Retailers - short order form",
+    "path": "https://docs.google.com/document/d/1OlgSgvMdyFlyH8M6f9lPa_9mbNzqVVR3/edit",
+    "tags": [
+      "Icecat",
+      "Contracts"
+    ]
+  },
+  {
+    "title": "Brands - long proposal template",
+    "path": "https://docs.google.com/document/d/1BFP2x1TMR0Az87BhXLL9w8H_Y2H0JeX3X40kUuZ5ahI/edit",
+    "tags": [
+      "Icecat",
+      "Contracts"
+    ]
+  },
+  {
+    "title": "Retailers - long proposal template",
+    "path": "https://docs.google.com/document/d/1MFoedOhswTUMf7kcMH1ru4tfpZmE2kBP/edit?rtpof=true",
+    "tags": [
+      "Icecat",
+      "Contracts"
+    ]
+  }
+]

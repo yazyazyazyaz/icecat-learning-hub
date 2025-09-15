@@ -1,0 +1,263 @@
+[
+  {
+    "title": "JSON Manual",
+    "path": "https://iceclog.com/manual-for-icecat-json-product-requests/",
+    "tags": [
+      "manual",
+      "usecase:APIs"
+    ],
+    "kind": "DOCUMENT"
+  },
+  {
+    "title": "Guideline",
+    "path": "/uploads/documents/1757518251503_GuidelineIcecatBlogImages.pdf",
+    "tags": [
+      "manual",
+      "usecase:Social Media"
+    ],
+    "kind": "DOCUMENT"
+  },
+  {
+    "title": "Error messages and codes for the Icecat JSON and XML files",
+    "path": "https://iceclog.com/which-json-and-xml-error-messages-can-i-get-using-icecat/",
+    "tags": [
+      "manual",
+      "usecase:Various"
+    ],
+    "kind": "DOCUMENT"
+  },
+  {
+    "title": "Video Tutorials: How to Edit Your Product Data in Icecat Brand Cloud",
+    "path": "https://iceclog.com/video-tutorials-how-to-edit-your-product-data-in-vendor-central/",
+    "tags": [
+      "manual",
+      "usecase:Brand Cloud"
+    ],
+    "kind": "DOCUMENT"
+  },
+  {
+    "title": "Manual for Product Reviews Integration via Icecat -",
+    "path": "https://iceclog.com/manual-for-testseek-product-reviews-integration-via-icecat/",
+    "tags": [
+      "manual",
+      "usecase:Various"
+    ],
+    "kind": "DOCUMENT"
+  },
+  {
+    "title": "Index files per vertical",
+    "path": "https://iceclog.com/full-index-files-per-vertical-on-en-and-nl-locales-in-icecat-catalog/",
+    "tags": [
+      "manual",
+      "usecase:APIs"
+    ],
+    "kind": "DOCUMENT"
+  },
+  {
+    "title": "Open Icecat Fair Use Policy",
+    "path": "https://iceclog.com/open-icecat-fair-use-policy/",
+    "tags": [
+      "manual",
+      "usecase:Various"
+    ],
+    "kind": "DOCUMENT"
+  },
+  {
+    "title": "How to Upload Brand&#039;s Product Content in Google Manufacturer Center",
+    "path": "https://iceclog.com/manual-how-to-upload-your-brands-product-content-in-google-manufacturer-center-via-icecat/",
+    "tags": [
+      "manual",
+      "usecase:Brand Cloud"
+    ],
+    "kind": "DOCUMENT"
+  },
+  {
+    "title": "Product XML batch processing manual from Icecat",
+    "path": "https://iceclog.com/manual-icecat-product-xmls-batch-processing/",
+    "tags": [
+      "manual",
+      "usecase:APIs"
+    ],
+    "kind": "DOCUMENT"
+  },
+  {
+    "title": "Manual: Product Story Content Requirements and Blocks",
+    "path": "https://iceclog.com/product-story-content-requirements-and-blocks/",
+    "tags": [
+      "manual",
+      "usecase:Product Story"
+    ],
+    "kind": "DOCUMENT"
+  },
+  {
+    "title": "Easily import free product content from Icecat into your webshop.",
+    "path": "https://iceclog.com/manual-how-to-import-product-content-into-your-webshop-via-icecat/",
+    "tags": [
+      "manual",
+      "usecase:Various"
+    ],
+    "kind": "DOCUMENT"
+  },
+  {
+    "title": "Product Story manual how to embed rich content into your website?",
+    "path": "https://iceclog.com/product-story-manual-how-to-embed-rich-content-into-your-website/",
+    "tags": [
+      "manual",
+      "usecase:Product Story"
+    ],
+    "kind": "DOCUMENT"
+  },
+  {
+    "title": "Manual: Brand Editor in Icecat Brand Cloud (PIM)",
+    "path": "https://iceclog.com/manual-for-a-brand-editor-in-icecat-vendor-central-pim/",
+    "tags": [
+      "manual",
+      "usecase:Brand Cloud"
+    ],
+    "kind": "DOCUMENT"
+  },
+  {
+    "title": "Manual for Icecat Push-API (API-IN)",
+    "path": "https://iceclog.com/manual-for-icecat-push-api-api-in/",
+    "tags": [
+      "manual",
+      "usecase:APIs"
+    ],
+    "kind": "DOCUMENT"
+  },
+  {
+    "title": "XML Manual",
+    "path": "https://iceclog.com/open-catalog-interface-oci-open-icecat-xml-and-full-icecat-xml-repositories/",
+    "tags": [
+      "manual",
+      "usecase:APIs"
+    ],
+    "kind": "DOCUMENT"
+  },
+  {
+    "title": "Icecat Live: Real-Time Product Data in Your App",
+    "path": "https://iceclog.com/icecat-live-real-time-product-data-in-your-app/",
+    "tags": [
+      "manual",
+      "usecase:APIs"
+    ],
+    "kind": "DOCUMENT"
+  },
+  {
+    "title": "Manual downloading image libraries for your online products",
+    "path": "https://iceclog.com/manual-downloading-image-libraries/",
+    "tags": [
+      "manual",
+      "usecase:Various"
+    ],
+    "kind": "DOCUMENT"
+  },
+  {
+    "title": "International Standards Supported by Icecat",
+    "path": "https://iceclog.com/international-standards-supported-by-icecat/",
+    "tags": [
+      "manual",
+      "usecase:Various"
+    ],
+    "kind": "DOCUMENT"
+  },
+  {
+    "title": "Icecat User Access Management Policies",
+    "path": "https://iceclog.com/icecat-user-access-management-policies/",
+    "tags": [
+      "manual",
+      "usecase:Various"
+    ],
+    "kind": "DOCUMENT"
+  },
+  {
+    "title": "Icecat Rank: What is it and How to Improve on it?",
+    "path": "https://iceclog.com/icecat-brand-ranking-what-is-it-and-how-to-improve-on-it/",
+    "tags": [
+      "manual",
+      "usecase:Various"
+    ],
+    "kind": "DOCUMENT"
+  },
+  {
+    "title": "Icecat Locales and Language Code Table",
+    "path": "https://iceclog.com/icecat-locales-and-language-code-table/",
+    "tags": [
+      "manual",
+      "usecase:Various"
+    ],
+    "kind": "DOCUMENT"
+  },
+  {
+    "title": "Icecat Connectors",
+    "path": "https://icecat.com/connectors/",
+    "tags": [
+      "manual",
+      "usecase:Icecat Commerce"
+    ],
+    "kind": "DOCUMENT"
+  },
+  {
+    "title": "How to Make the Product Gallery Great Again",
+    "path": "https://iceclog.com/how-to-make-product-gallery-great-again/",
+    "tags": [
+      "manual",
+      "usecase:Various"
+    ],
+    "kind": "DOCUMENT"
+  },
+  {
+    "title": "Completeness score and its parameters description on",
+    "path": "https://iceclog.com/completeness-score/",
+    "tags": [
+      "manual",
+      "usecase:Various"
+    ],
+    "kind": "DOCUMENT"
+  },
+  {
+    "title": "Coverage Analysis of Your Catalog",
+    "path": "https://iceclog.com/coverage-analysis-of-your-catalog/",
+    "tags": [
+      "manual",
+      "usecase:Various"
+    ],
+    "kind": "DOCUMENT"
+  },
+  {
+    "title": "Activating Two Factor Authentication (2FA)",
+    "path": "https://iceclog.com/activating-two-factor-authentication-2fa/",
+    "tags": [
+      "manual",
+      "usecase:Various"
+    ],
+    "kind": "DOCUMENT"
+  },
+  {
+    "title": "Danish EPR",
+    "path": "https://docs.google.com/document/d/1xuK_lqiCNWYB-0u5D1m3_XYsYGZKyQwr/edit",
+    "tags": [
+      "manual",
+      "usecase:Sustainability"
+    ],
+    "kind": "DOCUMENT"
+  },
+  {
+    "title": "Granular Calls of Open Icecat Content",
+    "path": "https://iceclog.com/manual-icecat-live-for-granular-call/",
+    "tags": [
+      "manual",
+      "usecase:APIs"
+    ],
+    "kind": "DOCUMENT"
+  },
+  {
+    "title": "Icecat CSV interface for open and full icecat users",
+    "path": "https://iceclog.com/manuals-csv-interface/",
+    "tags": [
+      "manual",
+      "usecase:APIs"
+    ],
+    "kind": "DOCUMENT"
+  }
+]
