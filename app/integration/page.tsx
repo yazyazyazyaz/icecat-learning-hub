@@ -75,7 +75,11 @@ export default async function IntegrationFilesPage({ searchParams }: { searchPar
     }
   }
 
-  const groupsOrder = group === 'All' ? ([...GROUPS] as const) : ([group] as any)
+  // Determine which groups to render; keep a strict type of group names
+  const groupsOrder: Array<typeof GROUPS[number]> =
+    group === 'All'
+      ? [...GROUPS]
+      : (GROUPS.includes(group as any) ? [group as unknown as typeof GROUPS[number]] : [...GROUPS])
 
   return (
     <div className="space-y-4">
@@ -139,7 +143,7 @@ export default async function IntegrationFilesPage({ searchParams }: { searchPar
         </table>
       </section>
 
-      {groupsOrder.map((g) => (
+      {groupsOrder.map((g: typeof GROUPS[number]) => (
         byGroup[g] && byGroup[g].length > 0 ? (
           <section key={g} className="bg-white border rounded-2xl shadow-sm p-0 overflow-hidden max-w-5xl">
             <div className="px-3 py-2 bg-neutral-100 text-xs font-medium text-neutral-600 flex items-center gap-2">
@@ -319,13 +323,18 @@ function renderScopeTags(m: any) {
   return '-'
 }
 
-function pairReference(items: any[]) {
+type PairEntry = { key: string; title: string; open?: any; full?: any; format: string }
+
+function pairReference(items: any[]): PairEntry[] {
   const norm = (s: string) => (s || '').trim().toLowerCase()
   const fmt = (p?: string) => fileFormat(p || '')
-  const map = new Map<string, { key: string; title: string; open?: any; full?: any; format: string }>()
+  const map = new Map<string, PairEntry>()
   for (const it of items) {
     const key = norm(it.title)
-    const entry = map.get(key) || { key, title: it.title, format: fmt(it.path) }
+    let entry = map.get(key)
+    if (!entry) {
+      entry = { key, title: it.title, format: fmt(it.path) }
+    }
     if (hasTag(it, 'refscope:open')) entry.open = it
     if (hasTag(it, 'refscope:full')) entry.full = it
     // Prefer a non-empty format from either
