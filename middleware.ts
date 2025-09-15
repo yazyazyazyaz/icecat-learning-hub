@@ -10,7 +10,8 @@ export async function middleware(req: NextRequest) {
     return NextResponse.next()
   }
 
-  const token = await getToken({ req, secret: process.env.AUTH_SECRET || process.env.NEXTAUTH_SECRET })
+  // Edge runtime: pass v4 secret explicitly
+  const token = await getToken({ req, secret: process.env.NEXTAUTH_SECRET })
   if (!token) {
     const url = new URL('/signin', req.url)
     url.searchParams.set('callbackUrl', pathname + (search || ''))

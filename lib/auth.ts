@@ -103,6 +103,6 @@ export const authOptions: NextAuthOptions = {
   pages: {
     signIn: '/signin',
   },
-  // Accept either NEXTAUTH_SECRET or AUTH_SECRET
-  secret: process.env.AUTH_SECRET || process.env.NEXTAUTH_SECRET,
+  // NextAuth v4 secret (set in Vercel/local as NEXTAUTH_SECRET)
+  secret: process.env.NEXTAUTH_SECRET,
 }
