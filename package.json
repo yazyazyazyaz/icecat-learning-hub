@@ -8,7 +8,7 @@
   "scripts": {
     "predev": "prisma generate",
     "dev": "next dev -p 3000",
-    "build": "next build",
+    "build": "prisma migrate deploy && tsx scripts/import_repo_content.ts || true && tsx scripts/import_onboarding_csv.ts || true && next build",
     "start": "next start -p 3000",
     "lint": "eslint .",
     "typecheck": "tsc --noEmit",
