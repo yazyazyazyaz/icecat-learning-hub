@@ -12,6 +12,10 @@ export const metadata = {
   description: "Training and quizzes for Icecat",
 }
 
+// Force dynamic rendering to avoid static pre-render of pages that read headers/session.
+export const dynamic = 'force-dynamic'
+export const revalidate = 0
+
 export default async function RootLayout({ children }: { children: React.ReactNode }) {
   let session: any = null
   try {
