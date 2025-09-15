@@ -13,7 +13,12 @@ export const metadata = {
 }
 
 export default async function RootLayout({ children }: { children: React.ReactNode }) {
-  const session = await getServerSession(authOptions)
+  let session: any = null
+  try {
+    session = await getServerSession(authOptions)
+  } catch (e) {
+    console.error('getServerSession failed', e)
+  }
   return (
     <html lang="en">
       <body className={`${mono.className} ${mono.variable} min-h-screen bg-[hsl(var(--bg))] text-[hsl(var(--fg))]`}>
