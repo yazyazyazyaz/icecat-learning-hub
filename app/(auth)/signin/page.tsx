@@ -51,7 +51,6 @@ function SignInInner() {
         </button>
         <div className="text-xs text-neutral-600">
           <p className="mb-1">No account? <a className="underline" href="/register">Register</a> (requires admin approval)</p>
-          <p>Demo users: admin@, trainer@, employee@, viewer@ with password password123</p>
         </div>
       </form>
     </div>
