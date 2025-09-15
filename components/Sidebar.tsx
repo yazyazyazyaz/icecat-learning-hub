@@ -38,13 +38,12 @@ const navItems: NavItem[] = [
   },
   { href: "/documents", label: "Documents", icon: Folder },
   { href: "/integration", label: "Integration Files", icon: Link2 },
-  { href: "/quizzes", label: "Quizzes", icon: HelpCircle },
   {
-    href: "/training",
-    label: "Training program",
+    href: "/onboarding",
+    label: "Onboarding",
     icon: GraduationCap,
     sub: [
-      { href: "/training?plan=onboarding", label: "Onboarding" },
+      { href: "/onboarding", label: "Training Program" },
       { href: "/quizzes", label: "Quizzes" },
     ],
   },

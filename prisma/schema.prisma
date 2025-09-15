@@ -242,3 +242,32 @@ model Invite {
   expiresAt  DateTime?
   usedAt     DateTime?
 }
+
+// Learning paths (additive)
+model LearningPath {
+  id        String         @id @default(cuid())
+  slug      String         @unique
+  title     String
+  sortOrder Int            @default(0)
+  tasks     LearningTask[]
+  createdAt DateTime       @default(now())
+  updatedAt DateTime       @updatedAt
+}
+
+model LearningTask {
+  id          String       @id @default(cuid())
+  path        LearningPath @relation(fields: [pathId], references: [id], onDelete: Cascade)
+  pathId      String
+  day         Int?         // Day number; null = Extras/Bonus
+  title       String
+  programMd   String?
+  noteMd      String?
+  trainer     String?
+  attachments Json?        // [{name, url}]
+  position    Int
+  createdAt   DateTime     @default(now())
+  updatedAt   DateTime     @updatedAt
+
+  @@index([pathId, day, position])
+  @@unique([pathId, day, title])
+}

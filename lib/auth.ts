@@ -32,8 +32,7 @@ export const authOptions: NextAuthOptions = {
         if (!user || !user.password) return null
         const ok = await bcrypt.compare(password, user.password)
         if (!ok) return null
-        // Treat missing approved column as approved=true
-        if (typeof user.approved === 'boolean' && !user.approved) return null
+        // Do not block here on approved; handle in signIn callback to provide a clear message
         const out: NextAuthUser = {
           id: user.id,
           name: user.name ?? undefined,
@@ -47,6 +46,19 @@ export const authOptions: NextAuthOptions = {
     // AzureAD(...), Google(...)
   ],
   callbacks: {
+    async signIn({ user, account, credentials }) {
+      // Enforce admin approval for credentials sign-in
+      if (account?.provider === 'credentials') {
+        try {
+          const u = await db.user.findUnique({ where: { email: String(user?.email || '') }, select: { approved: true } })
+          if (u && typeof u.approved === 'boolean' && !u.approved) {
+            // Redirect to sign-in with explicit error
+            return '/signin?error=AccountNotApproved'
+          }
+        } catch {}
+      }
+      return true
+    },
     async jwt({ token, user }) {
       // On sign-in, seed token fields from DB
       if (user?.email) {

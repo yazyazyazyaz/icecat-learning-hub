@@ -5,6 +5,12 @@ export default function ToggleDetails({ targetId, label = "Edit", className = "p
     e.preventDefault()
     const el = document.getElementById(targetId) as HTMLDetailsElement | null
     if (!el) return
+    // Close other edit panels to avoid confusion
+    try {
+      document.querySelectorAll("details[id^='edit-']").forEach((d) => {
+        if (d instanceof HTMLDetailsElement && d !== el) d.open = false
+      })
+    } catch {}
     el.open = !el.open
     if (el.open) {
       el.scrollIntoView({ behavior: 'smooth', block: 'nearest' })
@@ -16,4 +22,3 @@ export default function ToggleDetails({ targetId, label = "Edit", className = "p
     </button>
   )
 }
-

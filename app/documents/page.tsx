@@ -1,9 +1,11 @@
 import Link from "next/link"
 import { db } from "@/lib/db"
+import ActionButtons from "@/components/ActionButtons"
 
 const DOC_TAGS = [
   'Contracts',
   'Various documents',
+  'Internal documents',
 ] as const
 
 export default async function DocumentsPage({ searchParams }: { searchParams?: { tag?: string } }) {
@@ -30,6 +32,34 @@ export default async function DocumentsPage({ searchParams }: { searchParams?: {
       items = []
     }
   }
+
+  // Deduplicate items by normalized path (ignoring query/hash) or by normalized title if no path
+  function normalizePath(p: string): string {
+    try {
+      const u = new URL(p, 'https://example.com')
+      // If relative path, base URL above will be used but we only care about pathname
+      const isAbsolute = /^https?:\/\//i.test(p)
+      const key = (isAbsolute ? (u.host + u.pathname) : u.pathname).toLowerCase().replace(/\/+$/, '')
+      return key || p.toLowerCase()
+    } catch { return (p || '').toLowerCase() }
+  }
+  function normalizeTitle(t: string): string { return (t || '').trim().toLowerCase() }
+  const byKey = new Map<string, any>()
+  for (const it of items) {
+    const key = (it.path ? normalizePath(String(it.path)) : '') || normalizeTitle(String(it.title))
+    const prev = byKey.get(key)
+    if (!prev) {
+      byKey.set(key, it)
+    } else {
+      // Keep the most recent by updatedAt
+      try {
+        const a = new Date(it.updatedAt as any).getTime() || 0
+        const b = new Date(prev.updatedAt as any).getTime() || 0
+        if (a >= b) byKey.set(key, it)
+      } catch { /* ignore */ }
+    }
+  }
+  items = Array.from(byKey.values())
 
   const groupsOrder = tag ? [tag] : [...DOC_TAGS, 'Uncategorized']
   const byGroup: Record<string, any[]> = {}
@@ -66,7 +96,7 @@ export default async function DocumentsPage({ searchParams }: { searchParams?: {
             <tr>
               <th className="py-2 px-3 text-left text-xs font-medium">Title</th>
               <th className="py-2 px-3 text-left text-xs font-medium border-l border-[hsl(var(--border))]">Type</th>
-              <th className="py-2 px-3 text-left text-xs font-medium border-l border-[hsl(var(--border))]">Link</th>
+              <th className="py-2 px-3 text-right text-xs font-medium border-l border-[hsl(var(--border))]">Action</th>
             </tr>
           </thead>
         </table>
@@ -75,7 +105,10 @@ export default async function DocumentsPage({ searchParams }: { searchParams?: {
       {groupsOrder.map((group) => (
         byGroup[group] && byGroup[group].length > 0 ? (
           <section key={group} className="bg-white border rounded-2xl shadow-sm p-0 overflow-hidden max-w-5xl">
-            <div className="px-3 py-2 bg-neutral-100 text-xs font-medium text-neutral-600">{group}</div>
+            <div className="px-3 py-2 bg-neutral-100 text-xs font-medium text-neutral-600 flex items-center gap-2">
+              <span aria-hidden className="text-base leading-none">{emojiForDocTag(group)}</span>
+              <span>{group}</span>
+            </div>
             <table className="w-full table-fixed text-xs">
               <colgroup>
                 <col />
@@ -87,11 +120,11 @@ export default async function DocumentsPage({ searchParams }: { searchParams?: {
                   <tr key={m.id} className="align-middle">
                     <td className="py-2 px-3 text-xs font-normal text-neutral-900">{m.title}</td>
                     <td className="py-2 px-3 border-l border-[hsl(var(--border))] whitespace-nowrap text-neutral-700">{m.path?.startsWith('/uploads/') ? 'Attachment' : 'Link'}</td>
-                    <td className="py-2 px-3 border-l border-[hsl(var(--border))] whitespace-nowrap">
+                    <td className="py-2 px-3 border-l border-[hsl(var(--border))] whitespace-nowrap text-right">
                       {m.path?.startsWith('/uploads/') ? (
-                        <a className="underline font-medium" href={m.path} target="_blank" rel="noreferrer">Preview</a>
+                        <ActionButtons links={[{ label: 'Preview', href: m.path }]} labelMode="label" />
                       ) : (
-                        <a className="underline font-medium" href={m.path} target="_blank" rel="noreferrer">Open</a>
+                        <ActionButtons links={[{ label: 'Open', href: m.path }]} labelMode="label" />
                       )}
                     </td>
                   </tr>
@@ -104,3 +137,14 @@ export default async function DocumentsPage({ searchParams }: { searchParams?: {
     </div>
   )
 }
+
+function emojiForDocTag(tag: string): string {
+  switch (tag) {
+    case 'Contracts': return '🧾'
+    case 'Various documents': return '🗂️'
+    case 'Internal documents': return '🏢'
+    default: return '📄'
+  }
+}
+
+// ActionButtons handles favicons for external links; attachments show none

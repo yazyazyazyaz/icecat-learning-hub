@@ -16,6 +16,7 @@ type FormData = z.infer<typeof schema>
 function SignInInner() {
   const sp = useSearchParams()
   const callbackUrl = sp.get('callbackUrl') ?? '/dashboard'
+  const error = sp.get('error') || ''
   const {
     register,
     handleSubmit,
@@ -30,6 +31,11 @@ function SignInInner() {
     <div className="mx-auto max-w-md rounded-2xl border border-[hsl(var(--border))] bg-[hsl(var(--surface))] p-6 shadow-sm text-[15px]">
       <h1 className="text-xl font-semibold mb-4">Sign in</h1>
       <form onSubmit={handleSubmit(onSubmit)} className="grid gap-4">
+        {error === 'AccountNotApproved' && (
+          <div className="text-sm rounded-lg border border-amber-200 bg-amber-50 text-amber-900 p-2">
+            Account needs to get approved first.
+          </div>
+        )}
         <div>
           <label className="block text-sm mb-1">Email</label>
           <input className="input" type="email" placeholder="you@example.com" {...register('email')} />

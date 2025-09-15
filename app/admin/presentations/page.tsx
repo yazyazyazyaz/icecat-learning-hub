@@ -10,6 +10,9 @@ const TAGS = [
   "For Brands",
   "Icecat Commerce",
   "Amazon",
+  "Product Stories",
+  "Sustainability",
+  "Various",
 ] as const;
 
 export default async function AdminPresentations({
@@ -103,10 +106,10 @@ export default async function AdminPresentations({
               <input name="usecase_new" className="w-full rounded-xl border px-3 py-2 text-sm" placeholder="e.g. Integrations" />
             </div>
             <div className="md:col-span-6">
-              <label className="block text-sm mb-1">Tags</label>
+              <label className="block text-sm mb-1">Tag</label>
               <div className="flex items-center gap-3 flex-wrap">
                 {TAGS.map((t) => (
-                  <label key={t} className="text-sm"><input type="checkbox" name="tags" value={t} className="mr-2" defaultChecked={editing.tags?.includes(t)} /> {t}</label>
+                  <label key={t} className="text-sm"><input type="radio" name="tag" value={t} className="mr-2" defaultChecked={editing.tags?.includes(t)} /> {t}</label>
                 ))}
               </div>
             </div>
@@ -115,13 +118,7 @@ export default async function AdminPresentations({
               <input name="file" type="file" className="w-full text-sm" />
               <p className="text-xs text-neutral-500 mt-1">If selected, the file will be uploaded and used instead of URL.</p>
             </div>
-            <div>
-              <span className="block text-sm mb-1">Audience</span>
-              <div className="flex gap-3 text-sm">
-                <label className="inline-flex items-center gap-2"><input type="radio" name="audience" value="RETAILERS" defaultChecked={editing.audience==="RETAILERS"} /> For Retailers</label>
-                <label className="inline-flex items-center gap-2"><input type="radio" name="audience" value="BRANDS" defaultChecked={editing.audience==="BRANDS"} /> For Brands</label>
-              </div>
-            </div>
+            {/* Audience removed from edit */}
             <div className="flex items-center gap-2"><SubmitButton label="Update presentation" pendingLabel="Updating..." /><SaveStatus /></div>
           </form>
         )}
@@ -149,26 +146,20 @@ export default async function AdminPresentations({
             <label className="block text-sm mb-1">Custom Use Case (optional)</label>
             <input name="usecase_new" className="w-full rounded-xl border px-3 py-2 text-sm" placeholder="e.g. Integrations" />
           </div>
-          <div className="md:col-span-6">
-            <label className="block text-sm mb-1">Tags</label>
-            <div className="flex items-center gap-3 flex-wrap">
-              {TAGS.map((t) => (
-                <label key={t} className="text-sm"><input type="checkbox" name="tags" value={t} className="mr-2" /> {t}</label>
-              ))}
+            <div className="md:col-span-6">
+              <label className="block text-sm mb-1">Tag</label>
+              <div className="flex items-center gap-3 flex-wrap">
+                {TAGS.map((t) => (
+                  <label key={t} className="text-sm"><input type="radio" name="tag" value={t} className="mr-2" /> {t}</label>
+                ))}
+              </div>
             </div>
-          </div>
           <div className="md:col-span-3">
             <label className="block text-sm mb-1">Or upload attachment (optional)</label>
             <input name="file" type="file" className="w-full text-sm" />
             <p className="text-xs text-neutral-500 mt-1">If selected, the file will be uploaded and used instead of URL.</p>
           </div>
-          <div>
-            <span className="block text-sm mb-1">Audience</span>
-            <div className="flex gap-3 text-sm">
-              <label className="inline-flex items-center gap-2"><input type="radio" name="audience" value="RETAILERS" defaultChecked /> For Retailers</label>
-              <label className="inline-flex items-center gap-2"><input type="radio" name="audience" value="BRANDS" /> For Brands</label>
-            </div>
-          </div>
+            {/* Audience removed from add */}
           <div className="flex items-center gap-2"><SubmitButton label="Add presentation" pendingLabel="Adding..." /><SaveStatus /></div>
         </form>
       </section>
@@ -192,14 +183,7 @@ export default async function AdminPresentations({
                     <td className="py-2 px-4">{p.title}</td>
                     <td className="py-2 px-4 whitespace-nowrap text-neutral-700">{p.path?.startsWith('/uploads/') ? 'Attachment' : 'Link'}</td>
                     <td className="py-2 px-4 text-gray-700 truncate max-w-[360px]">
-                      {p.path?.startsWith('/uploads/') ? (
-                        <span className="space-x-3">
-                          <a className="underline font-medium" href={p.path} target="_blank" rel="noreferrer">Preview</a>
-                          <a className="underline text-neutral-700" href={p.path} download>Download</a>
-                        </span>
-                      ) : (
-                        <a className="underline font-medium" href={p.path} target="_blank" rel="noreferrer">Open</a>
-                      )}
+                      <a className="underline font-medium" href={p.path} target="_blank" rel="noreferrer">Click</a>
                     </td>
                     <td className="py-2 px-4 text-gray-600">{p.updatedAt.toISOString().slice(0,10)}</td>
                     <td className="py-2 px-4">
@@ -234,5 +218,17 @@ export default async function AdminPresentations({
       ))}
     </div>
   );
+}
+function emojiForTag(tag: string): string {
+  switch (tag) {
+    case 'For Retailers': return '🛍️'
+    case 'For Brands': return '🏷️'
+    case 'Icecat Commerce': return '🛒'
+    case 'Amazon': return '📦'
+    case 'Product Stories': return '📚'
+    case 'Sustainability': return '🌿'
+    case 'Various': return '🧩'
+    default: return '📄'
+  }
 }
 import Link from "next/link";

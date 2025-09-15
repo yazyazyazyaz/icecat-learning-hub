@@ -1,4 +1,5 @@
 import Link from "next/link"
+import { Fragment } from "react"
 import { db } from "@/lib/db"
 import { createUpload, updateUpload, deleteUpload, importManualsFromUrls } from "@/actions/uploads"
 import ConfirmDelete from "@/components/ConfirmDelete"
@@ -10,6 +11,18 @@ const DEFAULT_USE_CASES = [
   'Social Media',
   'Icecat Commerce',
   'Various',
+] as const
+
+// Editor tag options (used like Documents' tags)
+const MANUAL_TAGS = [
+  'APIs',
+  'Social Media',
+  'Icecat Commerce',
+  'Various',
+  'Brand Cloud',
+  'Reviews',
+  'Product Story',
+  'Sustainability',
 ] as const
 
 export default async function EditorManualsPage({ searchParams }: { searchParams?: { uc?: string; edit?: string } }) {
@@ -53,12 +66,13 @@ export default async function EditorManualsPage({ searchParams }: { searchParams
             <label className="block text-sm mb-1">URL (leave empty if uploading attachment)</label>
             <input name="path" className="w-full rounded-xl border px-3 py-2 text-sm" placeholder="https://..." />
           </div>
-          <div>
-            <label className="block text-sm mb-1">Use Case</label>
-            <select name="usecase" className="w-full rounded-xl border px-3 py-2 text-sm bg-white">
-              <option value="">(none)</option>
-              {useCases.map((c) => (<option key={c} value={c}>{c}</option>))}
-            </select>
+          <div className="md:col-span-6">
+            <label className="block text-sm mb-1">Tag</label>
+            <div className="flex items-center gap-3 flex-wrap">
+              {MANUAL_TAGS.map((t) => (
+                <label key={t} className="text-sm"><input type="radio" name="usecase" value={t} className="mr-2" /> {t}</label>
+              ))}
+            </div>
           </div>
           <div className="md:col-span-3">
             <label className="block text-sm mb-1">Or upload attachment (optional)</label>
@@ -66,7 +80,7 @@ export default async function EditorManualsPage({ searchParams }: { searchParams
             <p className="text-xs text-neutral-500 mt-1">If selected, the file will be uploaded and used instead of URL.</p>
           </div>
           <div className="flex items-center gap-2">
-            <SubmitButton label="Add manual" pendingLabel="Adding..." />
+            <SubmitButton label="Add manual" pendingLabel="Adding..." className="bg-violet-500 text-white hover:bg-violet-600 border-violet-600" />
             <SaveStatus />
           </div>
         </form>
@@ -101,7 +115,7 @@ https://example.com/post-2" className="w-full rounded-xl border px-3 py-2 text-s
               </thead>
               <tbody className="divide-y divide-[hsl(var(--border))]">
                 {byGroup[group].map((m: any) => (
-                  <>
+                  <Fragment key={m.id}>
                   <tr key={m.id} className="align-middle">
                     <td className="py-2 px-3 text-xs text-neutral-900">{m.title}</td>
                     <td className="py-2 px-3 border-l border-[hsl(var(--border))] whitespace-nowrap text-neutral-700">{m.path?.startsWith('/uploads/') ? 'Attachment' : 'Link'}</td>
@@ -116,17 +130,13 @@ https://example.com/post-2" className="w-full rounded-xl border px-3 py-2 text-s
                         </form>
                         <form action={async (fd: FormData) => { 'use server'; await updateUpload(fd) }} className="inline-flex items-center gap-2">
                           <input type="hidden" name="id" defaultValue={m.id} />
-                          <select name="usecase" defaultValue={m._uc || ''} className="rounded-xl border px-2 py-1 text-xs bg-white">
-                            <option value="">(none)</option>
-                            {useCases.map((c) => (<option key={c} value={c}>{c}</option>))}
-                          </select>
                           <SubmitButton label="Save" pendingLabel="Saving..." className="text-xs px-2 py-1" />
                           <SaveStatus />
                         </form>
                       </div>
                     </td>
                   </tr>
-                  <tr>
+                  <tr key={`edit-${m.id}-details`}>
                     <td colSpan={5} className="bg-neutral-50">
                       <details id={`edit-${m.id}`} open={editId === m.id}>
                         <summary className="hidden">Edit</summary>
@@ -141,24 +151,25 @@ https://example.com/post-2" className="w-full rounded-xl border px-3 py-2 text-s
                               <label className="block text-sm mb-1">URL</label>
                               <input name="path" defaultValue={m.path} className="w-full rounded-xl border px-3 py-2 text-sm bg-white" placeholder="https://..." />
                             </div>
-                            <div>
-                              <label className="block text-sm mb-1">Use Case</label>
-                              <select name="usecase" defaultValue={m._uc || ''} className="w-full rounded-xl border px-3 py-2 text-sm bg-white">
-                                <option value="">(none)</option>
-                                {useCases.map((c) => (<option key={c} value={c}>{c}</option>))}
-                              </select>
+                            <div className="md:col-span-6">
+                              <label className="block text-sm mb-1">Tag</label>
+                              <div className="flex items-center gap-3 flex-wrap">
+                                {MANUAL_TAGS.map((t) => (
+                                  <label key={t} className="text-sm"><input type="radio" name="usecase" value={t} defaultChecked={m._uc === t} className="mr-2" /> {t}</label>
+                                ))}
+                              </div>
                             </div>
                             <div className="flex items-center gap-2">
                               <SubmitButton label="Update" pendingLabel="Updating..." className="bg-emerald-600 text-white hover:bg-emerald-700 border-emerald-700" />
                               <SaveStatus />
-                              <Link href={`/editor/manuals${uc?`?uc=${encodeURIComponent(uc)}`:''}`} className="px-3 py-1 rounded-full border text-xs">Cancel</Link>
+                              <ToggleDetails targetId={`edit-${m.id}`} label="Cancel" className="px-3 py-1 rounded-full border text-xs" />
                             </div>
                           </form>
                         </div>
                       </details>
                     </td>
                   </tr>
-                  </>
+                  </Fragment>
                 ))}
               </tbody>
             </table>

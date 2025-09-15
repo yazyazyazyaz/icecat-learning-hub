@@ -1,9 +1,18 @@
 import Link from "next/link"
 import { db } from "@/lib/db"
+import ActionButtons from "@/components/ActionButtons"
 
 export const revalidate = 60
 
-const DEFAULT_USE_CASES = ["APIs", "Social Media", "Icecat Commerce", "Various"] as const
+// Preferred order of groups shown on the page
+const DEFAULT_USE_CASES = [
+  "APIs",
+  "Product Story",
+  "Icecat Commerce",
+  "Brand Cloud",
+  "Sustainability",
+  "Various",
+] as const
 
 type Manual = { id: string; title: string; path: string; tags?: string[]; _uc?: string }
 
@@ -70,7 +79,7 @@ export default async function ManualsPage({ searchParams }: { searchParams?: { u
             <tr>
               <th className="py-2 px-3 text-left text-xs font-medium">Title</th>
               <th className="py-2 px-3 text-left text-xs font-medium border-l border-[hsl(var(--border))]">Type</th>
-              <th className="py-2 px-3 text-left text-xs font-medium border-l border-[hsl(var(--border))]">Link</th>
+              <th className="py-2 px-3 text-right text-xs font-medium border-l border-[hsl(var(--border))]">Action</th>
             </tr>
           </thead>
         </table>
@@ -80,7 +89,10 @@ export default async function ManualsPage({ searchParams }: { searchParams?: { u
       {groupsOrder.map((group) =>
         byGroup[group] && byGroup[group].length > 0 ? (
           <section key={group} className="bg-white border rounded-2xl shadow-sm p-0 overflow-hidden max-w-5xl">
-            <div className="px-3 py-2 bg-neutral-100 text-xs font-medium text-neutral-600">{group}</div>
+            <div className="px-3 py-2 bg-neutral-100 text-xs font-medium text-neutral-600 flex items-center gap-2">
+              <span aria-hidden className="text-base leading-none">{emojiForUseCase(group)}</span>
+              <span>{group}</span>
+            </div>
             <table className="w-full table-fixed text-xs">
               <colgroup>
                 <col />
@@ -94,15 +106,11 @@ export default async function ManualsPage({ searchParams }: { searchParams?: { u
                     <td className="py-2 px-3 border-l border-[hsl(var(--border))] whitespace-nowrap text-neutral-700">
                       {m.path?.startsWith("/uploads/") ? "Attachment" : "Link"}
                     </td>
-                    <td className="py-2 px-3 border-l border-[hsl(var(--border))] whitespace-nowrap">
+                    <td className="py-2 px-3 border-l border-[hsl(var(--border))] whitespace-nowrap text-right">
                       {m.path?.startsWith("/uploads/") ? (
-                        <a className="underline font-medium" href={m.path} target="_blank" rel="noreferrer">
-                          Preview
-                        </a>
+                        <ActionButtons links={[{ label: 'Preview', href: m.path }]} labelMode="label" />
                       ) : (
-                        <a className="underline font-medium" href={m.path} target="_blank" rel="noreferrer">
-                          Open
-                        </a>
+                        <ActionButtons links={[{ label: 'Open', href: m.path }]} labelMode="label" />
                       )}
                     </td>
                   </tr>
@@ -114,4 +122,19 @@ export default async function ManualsPage({ searchParams }: { searchParams?: { u
       )}
     </div>
   )
+}
+
+// ActionButtons handles favicons for external links; attachments show none
+
+function emojiForUseCase(uc: string): string {
+  switch (uc) {
+    case 'APIs': return '🧩'
+    case 'Product Story': return '📄'
+    case 'Icecat Commerce': return '🛒'
+    case 'Brand Cloud': return '☁️'
+    case 'Sustainability': return '🍃'
+    case 'Various': return '🔹'
+    case 'Social Media': return '💬'
+    default: return '🔹'
+  }
 }

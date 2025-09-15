@@ -15,9 +15,10 @@ export async function createPresentation(formData: FormData) {
 
   const title = (formData.get("title") as string)?.trim();
   let filePath  = (formData.get("path")  as string)?.trim();
-  const audience = ((formData.get("audience") as string)?.toUpperCase() as "RETAILERS" | "BRANDS");
+  let audience = ((formData.get("audience") as string)?.toUpperCase() as "RETAILERS" | "BRANDS");
   const description = (formData.get("description") as string)?.trim() || null;
   const tagsInput = (formData.getAll("tags") || []).map((t)=>String(t));
+  const singleTag = String(formData.get('tag') || '').trim();
   const uc = String(formData.get('usecase') || '').trim();
   const ucNew = String(formData.get('usecase_new') || '').trim();
   const ucFinal = uc === 'custom' ? ucNew : uc;
@@ -35,10 +36,13 @@ export async function createPresentation(formData: FormData) {
     filePath = `/uploads/presentations/${fileName}`;
   }
 
+  // Default audience if omitted (UI no longer asks for it)
+  if (!audience) audience = 'RETAILERS';
   if (!title || !filePath || !audience) throw new Error("Missing fields");
 
   const tags = (() => {
     const t = tagsInput.filter((x) => !x.startsWith('usecase:'));
+    if (singleTag && !t.includes(singleTag)) t.push(singleTag);
     if (ucFinal) t.push(`usecase:${ucFinal}`);
     return t;
   })();
@@ -78,24 +82,47 @@ export async function updatePresentation(formData: FormData) {
 
   const id = (formData.get("id") as string) || "";
   const title = (formData.get("title") as string)?.trim();
-  const path  = (formData.get("path")  as string)?.trim();
-  const audience = ((formData.get("audience") as string)?.toUpperCase() as "RETAILERS" | "BRANDS");
+  let filePath  = (formData.get("path")  as string)?.trim();
+  let audience = ((formData.get("audience") as string)?.toUpperCase() as "RETAILERS" | "BRANDS");
   const description = (formData.get("description") as string)?.trim() || null;
   const tagsInput = (formData.getAll("tags") || []).map((t)=>String(t));
+  const singleTag = String(formData.get('tag') || '').trim();
   const uc = String(formData.get('usecase') || '').trim();
   const ucNew = String(formData.get('usecase_new') || '').trim();
   const ucFinal = uc === 'custom' ? ucNew : uc;
+  const file = formData.get('file') as unknown as File | null;
 
-  if (!id || !title || !path || !audience) throw new Error("Missing fields");
+  // Optional file upload to replace existing path
+  if (file && typeof file === 'object' && 'arrayBuffer' in file && (file as any).size > 0) {
+    const bytes = Buffer.from(await (file as File).arrayBuffer());
+    const ext = filePath ? filePath.substring(filePath.lastIndexOf('.')) || '.pdf' : ('.pdf');
+    const original = (file as any).name || `presentation${ext}`;
+    const safeName = original.replace(/[^a-zA-Z0-9._-]/g, '_');
+    const dir = path.join(process.cwd(), 'public', 'uploads', 'presentations');
+    await fs.mkdir(dir, { recursive: true });
+    const fileName = `${Date.now()}_${safeName}`;
+    const abs = path.join(dir, fileName);
+    await fs.writeFile(abs, bytes);
+    filePath = `/uploads/presentations/${fileName}`;
+  }
 
-  const prev = await prisma.presentation.findUnique({ where: { id }, select: { tags: true } });
+  // Pull previous presentation to preserve values when omitted
+  const prev = await prisma.presentation.findUnique({ where: { id }, select: { tags: true, audience: true } });
+  if (!audience) audience = (prev?.audience as any) || 'RETAILERS';
+  if (!id || !title || !filePath || !audience) throw new Error("Missing fields");
+
   let tags = (prev?.tags || []).filter((t) => !t.startsWith('usecase:'));
   for (const t of tagsInput) if (!t.startsWith('usecase:')) tags.push(t);
+  if (singleTag) {
+    // Replace any existing TAGS member with the selected one
+    tags = tags.filter((t) => !["For Retailers","For Brands","Icecat Commerce","Amazon"].includes(t as any));
+    tags.push(singleTag);
+  }
   if (ucFinal) tags = tags.filter((t)=>!t.startsWith('usecase:')).concat([`usecase:${ucFinal}`]);
 
   await prisma.presentation.update({
     where: { id },
-    data: { title, path, description, audience, tags },
+    data: { title, path: filePath, description, audience, tags },
   });
 
   revalidatePath("/admin/presentations");

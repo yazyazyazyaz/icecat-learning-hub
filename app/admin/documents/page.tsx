@@ -6,6 +6,7 @@ import { SubmitButton, SaveStatus } from "@/components/FormSaveControls"
 const DOC_TAGS = [
   'Contracts',
   'Various documents',
+  'Internal documents',
 ] as const
 
 export default async function AdminDocumentsPage({ searchParams }: { searchParams?: { tag?: string; edit?: string } }) {
@@ -107,7 +108,10 @@ export default async function AdminDocumentsPage({ searchParams }: { searchParam
       {groupsOrder.map((group) => (
         byGroup[group] && byGroup[group].length > 0 ? (
           <section key={group} className="bg-white border rounded-2xl shadow-sm p-0 overflow-hidden max-w-5xl">
-            <div className="px-3 py-2 border-b bg-neutral-100 text-[11px] uppercase tracking-wide text-neutral-700">{group}</div>
+            <div className="px-3 py-2 border-b bg-neutral-100 text-[11px] uppercase tracking-wide text-neutral-700 flex items-center gap-2">
+              <span aria-hidden className="text-base leading-none">{emojiForDocTag(group)}</span>
+              <span>{group}</span>
+            </div>
             <table className="w-full table-auto text-sm">
               <thead className="bg-neutral-50/80 text-neutral-600">
                 <tr>
@@ -146,4 +150,13 @@ export default async function AdminDocumentsPage({ searchParams }: { searchParam
       ))}
     </div>
   )
+}
+
+function emojiForDocTag(tag: string): string {
+  switch (tag) {
+    case 'Contracts': return '🧾'
+    case 'Various documents': return '🗂️'
+    case 'Internal documents': return '🏢'
+    default: return '📄'
+  }
 }

@@ -142,7 +142,10 @@ export default async function IntegrationFilesPage({ searchParams }: { searchPar
       {groupsOrder.map((g) => (
         byGroup[g] && byGroup[g].length > 0 ? (
           <section key={g} className="bg-white border rounded-2xl shadow-sm p-0 overflow-hidden max-w-5xl">
-            <div className="px-3 py-2 bg-neutral-100 text-xs font-medium text-neutral-600">{g}</div>
+            <div className="px-3 py-2 bg-neutral-100 text-xs font-medium text-neutral-600 flex items-center gap-2">
+              <span aria-hidden className="text-base leading-none">{emojiForGroup(g)}</span>
+              <span>{displayGroupName(g)}</span>
+            </div>
             <table className="w-full table-fixed text-xs">
               <colgroup>
                 <col />
@@ -157,9 +160,9 @@ export default async function IntegrationFilesPage({ searchParams }: { searchPar
                         <td className="py-2 px-3 text-xs font-normal text-neutral-900">
                           <DetailTitle title={p.title} openDesc={getDesc(p.open)} fullDesc={getDesc(p.full)} className="truncate" />
                         </td>
-                    <td className="py-2 px-3 border-l border-[hsl(var(--border))] whitespace-nowrap text-neutral-700">
-                      {p.open && p.full ? 'For both' : p.open ? 'Open Icecat' : p.full ? 'Full Icecat' : '—'}
-                    </td>
+                        <td className="py-2 px-3 border-l border-[hsl(var(--border))] whitespace-nowrap text-neutral-700">
+                          {renderPairScope(p)}
+                        </td>
                         <td className="py-2 px-3 border-l border-[hsl(var(--border))] whitespace-nowrap text-neutral-700">
                           <code className="px-1 py-0.5 rounded bg-neutral-100 text-neutral-800 text-[11px]">{p.format}</code>
                         </td>
@@ -171,6 +174,7 @@ export default async function IntegrationFilesPage({ searchParams }: { searchPar
                             ]}
                             openDesc={getDesc(p.open)}
                             fullDesc={getDesc(p.full)}
+                            favicon={"https://www.google.com/s2/favicons?sz=32&domain=icecat.biz"}
                           />
                         </td>
                       </tr>
@@ -180,12 +184,12 @@ export default async function IntegrationFilesPage({ searchParams }: { searchPar
                         <td className="py-2 px-3 text-xs font-normal text-neutral-900">
                           <DetailTitle title={m.title} desc={getDesc(m)} className="truncate" />
                         </td>
-                        <td className="py-2 px-3 border-l border-[hsl(var(--border))] whitespace-nowrap text-neutral-700">{typeLabel(m)}</td>
+                        <td className="py-2 px-3 border-l border-[hsl(var(--border))] whitespace-nowrap text-neutral-700">{renderScopeTags(m)}</td>
                         <td className="py-2 px-3 border-l border-[hsl(var(--border))] whitespace-nowrap text-neutral-700">
                           <code className="px-1 py-0.5 rounded bg-neutral-100 text-neutral-800 text-[11px]">{fileFormat(m.path)}</code>
                         </td>
                         <td className="py-2 px-3 border-l border-[hsl(var(--border))] whitespace-nowrap text-right">
-                          <ActionButtons links={[{ label: 'Link', href: m.path }]} desc={getDesc(m)} />
+                          <ActionButtons links={[{ label: 'Link', href: m.path }]} desc={getDesc(m)} favicon={"https://www.google.com/s2/favicons?sz=32&domain=icecat.biz"} />
                         </td>
                       </tr>
                     ))}
@@ -228,6 +232,91 @@ function getDesc(m: any): string | null {
     const found = t.find((x) => typeof x === 'string' && x.startsWith('desc:'))
     return found ? found.slice(5) : null
   } catch { return null }
+}
+
+function emojiForGroup(name: string): string {
+  try {
+    const n = String(name || '')
+    if (/index/i.test(n)) return '🗂️'
+    if (/reference/i.test(n)) return '🔖'
+    const options = ['📄','📁','📑','🧭','🗃️','🗂️','📚','🔗']
+    let h = 0
+    for (let i = 0; i < n.length; i++) h = (h * 31 + n.charCodeAt(i)) >>> 0
+    return options[h % options.length]
+  } catch { return '📄' }
+}
+
+function displayGroupName(name: string): string {
+  try {
+    if (name === 'Index File') return 'Index Files'
+    if (name === 'Reference File') return 'Reference Files'
+    return name
+  } catch { return name }
+}
+
+function Dot({ color }: { color: 'green' | 'blue' }) {
+  const cls = color === 'green' ? 'bg-emerald-500' : 'bg-sky-500'
+  return <span aria-hidden className={`inline-block w-2 h-2 rounded-full ${cls}`}></span>
+}
+
+function renderPairScope(p: { open?: any; full?: any }) {
+  if (p.open && p.full) {
+    return (
+      <span className="inline-flex items-center gap-1">
+        <Dot color="green" />
+        <Dot color="blue" />
+        <span>For both</span>
+      </span>
+    )
+  }
+  if (p.open) {
+    return (
+      <span className="inline-flex items-center gap-1">
+        <Dot color="green" />
+        <span>Open Icecat</span>
+      </span>
+    )
+  }
+  if (p.full) {
+    return (
+      <span className="inline-flex items-center gap-1">
+        <Dot color="blue" />
+        <span>Full Icecat</span>
+      </span>
+    )
+  }
+  return '-'
+}
+
+function renderScopeTags(m: any) {
+  const open = hasTag(m, 'refscope:open')
+  const full = hasTag(m, 'refscope:full')
+  if (open && full) {
+    return (
+      <span className="inline-flex items-center gap-1">
+        <Dot color="green" />
+        <Dot color="blue" />
+        <span>For both</span>
+      </span>
+    )
+  }
+  if (open) {
+    return (
+      <span className="inline-flex items-center gap-1">
+        <Dot color="green" />
+        <span>Open Icecat</span>
+      </span>
+    )
+  }
+  if (full) {
+    return (
+      <span className="inline-flex items-center gap-1">
+        <Dot color="blue" />
+        <span>Full Icecat</span>
+      </span>
+    )
+  }
+  return '-'
 }
 
 function pairReference(items: any[]) {

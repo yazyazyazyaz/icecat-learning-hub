@@ -76,16 +76,16 @@ export default async function EditorIntegrationFilesPage({ searchParams }: { sea
             <label className="block text-sm mb-1">Groups</label>
             <div className="flex items-center gap-3 flex-wrap">
               {GROUPS.map((t) => (
-                <label key={t} className="text-sm"><input type="checkbox" name="tags" value={t} className="mr-2" /> {t}</label>
+                <label key={t} className="text-sm"><input type="checkbox" name="tags" value={t} className="mr-2" /> {displayGroupName(t)}</label>
               ))}
             </div>
-            <div className="mt-2 text-xs text-neutral-600">Access level (only for Reference File):</div>
+            <div className="mt-2 text-xs text-neutral-600">Access level (only for Reference Files):</div>
             <div className="flex items-center gap-3 flex-wrap mt-1">
               <label className="text-sm"><input type="checkbox" name="tags" value="refscope:open" className="mr-2" /> Open Icecat</label>
               <label className="text-sm"><input type="checkbox" name="tags" value="refscope:full" className="mr-2" /> Full Icecat</label>
             </div>
           </div>
-          <div className="flex items-center gap-2"><SubmitButton label="Add link" pendingLabel="Adding..." /><SaveStatus /></div>
+          <div className="flex items-center gap-2"><SubmitButton label="Add link" pendingLabel="Adding..." className="bg-violet-500 text-white hover:bg-violet-600 border-violet-600" /><SaveStatus /></div>
         </form>
       </section>
 
@@ -102,7 +102,7 @@ export default async function EditorIntegrationFilesPage({ searchParams }: { sea
       {groupsOrder.map((g) => (
         byGroup[g] && byGroup[g].length > 0 ? (
           <section key={g} className="bg-white border rounded-2xl shadow-sm p-0 overflow-hidden max-w-5xl">
-            <div className="px-3 py-2 border-b bg-neutral-100 text-[11px] uppercase tracking-wide text-neutral-700">{g}</div>
+            <div className="px-3 py-2 border-b bg-neutral-100 text-[11px] uppercase tracking-wide text-neutral-700">{displayGroupName(g)}</div>
             <ul className="divide-y divide-[hsl(var(--border))]">
               {byGroup[g].map((m: any) => (
                 <li key={m.id} className="grid grid-cols-[1fr_14rem_12rem_28rem] items-center text-xs">
@@ -143,10 +143,10 @@ export default async function EditorIntegrationFilesPage({ searchParams }: { sea
                             <label className="block text-sm mb-1">Groups</label>
                             <div className="flex items-center gap-3 flex-wrap">
                               {GROUPS.map((t) => (
-                                <label key={t} className="text-sm"><input type="checkbox" name="tags" value={t} defaultChecked={hasTag(m, t)} className="mr-2" /> {t}</label>
+                                <label key={t} className="text-sm"><input type="checkbox" name="tags" value={t} defaultChecked={hasTag(m, t)} className="mr-2" /> {displayGroupName(t)}</label>
                               ))}
                             </div>
-                            <div className="mt-2 text-xs text-neutral-600">Access level (only for Reference File):</div>
+                            <div className="mt-2 text-xs text-neutral-600">Access level (only for Reference Files):</div>
                             <div className="flex items-center gap-3 flex-wrap mt-1">
                               <label className="text-sm"><input type="checkbox" name="tags" value="refscope:open" defaultChecked={hasTag(m,'refscope:open')} className="mr-2" /> Open Icecat</label>
                               <label className="text-sm"><input type="checkbox" name="tags" value="refscope:full" defaultChecked={hasTag(m,'refscope:full')} className="mr-2" /> Full Icecat</label>
@@ -199,6 +199,14 @@ function getDesc(m: any): string | null {
     const found = t.find((x) => typeof x === 'string' && x.startsWith('desc:'))
     return found ? found.slice(5) : null
   } catch { return null }
+}
+
+function displayGroupName(name: string): string {
+  try {
+    if (name === 'Index File') return 'Index Files'
+    if (name === 'Reference File') return 'Reference Files'
+    return name
+  } catch { return name }
 }
 
 function typeLabel(m: any): string {

@@ -33,7 +33,7 @@ export async function registerUser(input: unknown) {
     }
   }
   try {
-    await db.user.create({
+    const u = await db.user.create({
       data: {
         name: data.name,
         jobFunction: data.jobFunction,
@@ -42,7 +42,19 @@ export async function registerUser(input: unknown) {
         approved: false,
         ...(role ? { role } : {}),
       } as any,
+      select: { id: true, name: true, email: true },
     })
+    // Notify admin of new registration
+    try {
+      const { sendMail } = await import('@/lib/mail')
+      await sendMail({
+        to: process.env.NEW_USER_NOTIFY_EMAIL || 'yagiz@icecat.com',
+        subject: `New registration: ${data.name} <${data.email}>`,
+        text: `A new user registered.\n\nName: ${data.name}\nEmail: ${data.email}\nFunction: ${data.jobFunction}\nInvite: ${data.invite || '-'}\n\nApprove in Admin → Users.`,
+      })
+    } catch (e) {
+      console.warn('Failed to send registration email notification', e)
+    }
   } catch (e) {
     // Fallback when optional columns (e.g., jobFunction) are not present in DB
     const user = await db.user.create({
@@ -64,6 +76,15 @@ export async function registerUser(input: unknown) {
       )`)
       await (db as any).$executeRawUnsafe('INSERT INTO "UserKV" ("userId","key","value") VALUES ($1,$2,$3) ON CONFLICT ("userId","key") DO UPDATE SET value=EXCLUDED.value', user.id, 'jobFunction', data.jobFunction)
     } catch {}
+    // Attempt notification even on fallback
+    try {
+      const { sendMail } = await import('@/lib/mail')
+      await sendMail({
+        to: process.env.NEW_USER_NOTIFY_EMAIL || 'yagiz@icecat.com',
+        subject: `New registration: ${data.name} <${data.email}>`,
+        text: `A new user registered.\n\nName: ${data.name}\nEmail: ${data.email}\nFunction: ${data.jobFunction}\nInvite: ${data.invite || '-'}\n\nApprove in Admin → Users.`,
+      })
+    } catch {}
   }
   return { ok: true }
 }
@@ -78,8 +99,18 @@ async function requireAdmin() {
 
 export async function approveUser(id: string) {
   await requireAdmin()
-  const { id: userId } = approveSchema.parse({ id })
-  await db.user.update({ where: { id: userId }, data: { approved: true }, select: { id: true } })
+  const parsed = approveSchema.safeParse({ id })
+  const userId = parsed.success ? parsed.data.id : id
+  try {
+    await db.user.update({ where: { id: userId }, data: { approved: true }, select: { id: true } })
+  } catch (e) {
+    // Fallback: try raw SQL for environments where Prisma schema may be out of sync
+    try {
+      await (db as any).$executeRawUnsafe(`UPDATE "User" SET "approved"=true WHERE "id"=$1`, userId)
+    } catch (err) {
+      throw e
+    }
+  }
   revalidatePath('/admin/users')
   return { ok: true }
 }
