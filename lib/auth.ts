@@ -4,8 +4,6 @@ import { db } from '@/lib/db'
 import bcrypt from 'bcryptjs'
 
 export const authOptions: NextAuthOptions = {
-  // Allow running on Vercel without NEXTAUTH_URL by trusting host header
-  trustHost: true,
   session: { strategy: 'jwt' },
   providers: [
     Credentials({
