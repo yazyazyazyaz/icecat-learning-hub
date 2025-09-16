@@ -8,6 +8,7 @@ import JSZip from 'jszip'
 import * as XLSX from 'xlsx'
 import { revalidatePath } from "next/cache"
 import { db } from "@/lib/db"
+import { saveTempDownload } from "@/lib/tempDownloads"
 
 function ensureAuth(session: any) {
   if (!session?.user) throw new Error('Unauthorized')
@@ -38,9 +39,8 @@ async function persistWizardFile(filename: string, buf: Buffer, mime: string) {
   const dir = safeUploadDir('wizard')
   await fs.mkdir(dir, { recursive: true })
   if (dir.startsWith('/tmp')) {
-    return {
-      path: `data:${mime};name=${encodeURIComponent(filename)};base64,${buf.toString('base64')}`,
-    }
+    const token = saveTempDownload(buf, mime, filename)
+    return { path: `/api/wizard/download?token=${token}` }
   }
   const outPath = path.join(dir, filename)
   await fs.writeFile(outPath, buf)
@@ -355,8 +355,8 @@ export async function runBatch(formData: FormData) {
   const out = path.join(dir, `batch_${token}.zip`)
   let pathZip: string
   if (dir.startsWith('/tmp')) {
-    // Serverless: return data URL so the client can download without persistent storage
-    pathZip = `data:application/zip;name=${encodeURIComponent(path.basename(out))};base64,${blob.toString('base64')}`
+    const tokenZip = saveTempDownload(blob, 'application/zip', path.basename(out))
+    pathZip = `/api/wizard/download?token=${tokenZip}`
   } else {
     await fs.writeFile(out, blob)
     pathZip = `/uploads/wizard/${path.basename(out)}`
@@ -378,7 +378,8 @@ export async function runBatch(formData: FormData) {
     const xbuf = XLSX.write(wbErr, { bookType: 'xlsx', type: 'buffer' }) as Buffer
     const xfile = path.join(dir, `batch_${token}_errors.xlsx`)
     if (dir.startsWith('/tmp')) {
-      errorsXlsxPath = `data:application/vnd.openxmlformats-officedocument.spreadsheetml.sheet;name=${encodeURIComponent(path.basename(xfile))};base64,${xbuf.toString('base64')}`
+      const tokenErr = saveTempDownload(xbuf, 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet', path.basename(xfile))
+      errorsXlsxPath = `/api/wizard/download?token=${tokenErr}`
     } else {
       await fs.writeFile(xfile, xbuf)
       errorsXlsxPath = `/uploads/wizard/${path.basename(xfile)}`
@@ -395,7 +396,8 @@ export async function runBatch(formData: FormData) {
     const lbuf = XLSX.write(wbLinks, { bookType: 'xlsx', type: 'buffer' }) as Buffer
     const lfile = path.join(dir, `batch_${token}_links.xlsx`)
     if (dir.startsWith('/tmp')) {
-      linksXlsxPath = `data:application/vnd.openxmlformats-officedocument.spreadsheetml.sheet;name=${encodeURIComponent(path.basename(lfile))};base64,${lbuf.toString('base64')}`
+      const tokenLinks = saveTempDownload(lbuf, 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet', path.basename(lfile))
+      linksXlsxPath = `/api/wizard/download?token=${tokenLinks}`
     } else {
       await fs.writeFile(lfile, lbuf)
       linksXlsxPath = `/uploads/wizard/${path.basename(lfile)}`

@@ -186,12 +186,11 @@ export default function WizardClient() {
         <button className={`tag-chip ${mode==='single'?'bg-sky-100 border-sky-400 text-sky-900':''}`} onClick={()=>setMode('single')}>Single Product</button>
         <button className={`tag-chip ${mode==='batch'?'bg-sky-100 border-sky-400 text-sky-900':''}`} onClick={()=>setMode('batch')}>Batch</button>
         {busy && (
-          <span className="ml-2 inline-flex items-center gap-2 text-sm text-neutral-700 dark:text-neutral-200">
-            <Hourglass className="w-4 h-4 animate-spin text-emerald-700 dark:text-sky-400" /> Working…
-            {mode==='batch' && eta>0 && <span className="text-xs">ETA: {eta}s</span>}
+          <span className="ml-2 inline-flex items-center gap-2 text-sm text-neutral-800">
+            <Hourglass className="w-4 h-4 animate-spin text-sky-700" /> Working.
+            {mode==='batch' && eta>0 && <span className="text-xs text-neutral-600">ETA: {eta}s</span>}
           </span>
         )}
-      </div>
 
       {mode === 'single' && (
         <div className="mt-3 flex items-center gap-2">
