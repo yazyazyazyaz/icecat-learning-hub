@@ -6,8 +6,8 @@
   /* Warm cream background (slightly lighter than sample) */
   --bg: 40 45% 96%;           /* soft cream */
   --surface: 40 40% 98%;      /* lighter surface on cream */
-  --fg: 220 25% 12%;          /* deep slate text for contrast */
-  --muted: 32 12% 42%;        /* warm gray for secondary text */
+  --fg: 0 0% 10%;             /* near-black default text */
+  --muted: 0 0% 35%;          /* neutral gray for secondary text */
   --border: 40 25% 90%;       /* gentle border on cream */
   --accent: 221 85% 38%;      /* Finnish blue accent */
   --radius: 16px;

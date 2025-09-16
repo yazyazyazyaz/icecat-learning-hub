@@ -72,12 +72,12 @@ export function Sidebar({ className = "" }: { className?: string }) {
                   "flex items-center gap-3 rounded-xl px-2.5 py-2.5 text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[hsl(var(--accent))] focus-visible:ring-offset-2 transition-colors transform",
                   "hover:translate-x-0.5",
                   active
-                    ? "font-semibold text-neutral-900 dark:text-neutral-100"
-                    : "text-neutral-900/90 dark:text-neutral-200 hover:text-neutral-900 dark:hover:text-neutral-100"
+                    ? "font-semibold text-neutral-900"
+                    : "text-neutral-800 hover:text-neutral-900"
                 )}
                 aria-current={active ? "page" : undefined}
               >
-                <Icon className="h-[18px] w-[18px] text-neutral-700 dark:text-neutral-300" />
+                <Icon className="h-[18px] w-[18px] text-neutral-800" />
                 <span>{item.label}</span>
               </Link>
             )
@@ -89,8 +89,7 @@ export function Sidebar({ className = "" }: { className?: string }) {
               href="/editor"
               className={cn(
                 "block text-center px-3 py-2 rounded-xl text-sm font-medium",
-                "bg-emerald-700 text-white hover:bg-emerald-800",
-                "dark:bg-emerald-800 dark:hover:bg-emerald-900"
+                "bg-emerald-700 text-white hover:bg-emerald-800"
               )}
             >
               Editor Panel
@@ -99,8 +98,7 @@ export function Sidebar({ className = "" }: { className?: string }) {
               href="/admin"
               className={cn(
                 "block text-center px-3 py-2 rounded-xl text-sm font-medium",
-                "bg-neutral-800 text-white hover:bg-neutral-900",
-                "dark:bg-neutral-700 dark:hover:bg-neutral-800"
+                "bg-neutral-900 text-white hover:bg-neutral-800"
               )}
             >
               Admin Panel
@@ -113,8 +111,7 @@ export function Sidebar({ className = "" }: { className?: string }) {
               href="/editor"
               className={cn(
                 "block text-center px-3 py-2 rounded-xl text-sm font-medium",
-                "bg-emerald-700 text-white hover:bg-emerald-800",
-                "dark:bg-emerald-800 dark:hover:bg-emerald-900"
+                "bg-emerald-700 text-white hover:bg-emerald-800"
               )}
             >
               Editor Panel

@@ -2,7 +2,6 @@ import type { Config } from 'tailwindcss'
 import defaultTheme from 'tailwindcss/defaultTheme'
 
 const config: Config = {
-  darkMode: false,
   content: [
     "./app/**/*.{ts,tsx}",
     "./components/**/*.{ts,tsx}",
