@@ -14,6 +14,8 @@ function ensureAuth(session: any) {
 }
 
 function safeUploadDir(...parts: string[]) {
+  const useTmp = process.env.VERCEL === '1'
+  if (useTmp) return path.join('/tmp', ...parts)
   return path.join(process.cwd(), 'public', 'uploads', ...parts)
 }
 
@@ -29,6 +31,17 @@ function safeName(s: string | undefined | null) {
 function getShopName(formShop?: string) {
   const s = (formShop || '').trim()
   return s || process.env.ICECAT_SHOPNAME || process.env.NEXT_PUBLIC_ICECAT_SHOPNAME || 'openicecat-live'
+}
+
+async function persistWizardFile(filename: string, buf: Buffer, mime: string): Promise<string> {
+  const dir = safeUploadDir('wizard')
+  await fs.mkdir(dir, { recursive: true })
+  if (dir.startsWith('/tmp')) {
+    return `data:${mime};name=${encodeURIComponent(filename)};base64,${buf.toString('base64')}`
+  }
+  const outPath = path.join(dir, filename)
+  await fs.writeFile(outPath, buf)
+  return `/uploads/wizard/${path.basename(outPath)}`
 }
 
 async function getAppKeyForCurrentUser(): Promise<string | null> {
@@ -157,12 +170,9 @@ export async function runSingle(formData: FormData) {
       filename = fileNameJsonByMpnBrand(mpn, brand, lang)
     }
     const buf = await fetchJson(url)
-    const dir = safeUploadDir('wizard')
-    await fs.mkdir(dir, { recursive: true })
-    const outPath = path.join(dir, filename)
-    await fs.writeFile(outPath, buf)
+    const downloadPath = await persistWizardFile(filename, buf, 'application/json')
     revalidatePath('/wizard')
-    return { ok: true, path: `/uploads/wizard/${filename}` }
+    return { ok: true, path: downloadPath, request: url }
   } else {
     const auth = { user, pass }
     let url = ''
@@ -177,12 +187,9 @@ export async function runSingle(formData: FormData) {
       filename = fileNameXmlByMpnBrand(mpn, brand, lang)
     }
     const buf = await fetchXml(url, auth)
-    const dir = safeUploadDir('wizard')
-    await fs.mkdir(dir, { recursive: true })
-    const outPath = path.join(dir, filename)
-    await fs.writeFile(outPath, buf)
+    const downloadPath = await persistWizardFile(filename, buf, 'application/xml')
     revalidatePath('/wizard')
-    return { ok: true, path: `/uploads/wizard/${filename}` }
+    return { ok: true, path: downloadPath, request: url }
   }
 }
 
@@ -331,10 +338,7 @@ export async function runBatch(formData: FormData) {
   }
 
   const blob = await zip.generateAsync({ type: 'nodebuffer' })
-  const dir = safeUploadDir('wizard')
-  await fs.mkdir(dir, { recursive: true })
-  const out = path.join(dir, `batch_${token}.zip`)
-  await fs.writeFile(out, blob)
+  const zipPath = await persistWizardFile(`batch_${token}.zip`, blob, 'application/zip')
   // Write XLSX error workbook with dynamic identifier columns
   const wbErr = XLSX.utils.book_new()
   if (errRowsEan.length > 0) {
@@ -350,9 +354,8 @@ export async function runBatch(formData: FormData) {
   let errorsXlsxPath: string | null = null
   if ((errRowsEan.length + errRowsMpn.length) > 0) {
     const xbuf = XLSX.write(wbErr, { bookType: 'xlsx', type: 'buffer' }) as Buffer
-    const xfile = path.join(dir, `batch_${token}_errors.xlsx`)
-    await fs.writeFile(xfile, xbuf)
-    errorsXlsxPath = `/uploads/wizard/${path.basename(xfile)}`
+    errorsXlsxPath = await persistWizardFile(`batch_${token}_errors.xlsx`, xbuf,
+      'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')
   }
 
   // Write XLSX download links (single column)
@@ -363,15 +366,14 @@ export async function runBatch(formData: FormData) {
     const sheet = XLSX.utils.aoa_to_sheet([header, ...linkRows])
     XLSX.utils.book_append_sheet(wbLinks, sheet, 'Links')
     const lbuf = XLSX.write(wbLinks, { bookType: 'xlsx', type: 'buffer' }) as Buffer
-    const lfile = path.join(dir, `batch_${token}_links.xlsx`)
-    await fs.writeFile(lfile, lbuf)
-    linksXlsxPath = `/uploads/wizard/${path.basename(lfile)}`
+    linksXlsxPath = await persistWizardFile(`batch_${token}_links.xlsx`, lbuf,
+      'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')
   }
   revalidatePath('/wizard')
   const totalRows = Math.max(0, rows.length)
   return {
     ok: true,
-    path: `/uploads/wizard/${path.basename(out)}`,
+    path: zipPath,
     errorsXlsx: errorsXlsxPath || undefined,
     linksXlsx: linksXlsxPath || undefined,
     metrics: {

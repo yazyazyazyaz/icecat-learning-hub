@@ -119,10 +119,10 @@ export default async function OnboardingPage({ searchParams }: { searchParams?: 
 
           return (
             <details key={item.id} className="group rounded-lg border bg-white open:border-blue-500 open:ring-2 open:ring-blue-200">
-              <summary className="cursor-pointer px-3 py-2 text-xs font-medium transition-colors group-open:bg-blue-50 group-open:text-blue-900">
-                <span className="block text-sm font-semibold text-neutral-900">Training {trainingNumber}</span>
-                <span className={`block text-xs font-semibold ${accentClass}`}>{dayDisplay}</span>
-                <span className="block text-xs text-neutral-700 mt-1">{item.title}</span>
+              <summary className="cursor-pointer px-3 py-2 text-xs font-medium transition-colors group-open:bg-blue-50 group-open:text-blue-900 flex flex-wrap items-baseline gap-2">
+                <span className="text-sm font-semibold text-neutral-900">Training {trainingNumber}</span>
+                <span className={`text-xs font-semibold ${accentClass}`}>{dayDisplay}</span>
+                <span className="text-xs text-neutral-700">{item.title}</span>
               </summary>
               <div className="p-3 border-t bg-neutral-50 space-y-3">
                 {item.programMd && (

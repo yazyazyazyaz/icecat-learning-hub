@@ -82,7 +82,13 @@ export default function WizardClient() {
         const res = await runSingle(formData)
         const p = (res as any)?.path || null
         setSingleResult(p)
-        try { if (p) localStorage.setItem('wizard:singleResult', p) } catch {}
+        try {
+          if (p && !String(p).startsWith('data:')) {
+            localStorage.setItem('wizard:singleResult', p)
+          } else {
+            localStorage.removeItem('wizard:singleResult')
+          }
+        } catch {}
       } catch (e: any) {
         setSingleError(String(e?.message || 'Failed'))
       }
@@ -120,7 +126,15 @@ export default function WizardClient() {
       if (etaRef.current) { clearInterval(etaRef.current); etaRef.current = null }
       const next = { path: (res as any)?.path, errorsXlsx: (res as any)?.errorsXlsx, linksXlsx: (res as any)?.linksXlsx, metrics: (res as any)?.metrics }
       setBatchResult(next)
-      try { localStorage.setItem('wizard:batchResult', JSON.stringify(next)) } catch {}
+      try {
+        const p = String(next.path || '')
+        const hasData = p.startsWith('data:') || String(next.errorsXlsx || '').startsWith('data:') || String(next.linksXlsx || '').startsWith('data:')
+        if (!hasData) {
+          localStorage.setItem('wizard:batchResult', JSON.stringify(next))
+        } else {
+          localStorage.removeItem('wizard:batchResult')
+        }
+      } catch {}
     })
   }
 
