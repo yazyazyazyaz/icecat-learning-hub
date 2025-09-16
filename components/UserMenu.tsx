@@ -23,10 +23,7 @@ export default function UserMenu() {
     <div className="relative">
       <details className="group">
         <summary className="cursor-pointer text-sm list-none select-none px-3 py-1.5 rounded-full border bg-white hover:bg-neutral-100 marker:content-none">
-          <span className="inline-flex items-center gap-2 text-neutral-900">
-            <span className="font-medium truncate max-w-[14rem]">{name}</span>
-            {role && <span className="text-xs text-neutral-500 uppercase tracking-wide">{role}</span>}
-          </span>
+          <span className="font-medium text-neutral-900 truncate max-w-[14rem]">{name}</span>
         </summary>
         <div className="absolute right-0 mt-2 w-48 rounded-xl border bg-white shadow-lg p-1">
           <Link href="/profile" className="block px-3 py-2 text-sm rounded-lg hover:bg-neutral-100">Profile</Link>

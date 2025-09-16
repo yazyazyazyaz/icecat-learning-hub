@@ -31,17 +31,17 @@ export default function Header() {
           </SheetTrigger>
           <SheetContent side="left" className="p-0">
             <div className="p-4 border-b border-[hsl(var(--border))]">
-              <Link href="/" className="flex items-center gap-2 text-base font-semibold">
-                <Logo className="h-10 w-10" />
+              <Link href="/" className="flex items-center gap-2 text-sm font-medium text-neutral-900">
+                <Logo className="h-8 w-8" />
                 <span>Icecat Learning Hub</span>
               </Link>
             </div>
             <Sidebar className="h-[calc(100vh-57px)]" />
           </SheetContent>
         </Sheet>
-        <Link href="/" className="hidden md:inline text-base font-semibold">
+        <Link href="/" className="hidden md:inline text-sm font-medium text-neutral-900">
           <span className="inline-flex items-center gap-2">
-            <Logo className="h-10 w-10" />
+            <Logo className="h-8 w-8" />
             <span>Icecat Learning Hub</span>
           </span>
         </Link>
