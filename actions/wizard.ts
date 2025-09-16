@@ -8,16 +8,12 @@ import JSZip from 'jszip'
 import * as XLSX from 'xlsx'
 import { revalidatePath } from "next/cache"
 import { db } from "@/lib/db"
-import { saveTempDownload } from "@/lib/tempDownloads"
 
 function ensureAuth(session: any) {
   if (!session?.user) throw new Error('Unauthorized')
 }
 
 function safeUploadDir(...parts: string[]) {
-  // On Vercel, the filesystem is read-only except for /tmp. Use /tmp for temp and outputs.
-  const useTmp = process.env.VERCEL === '1'
-  if (useTmp) return path.join('/tmp', ...parts)
   return path.join(process.cwd(), 'public', 'uploads', ...parts)
 }
 
@@ -33,20 +29,6 @@ function safeName(s: string | undefined | null) {
 function getShopName(formShop?: string) {
   const s = (formShop || '').trim()
   return s || process.env.ICECAT_SHOPNAME || process.env.NEXT_PUBLIC_ICECAT_SHOPNAME || 'openicecat-live'
-}
-
-async function persistWizardFile(filename: string, buf: Buffer, mime: string) {
-  const dir = safeUploadDir('wizard')
-  await fs.mkdir(dir, { recursive: true })
-  if (dir.startsWith('/tmp')) {
-    const token = saveTempDownload(buf, mime, filename)
-    return { path: `/api/wizard/download?token=${token}` }
-  }
-  const outPath = path.join(dir, filename)
-  await fs.writeFile(outPath, buf)
-  return {
-    path: `/uploads/wizard/${filename}`,
-  }
 }
 
 async function getAppKeyForCurrentUser(): Promise<string | null> {
@@ -103,8 +85,8 @@ async function fetchJson(url: string): Promise<Buffer> {
   // Some Icecat responses may be HTTP 200 but contain a Message indicating not found
   try {
     const j = JSON.parse(bodyText)
-    const maybeMsg = (j.Message || j.message || j.ErrorMessage || '').toString()
-    if (maybeMsg && /not\s+present|not\s+found|no\s+match|does\s+not\s+exist|invalid|unauthori|denied/i.test(maybeMsg)) {
+    const maybeMsg = (j.Message || j.message || '').toString()
+    if (maybeMsg && /not\s+present|not\s+found|no\s+match/i.test(maybeMsg)) {
       throw new Error(maybeMsg)
     }
   } catch {
@@ -130,19 +112,12 @@ async function fetchXml(url: string, auth: { user?: string; pass?: string }): Pr
     throw new Error(`XML ${res.status}: ${msg || 'request failed'}`)
   }
   // Detect embedded error despite 200
-  {
-    // If ErrorMessage or <Message> is present, treat as error
-    const m = bodyText.match(/ErrorMessage=\"([^\"]+)/i) || bodyText.match(/<Message[^>]*>([^<]+)</i)
-    if (m && m[1]) {
-      const msg = m[1]
-      throw new Error(msg)
-    }
-    if (/requested\s+product\s+is\s+not\s+present|not\s+found|no\s+match|does\s+not\s+exist|invalid|unauthori|denied/i.test(bodyText)) {
-      let msg = 'The requested product is not present in the Icecat database'
-      const mm = bodyText.match(/Message\"?>([^<]+)</i) || bodyText.match(/ErrorMessage=\"([^\"]+)/i)
-      if (mm && mm[1]) msg = mm[1]
-      throw new Error(msg)
-    }
+  if (/requested\s+product\s+is\s+not\s+present|not\s+found|no\s+match/i.test(bodyText)) {
+    // Try get clearer message
+    let msg = 'The requested product is not present in the Icecat database'
+    const m = bodyText.match(/Message\"?>([^<]+)</i) || bodyText.match(/ErrorMessage=\"([^\"]+)/i)
+    if (m && m[1]) msg = m[1]
+    throw new Error(msg)
   }
   return Buffer.from(bodyText, 'utf8')
 }
@@ -181,27 +156,33 @@ export async function runSingle(formData: FormData) {
       url = buildJsonUrlByMpnBrand({ shop, lang, brand, mpn, appKey })
       filename = fileNameJsonByMpnBrand(mpn, brand, lang)
     }
-      const buf = await fetchJson(url)
-      const { path: downloadPath } = await persistWizardFile(filename, buf, 'application/json')
-      revalidatePath('/wizard')
-      return { ok: true, path: downloadPath, request: url, filename }
+    const buf = await fetchJson(url)
+    const dir = safeUploadDir('wizard')
+    await fs.mkdir(dir, { recursive: true })
+    const outPath = path.join(dir, filename)
+    await fs.writeFile(outPath, buf)
+    revalidatePath('/wizard')
+    return { ok: true, path: `/uploads/wizard/${filename}` }
   } else {
     const auth = { user, pass }
     let url = ''
     let filename = ''
-      if (mode === 'EAN') {
-        if (!ean) throw new Error('EAN required')
-        url = buildXmlUrlByEan({ lang, ean })
-        filename = fileNameXmlByEan(lang)
-      } else {
-        if (!brand || !mpn) throw new Error('Brand and MPN required')
-        url = buildXmlUrlByMpnBrand({ lang, brand, mpn })
-        filename = fileNameXmlByMpnBrand(mpn, brand, lang)
-      }
-      const buf = await fetchXml(url, auth)
-      const { path: downloadPath } = await persistWizardFile(filename, buf, 'application/xml')
-      revalidatePath('/wizard')
-      return { ok: true, path: downloadPath, request: url, filename }
+    if (mode === 'EAN') {
+      if (!ean) throw new Error('EAN required')
+      url = buildXmlUrlByEan({ lang, ean })
+      filename = fileNameXmlByEan(lang)
+    } else {
+      if (!brand || !mpn) throw new Error('Brand and MPN required')
+      url = buildXmlUrlByMpnBrand({ lang, brand, mpn })
+      filename = fileNameXmlByMpnBrand(mpn, brand, lang)
+    }
+    const buf = await fetchXml(url, auth)
+    const dir = safeUploadDir('wizard')
+    await fs.mkdir(dir, { recursive: true })
+    const outPath = path.join(dir, filename)
+    await fs.writeFile(outPath, buf)
+    revalidatePath('/wizard')
+    return { ok: true, path: `/uploads/wizard/${filename}` }
   }
 }
 
@@ -353,14 +334,7 @@ export async function runBatch(formData: FormData) {
   const dir = safeUploadDir('wizard')
   await fs.mkdir(dir, { recursive: true })
   const out = path.join(dir, `batch_${token}.zip`)
-  let pathZip: string
-  if (dir.startsWith('/tmp')) {
-    const tokenZip = saveTempDownload(blob, 'application/zip', path.basename(out))
-    pathZip = `/api/wizard/download?token=${tokenZip}`
-  } else {
-    await fs.writeFile(out, blob)
-    pathZip = `/uploads/wizard/${path.basename(out)}`
-  }
+  await fs.writeFile(out, blob)
   // Write XLSX error workbook with dynamic identifier columns
   const wbErr = XLSX.utils.book_new()
   if (errRowsEan.length > 0) {
@@ -377,13 +351,8 @@ export async function runBatch(formData: FormData) {
   if ((errRowsEan.length + errRowsMpn.length) > 0) {
     const xbuf = XLSX.write(wbErr, { bookType: 'xlsx', type: 'buffer' }) as Buffer
     const xfile = path.join(dir, `batch_${token}_errors.xlsx`)
-    if (dir.startsWith('/tmp')) {
-      const tokenErr = saveTempDownload(xbuf, 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet', path.basename(xfile))
-      errorsXlsxPath = `/api/wizard/download?token=${tokenErr}`
-    } else {
-      await fs.writeFile(xfile, xbuf)
-      errorsXlsxPath = `/uploads/wizard/${path.basename(xfile)}`
-    }
+    await fs.writeFile(xfile, xbuf)
+    errorsXlsxPath = `/uploads/wizard/${path.basename(xfile)}`
   }
 
   // Write XLSX download links (single column)
@@ -395,20 +364,14 @@ export async function runBatch(formData: FormData) {
     XLSX.utils.book_append_sheet(wbLinks, sheet, 'Links')
     const lbuf = XLSX.write(wbLinks, { bookType: 'xlsx', type: 'buffer' }) as Buffer
     const lfile = path.join(dir, `batch_${token}_links.xlsx`)
-    if (dir.startsWith('/tmp')) {
-      const tokenLinks = saveTempDownload(lbuf, 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet', path.basename(lfile))
-      linksXlsxPath = `/api/wizard/download?token=${tokenLinks}`
-    } else {
-      await fs.writeFile(lfile, lbuf)
-      linksXlsxPath = `/uploads/wizard/${path.basename(lfile)}`
-    }
+    await fs.writeFile(lfile, lbuf)
+    linksXlsxPath = `/uploads/wizard/${path.basename(lfile)}`
   }
   revalidatePath('/wizard')
   const totalRows = Math.max(0, rows.length)
-  const denominator = attempted || totalRows
   return {
     ok: true,
-    path: pathZip,
+    path: `/uploads/wizard/${path.basename(out)}`,
     errorsXlsx: errorsXlsxPath || undefined,
     linksXlsx: linksXlsxPath || undefined,
     metrics: {
@@ -416,7 +379,7 @@ export async function runBatch(formData: FormData) {
       attempted,
       success,
       failed,
-      successRate: denominator ? Number(((success / denominator) * 100).toFixed(1)) : 0,
+      successRate: totalRows ? Math.round((success / totalRows) * 100) : 0,
     }
   }
 }

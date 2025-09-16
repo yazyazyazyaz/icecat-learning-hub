@@ -14,8 +14,6 @@ export default function WizardClient() {
   const [matchBy, setMatchBy] = useState<'EAN'|'MPN'|null>(null)
   const [busy, start] = useTransition()
   const [singleResult, setSingleResult] = useState<string | null>(null)
-  const [singleRequest, setSingleRequest] = useState<string | null>(null)
-  const [singleFilename, setSingleFilename] = useState<string | null>(null)
   const [singleError, setSingleError] = useState<string | null>(null)
   const [singleFmt, setSingleFmt] = useState<'JSON'|'XML'>('JSON')
   const [batchPreview, setBatchPreview] = useState<{ token: string; headers: string[]; rows: any[][]; totalRows: number } | null>(null)
@@ -27,10 +25,6 @@ export default function WizardClient() {
   const [eta, setEta] = useState<number>(0)
   const etaRef = useRef<any>(null)
   const [batchFmt, setBatchFmt] = useState<'JSON'|'XML'>('JSON')
-  const downloadLabel = useMemo(() => {
-    if (singleFilename) return `Download ${singleFilename}`
-    return singleFmt === 'XML' ? 'Download the XML' : 'Download the JSON'
-  }, [singleFilename, singleFmt])
 
   function clearBatch() {
     if (etaRef.current) { clearInterval(etaRef.current); etaRef.current = null }
@@ -79,9 +73,7 @@ export default function WizardClient() {
     formData.append('mode', matchBy)
     start(async () => {
       setSingleResult(null)
-      setSingleRequest(null)
       setSingleError(null)
-      setSingleFilename(null)
       try {
         if (singleFmt === 'JSON') {
           const ok = await hasAppKey()
@@ -89,29 +81,10 @@ export default function WizardClient() {
         }
         const res = await runSingle(formData)
         const p = (res as any)?.path || null
-        const req = (res as any)?.request || null
-        const name = (res as any)?.filename || null
         setSingleResult(p)
-        setSingleRequest(req)
-        setSingleFilename(name)
-        try {
-          if (p && !p.startsWith('data:')) {
-            localStorage.setItem('wizard:singleResult', p)
-          } else {
-            localStorage.removeItem('wizard:singleResult')
-          }
-        } catch {}
-        try {
-          if (req) localStorage.setItem('wizard:singleRequest', req)
-          else localStorage.removeItem('wizard:singleRequest')
-        } catch {}
-        try {
-          if (name) localStorage.setItem('wizard:singleFilename', name)
-          else localStorage.removeItem('wizard:singleFilename')
-        } catch {}
+        try { if (p) localStorage.setItem('wizard:singleResult', p) } catch {}
       } catch (e: any) {
         setSingleError(String(e?.message || 'Failed'))
-        setSingleFilename(null)
       }
     })
   }
@@ -169,10 +142,8 @@ export default function WizardClient() {
         if (typeof o.colBrand==='number') setColBrand(o.colBrand)
         if (typeof o.colMpn==='number') setColMpn(o.colMpn)
       }
-      const fn = localStorage.getItem('wizard:singleFilename'); if (fn) setSingleFilename(fn)
     } catch {}
-      try { const srq = localStorage.getItem('wizard:singleRequest'); if (srq) setSingleRequest(srq) } catch {}
-    }, [])
+  }, [])
 
   useEffect(() => { try { if (matchBy) localStorage.setItem('wizard:matchBy', matchBy) } catch {} }, [matchBy])
   useEffect(() => { try { if (mode) localStorage.setItem('wizard:mode', mode) } catch {} }, [mode])
@@ -183,36 +154,37 @@ export default function WizardClient() {
   return (
     <div className="mt-4">
       <div className="flex items-center gap-2">
-        <button className={`tag-chip ${mode==='single'?'bg-sky-100 border-sky-400 text-sky-900':''}`} onClick={()=>setMode('single')}>Single Product</button>
-        <button className={`tag-chip ${mode==='batch'?'bg-sky-100 border-sky-400 text-sky-900':''}`} onClick={()=>setMode('batch')}>Batch</button>
+        <button className={`tag-chip ${mode==='single'?'tag-chip--active':''}`} onClick={()=>setMode('single')}>Single Product</button>
+        <button className={`tag-chip ${mode==='batch'?'tag-chip--active':''}`} onClick={()=>setMode('batch')}>Batch</button>
         {busy && (
-          <span className="ml-2 inline-flex items-center gap-2 text-sm text-neutral-800">
-            <Hourglass className="w-4 h-4 animate-spin text-sky-700" /> Working.
-            {mode==='batch' && eta>0 && <span className="text-xs text-neutral-600">ETA: {eta}s</span>}
+          <span className="ml-2 inline-flex items-center gap-2 text-sm text-neutral-700 dark:text-neutral-200">
+            <Hourglass className="w-4 h-4 animate-spin text-emerald-700 dark:text-sky-400" /> Working…
+            {mode==='batch' && eta>0 && <span className="text-xs">ETA: {eta}s</span>}
           </span>
         )}
+      </div>
 
       {mode === 'single' && (
         <div className="mt-3 flex items-center gap-2">
           <span className="text-sm">Match by:</span>
-          <button className={`tag-chip ${matchBy==='EAN'?'bg-amber-50 border-amber-300 text-amber-800':''}`} onClick={()=>setMatchBy('EAN')}>EAN</button>
-          <button className={`tag-chip ${matchBy==='MPN'?'bg-amber-50 border-amber-300 text-amber-800':''}`} onClick={()=>setMatchBy('MPN')}>MPN + Brand</button>
+          <button className={`tag-chip ${matchBy==='EAN'?'tag-chip--active':''}`} onClick={()=>setMatchBy('EAN')}>EAN</button>
+          <button className={`tag-chip ${matchBy==='MPN'?'tag-chip--active':''}`} onClick={()=>setMatchBy('MPN')}>MPN + Brand</button>
         </div>
       )}
 
       {mode === 'single' && matchBy && (
         <form action={onSingle} className="grid md:grid-cols-3 gap-3 items-end mt-4">
-            {singleError && (
-              <div className="md:col-span-3 text-sm text-red-700 italic">
-                {formatError(singleError)}
-                {singleError.includes('Missing App Key') && (
-                  <>
-                    <span className="mx-2 not-italic text-neutral-700">-</span>
-                    <a href="/profile" className="underline not-italic">Go to Profile</a>
-                  </>
-                )}
-              </div>
-            )}
+          {singleError && (
+            <div className="md:col-span-3 rounded-xl border border-red-200 bg-red-50 text-red-900 text-sm px-3 py-2">
+              {singleError}
+              {singleError.includes('Missing App Key') && (
+                <>
+                  <span className="mx-2">—</span>
+                  <a href="/profile" className="underline">Go to Profile</a>
+                </>
+              )}
+            </div>
+          )}
           {matchBy==='EAN' && (
           <div>
             <label className="block text-sm mb-1">EAN</label>
@@ -258,37 +230,12 @@ export default function WizardClient() {
           <div>
             <button disabled={busy} aria-busy={busy} className="rounded-full border px-4 py-2 text-sm disabled:opacity-60 disabled:cursor-not-allowed">{busy? 'Running…' : 'Fetch'}</button>
           </div>
-            {singleResult && !singleError && (
-              <div className="md:col-span-3 grid gap-2">
-                <div className="rounded-xl border border-emerald-800 bg-emerald-700 text-white text-sm px-3 py-2">
-                  <div className="flex items-center gap-2">
-                    <Download className="h-4 w-4" />
-                        <a className="underline text-white" href={singleResult} download={singleFilename || undefined}>{downloadLabel}</a>
-                  </div>
-                  <div className="pl-6 grid gap-1 mt-1">
-                    {singleRequest && (
-                      <a className="inline-flex items-center gap-2 underline text-white" href={singleRequest} target="_blank" rel="noreferrer">
-                        <Link2 className="h-4 w-4" /> Open link
-                      </a>
-                    )}
-                  </div>
-                </div>
-                <div>
-                  <button
-                    type="button"
-                    className="px-3 py-1.5 rounded-full border text-sm"
-                    onClick={()=>{
-                      setSingleResult(null)
-                      setSingleRequest(null)
-                      setSingleFilename(null)
-                      try{ localStorage.removeItem('wizard:singleResult'); localStorage.removeItem('wizard:singleRequest'); localStorage.removeItem('wizard:singleFilename') } catch {}
-                    }}
-                  >
-                    Start over
-                  </button>
-                </div>
-              </div>
-            )}
+          {singleResult && (
+            <div className="md:col-span-3">
+              <a className="underline" href={singleResult} download>Download result</a>
+              <button type="button" className="ml-3 px-3 py-1.5 rounded-full border text-sm" onClick={()=>{ setSingleResult(null); try{ localStorage.removeItem('wizard:singleResult') } catch {} }}>Start over</button>
+            </div>
+          )}
         </form>
       )}
 
@@ -305,37 +252,35 @@ export default function WizardClient() {
               </div>
             </form>
           ) : (
-              <>
-                <div className="rounded-xl border bg-white p-3 text-sm">
-                  <div className="font-medium mb-2">Preview (first 2 rows)</div>
-                  <div className="w-full max-w-full min-w-0 overflow-x-auto overflow-y-auto max-h-64 md:max-h-80">
-                  {batchError && (
-                    <div className="mb-2 rounded-xl border border-red-200 bg-red-50 text-red-900 text-sm px-3 py-2">
-                      {batchError}
-                      {batchError.includes('Missing App Key') && (
-                        <>
-                          <span className="mx-2">-</span>
-                          <a href="/profile" className="underline">Go to Profile</a>
-                        </>
-                      )}
-                    </div>
-                  )}
-                  <table className="table-auto text-sm min-w-max">
-                    <thead>
-                      <tr>
-                        {batchPreview.headers.map((h,i)=>(<th key={i} className="px-2 py-1 text-left whitespace-nowrap">{h||`Col ${i+1}`}</th>))}
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {batchPreview.rows.map((r,ri)=>(
-                        <tr key={ri}>
-                          {batchPreview.headers.map((_,ci)=>(<td key={ci} className="px-2 py-1 whitespace-nowrap">{String(r[ci] ?? '')}</td>))}
-                        </tr>
-                      ))}
-                    </tbody>
-                  </table>
+            <>
+              <div className="rounded-xl border bg-white p-3 text-sm overflow-auto">
+                <div className="font-medium mb-2">Preview (first 2 rows)</div>
+                {batchError && (
+                  <div className="mb-2 rounded-xl border border-red-200 bg-red-50 text-red-900 text-sm px-3 py-2">
+                    {batchError}
+                    {batchError.includes('Missing App Key') && (
+                      <>
+                        <span className="mx-2">—</span>
+                        <a href="/profile" className="underline">Go to Profile</a>
+                      </>
+                    )}
                   </div>
-                </div>
+                )}
+                <table className="table-auto text-sm">
+                  <thead>
+                    <tr>
+                      {batchPreview.headers.map((h,i)=>(<th key={i} className="px-2 py-1 text-left">{h||`Col ${i+1}`}</th>))}
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {batchPreview.rows.map((r,ri)=>(
+                      <tr key={ri}>
+                        {batchPreview.headers.map((_,ci)=>(<td key={ci} className="px-2 py-1">{String(r[ci] ?? '')}</td>))}
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
               <form action={onRunBatch} className="grid md:grid-cols-3 gap-3 items-end mt-3">
                 <div>
                   <label className="block text-sm mb-1">EAN column</label>
@@ -362,6 +307,12 @@ export default function WizardClient() {
                   <label className="block text-sm mb-1">Icecat username</label>
                   <input name="username" className="w-full rounded-xl border px-3 py-2 text-sm" placeholder="Icecat username" />
                 </div>
+                {batchFmt==='XML' && (
+                  <div>
+                    <label className="block text-sm mb-1">Icecat password</label>
+                    <input name="password" type="password" className="w-full rounded-xl border px-3 py-2 text-sm" placeholder="For XML auth" />
+                  </div>
+                )}
                 <div>
                   <label className="block text-sm mb-1">Language</label>
                   <select name="lang" className="w-full rounded-xl border px-3 py-2 text-sm bg-white" defaultValue="EN">
@@ -376,11 +327,11 @@ export default function WizardClient() {
                 </select>
               </div>
               <div>
-                <label className="block text-sm mb-1">{batchFmt==='XML' ? 'Icecat password' : 'App Key (from Profile)'}</label>
+                <label className="block text-sm mb-1">{batchFmt==='XML' ? 'Password' : 'App Key (from Profile)'}</label>
                 {batchFmt==='JSON' ? (
                   <div className="w-full rounded-xl border px-3 py-2 text-sm bg-neutral-100 text-neutral-600">Uses App Key from Profile <a className="underline ml-2" href="/profile">Go to Profile</a></div>
                 ) : (
-                  <input name="password" type="password" className="w-full rounded-xl border px-3 py-2 text-sm" placeholder="Icecat password" />
+                  <input name="password" type="password" className="w-full rounded-xl border px-3 py-2 text-sm" placeholder="Enter password" />
                 )}
               </div>
               <div className="flex items-center gap-2">
@@ -410,13 +361,10 @@ export default function WizardClient() {
                     {batchResult.metrics && (
                       <div className="rounded-xl border border-blue-200 bg-blue-50 text-blue-900 text-sm px-3 py-2">
                         <div>
-                          Coverage: <span className="text-green-700 font-medium">{batchResult.metrics.success}/{batchResult.metrics.attempted || batchResult.metrics.totalRows} matched ({batchResult.metrics.successRate}%)</span>
+                          Coverage: <span className="text-green-700 font-medium">{batchResult.metrics.success}/{batchResult.metrics.totalRows} matched ({batchResult.metrics.successRate}%)</span>
                         </div>
                         <div>
-                          Processed: <span className="text-orange-600 font-medium">{batchResult.metrics.attempted}</span>
-                          {typeof batchResult.metrics.totalRows === 'number' && batchResult.metrics.totalRows !== batchResult.metrics.attempted && (
-                            <span className="ml-1 text-neutral-600">of {batchResult.metrics.totalRows}</span>
-                          )}
+                          Attempted: <span className="text-orange-600 font-medium">{batchResult.metrics.attempted}</span>
                         </div>
                         <div>
                           Failed: <span className="text-red-800 font-medium">{batchResult.metrics.failed}</span>
@@ -435,21 +383,4 @@ export default function WizardClient() {
       )}
     </div>
   )
-}
-
-function formatError(raw: string): string {
-  try {
-    let s = String(raw || '').trim()
-    // Strip transport prefixes like "JSON 404:" or "XML 200:"
-    s = s.replace(/^(JSON|XML)\s+\d{3}:\s*/i, '')
-    // Remove surrounding quotes
-    s = s.replace(/^"+|"+$/g, '')
-    // Normalize whitespace
-    s = s.replace(/\s+/g, ' ').trim()
-    // Ensure trailing period
-    if (s && !/[.!?]$/.test(s)) s = s + '.'
-    return s
-  } catch {
-    return raw
-  }
 }
