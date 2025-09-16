@@ -14,6 +14,9 @@ function ensureAuth(session: any) {
 }
 
 function safeUploadDir(...parts: string[]) {
+  // On Vercel, the filesystem is read-only except for /tmp. Use /tmp for temp and outputs.
+  const useTmp = process.env.VERCEL === '1'
+  if (useTmp) return path.join('/tmp', ...parts)
   return path.join(process.cwd(), 'public', 'uploads', ...parts)
 }
 
@@ -341,7 +344,14 @@ export async function runBatch(formData: FormData) {
   const dir = safeUploadDir('wizard')
   await fs.mkdir(dir, { recursive: true })
   const out = path.join(dir, `batch_${token}.zip`)
-  await fs.writeFile(out, blob)
+  let pathZip: string
+  if (dir.startsWith('/tmp')) {
+    // Serverless: return data URL so the client can download without persistent storage
+    pathZip = `data:application/zip;base64,${blob.toString('base64')}`
+  } else {
+    await fs.writeFile(out, blob)
+    pathZip = `/uploads/wizard/${path.basename(out)}`
+  }
   // Write XLSX error workbook with dynamic identifier columns
   const wbErr = XLSX.utils.book_new()
   if (errRowsEan.length > 0) {
@@ -357,9 +367,13 @@ export async function runBatch(formData: FormData) {
   let errorsXlsxPath: string | null = null
   if ((errRowsEan.length + errRowsMpn.length) > 0) {
     const xbuf = XLSX.write(wbErr, { bookType: 'xlsx', type: 'buffer' }) as Buffer
-    const xfile = path.join(dir, `batch_${token}_errors.xlsx`)
-    await fs.writeFile(xfile, xbuf)
-    errorsXlsxPath = `/uploads/wizard/${path.basename(xfile)}`
+    if (dir.startsWith('/tmp')) {
+      errorsXlsxPath = `data:application/vnd.openxmlformats-officedocument.spreadsheetml.sheet;base64,${xbuf.toString('base64')}`
+    } else {
+      const xfile = path.join(dir, `batch_${token}_errors.xlsx`)
+      await fs.writeFile(xfile, xbuf)
+      errorsXlsxPath = `/uploads/wizard/${path.basename(xfile)}`
+    }
   }
 
   // Write XLSX download links (single column)
@@ -370,15 +384,19 @@ export async function runBatch(formData: FormData) {
     const sheet = XLSX.utils.aoa_to_sheet([header, ...linkRows])
     XLSX.utils.book_append_sheet(wbLinks, sheet, 'Links')
     const lbuf = XLSX.write(wbLinks, { bookType: 'xlsx', type: 'buffer' }) as Buffer
-    const lfile = path.join(dir, `batch_${token}_links.xlsx`)
-    await fs.writeFile(lfile, lbuf)
-    linksXlsxPath = `/uploads/wizard/${path.basename(lfile)}`
+    if (dir.startsWith('/tmp')) {
+      linksXlsxPath = `data:application/vnd.openxmlformats-officedocument.spreadsheetml.sheet;base64,${lbuf.toString('base64')}`
+    } else {
+      const lfile = path.join(dir, `batch_${token}_links.xlsx`)
+      await fs.writeFile(lfile, lbuf)
+      linksXlsxPath = `/uploads/wizard/${path.basename(lfile)}`
+    }
   }
   revalidatePath('/wizard')
   const totalRows = Math.max(0, rows.length)
   return {
     ok: true,
-    path: `/uploads/wizard/${path.basename(out)}`,
+    path: pathZip,
     errorsXlsx: errorsXlsxPath || undefined,
     linksXlsx: linksXlsxPath || undefined,
     metrics: {
