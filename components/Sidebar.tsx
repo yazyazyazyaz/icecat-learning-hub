@@ -54,8 +54,12 @@ export function Sidebar({ className = "" }: { className?: string }) {
   const pathname = usePathname()
   const { data: session } = useSession()
   const role = (session?.user as any)?.role as string | undefined
-  const extra = role === 'EMPLOYEE' ? [{ href: '/user', label: 'User', icon: LayoutDashboard }] : []
-  const items = [...navItems, ...extra]
+  const items = navItems.filter((item) => {
+    if (item.href.startsWith('/editor')) return role === 'ADMIN' || role === 'TRAINER'
+    if (item.href.startsWith('/admin')) return role === 'ADMIN'
+    if (item.href === '/user') return role !== 'EMPLOYEE'
+    return true
+  })
   return (
     <aside className={cn("h-full w-full p-2", className)} aria-label="Primary">
       <div className="rounded-2xl border border-[hsl(var(--border))] bg-[hsl(var(--surface))] p-4 shadow-sm max-w-[13rem] mx-auto">
