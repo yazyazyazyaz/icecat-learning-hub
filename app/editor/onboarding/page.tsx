@@ -2,6 +2,7 @@ import { db } from "@/lib/db"
 import { createLearningPath, deleteLearningPath, addLearningTask, deleteLearningTask, moveLearningPath, updateLearningPath, updateLearningTask, addLearningTaskAttachment } from "@/actions/learningPaths"
 import { SubmitButton, SaveStatus } from "@/components/FormSaveControls"
 import ToggleDetails from "@/components/ToggleDetails"
+import ConfirmDelete from "@/components/ConfirmDelete"
 
 export default async function EditorOnboardingPage() {
   // Fetch weeks for the Add Training selector
@@ -107,7 +108,11 @@ async function WeeksEditor() {
               <div className="text-xs text-neutral-600">Slug: {p.slug} • Order: {p.sortOrder}</div>
             </div>
             <form action={async ()=>{ 'use server'; await deleteLearningPath(p.id) }}>
-              <button className="px-2 py-1 rounded-full border text-xs">Delete week</button>
+              <ConfirmDelete
+                className="px-2 py-1 rounded-full border text-xs"
+                prompt="Delete this week?"
+                yesLabel="Delete"
+              />
             </form>
           </div>
 
@@ -201,7 +206,11 @@ async function WeeksEditor() {
                         <div className="inline-flex items-center gap-2">
                           <ToggleDetails targetId={`edit-task-${t.id}`} label="Edit" className="px-2 py-1 rounded-full border text-xs" />
                           <form action={async ()=>{ 'use server'; await deleteLearningTask(t.id) }}>
-                            <button className="px-2 py-1 rounded-full border text-xs">Delete</button>
+                            <ConfirmDelete
+                              className="px-2 py-1 rounded-full border text-xs"
+                              prompt="Delete this training?"
+                              yesLabel="Delete"
+                            />
                           </form>
                         </div>
                       </td>
@@ -311,7 +320,11 @@ async function AllTrainingsEditor() {
                   <div className="inline-flex items-center gap-2">
                     <ToggleDetails targetId={`flat-edit-${t.id}`} label="Edit" className="px-2 py-1 rounded-full border text-xs" />
                     <form action={async ()=>{ 'use server'; await deleteLearningTask(t.id) }}>
-                      <button className="px-2 py-1 rounded-full border text-xs">Delete</button>
+                      <ConfirmDelete
+                        className="px-2 py-1 rounded-full border text-xs"
+                        prompt="Delete this training?"
+                        yesLabel="Delete"
+                      />
                     </form>
                   </div>
                 </td>

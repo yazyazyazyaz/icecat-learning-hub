@@ -102,24 +102,44 @@ export default async function AdminUsersPage({ searchParams }: { searchParams?: 
                 
                 <td className="py-2 px-3">
                   {u.approved ? (
-                    <button
-                      formAction={async () => { 'use server'; const { deactivateUser } = await import('@/actions/users'); await deactivateUser(u.id) }}
-                      className="inline-flex items-center rounded-2xl border border-[hsl(var(--border))] px-2 py-1 hover:bg-neutral-100/60"
+                    <form
+                      action={async (fd: FormData) => {
+                        'use server'
+                        const id = String(fd.get('userId') || '') || u.id
+                        const { deactivateUser } = await import('@/actions/users')
+                        await deactivateUser(id)
+                      }}
+                      className="inline-block"
                     >
-                      Deactivate
-                    </button>
+                      <input type="hidden" name="userId" value={u.id} />
+                      <SubmitButton
+                        label="Deactivate"
+                        pendingLabel="Deactivating..."
+                        className="inline-flex items-center rounded-2xl border border-[hsl(var(--border))] px-2 py-1 hover:bg-neutral-100/60"
+                      />
+                    </form>
                   ) : (
                     <span className="text-neutral-500">-</span>
                   )}
                 </td>
                 <td className="py-2 px-3">
                   {!u.approved ? (
-                    <button
-                      formAction={async () => { 'use server'; const { approveUser } = await import('@/actions/users'); await approveUser(u.id) }}
-                      className="inline-flex items-center rounded-2xl border border-[hsl(var(--border))] px-3 py-1 hover:bg-neutral-100/60"
+                    <form
+                      action={async (fd: FormData) => {
+                        'use server'
+                        const id = String(fd.get('userId') || '') || u.id
+                        const { approveUser } = await import('@/actions/users')
+                        await approveUser(id)
+                      }}
+                      className="inline-block"
                     >
-                      Approve
-                    </button>
+                      <input type="hidden" name="userId" value={u.id} />
+                      <SubmitButton
+                        label="Approve"
+                        pendingLabel="Approving..."
+                        className="inline-flex items-center rounded-2xl border border-[hsl(var(--border))] px-3 py-1 hover:bg-neutral-100/60"
+                      />
+                    </form>
                   ) : (
                     <span className="text-neutral-500">-</span>
                   )}

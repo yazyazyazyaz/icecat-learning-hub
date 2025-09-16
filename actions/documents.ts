@@ -7,6 +7,51 @@ import { revalidatePath } from "next/cache"
 import path from 'path'
 import { promises as fs } from 'fs'
 
+function safeUploadDir(...parts: string[]) {
+  const base = process.env.VERCEL === '1' ? '/tmp' : path.join(process.cwd(), 'public', 'uploads')
+  return path.join(base, ...parts)
+}
+
+function guessMimeType(ext: string): string {
+  const map: Record<string, string> = {
+    '.pdf': 'application/pdf',
+    '.zip': 'application/zip',
+    '.csv': 'text/csv',
+    '.txt': 'text/plain',
+    '.doc': 'application/msword',
+    '.docx': 'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+    '.xls': 'application/vnd.ms-excel',
+    '.xlsx': 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+    '.ppt': 'application/vnd.ms-powerpoint',
+    '.pptx': 'application/vnd.openxmlformats-officedocument.presentationml.presentation',
+    '.png': 'image/png',
+    '.jpg': 'image/jpeg',
+    '.jpeg': 'image/jpeg',
+    '.gif': 'image/gif',
+    '.webp': 'image/webp',
+    '.svg': 'image/svg+xml',
+    '.mp4': 'video/mp4',
+  }
+  return map[ext.toLowerCase()] || 'application/octet-stream'
+}
+
+async function persistUploadedFile(file: File): Promise<string> {
+  const bytes = Buffer.from(await file.arrayBuffer())
+  const original = (file as any)?.name || 'document.bin'
+  const ext = path.extname(original) || '.bin'
+  const safeName = original.replace(/[^a-zA-Z0-9._-]/g, '_') || `document${ext}`
+  const dir = safeUploadDir('files')
+  await fs.mkdir(dir, { recursive: true })
+  const fileName = `${Date.now()}_${safeName}`
+  const abs = path.join(dir, fileName)
+  await fs.writeFile(abs, bytes)
+  if (dir.startsWith('/tmp')) {
+    const mime = guessMimeType(ext)
+    return `data:${mime};base64,${bytes.toString('base64')}`
+  }
+  return `/uploads/files/${fileName}`
+}
+
 export async function createDocument(formData: FormData) {
   const session = await getServerSession(authOptions)
   if (!session?.user) throw new Error('Unauthorized')
@@ -19,30 +64,39 @@ export async function createDocument(formData: FormData) {
   const file = formData.get('file') as any as File | null
 
   if (file && typeof file === 'object' && 'arrayBuffer' in file && (file as any).size > 0) {
-    const bytes = Buffer.from(await (file as File).arrayBuffer())
-    const ext = path.extname((file as any).name || '') || '.bin'
-    const safeName = (file as any).name?.replace(/[^a-zA-Z0-9._-]/g, '_') || `document${ext}`
-    const dir = path.join(process.cwd(), 'public', 'uploads', 'files')
-    await fs.mkdir(dir, { recursive: true })
-    const fileName = `${Date.now()}_${safeName}`
-    const abs = path.join(dir, fileName)
-    await fs.writeFile(abs, bytes)
-    filePath = `/uploads/files/${fileName}`
+    filePath = await persistUploadedFile(file as File)
   }
 
   if (!title || !filePath) throw new Error('Missing fields')
 
   const INTEGRATION_TAGS = new Set(['Index File','Reference File','refscope:open','refscope:full'])
   const DOC_TAGS = new Set(['Contracts','Various documents','Internal documents'])
-  function buildTags(base: string[]): string[] {
-    // remove desc/integration/doc tags, then add one doc tag if provided
-    let t = (base || []).filter((x) => !String(x).startsWith('desc:') && !INTEGRATION_TAGS.has(String(x)) && !DOC_TAGS.has(String(x)))
-    const doc = chosenTag || base.find((x) => DOC_TAGS.has(String(x))) || ''
-    if (doc) t.push(doc)
-    if (description) t.push(`desc:${description}`)
-    return t
+  function buildTags(base: string[], opts?: { includeIntegration?: boolean }): string[] {
+    const includeIntegration = Boolean(opts?.includeIntegration)
+    const next = new Set<string>()
+    const integration: string[] = []
+    let docTag = chosenTag || ''
+    for (const raw of base || []) {
+      const tag = String(raw || '')
+      if (!tag || tag.startsWith('desc:')) continue
+      if (INTEGRATION_TAGS.has(tag)) {
+        if (includeIntegration) integration.push(tag)
+        continue
+      }
+      if (DOC_TAGS.has(tag)) {
+        if (!docTag) docTag = tag
+        continue
+      }
+      next.add(tag)
+    }
+    if (docTag) next.add(docTag)
+    if (includeIntegration) {
+      for (const tag of integration) next.add(tag)
+    }
+    if (description) next.add(`desc:${description}`)
+    return Array.from(next)
   }
-  const tagsWithDesc = buildTags(rawTags)
+  const tagsWithDesc = buildTags(rawTags, { includeIntegration: true })
   // If a document with same path exists, update it instead of creating duplicate
   try {
     const existing = await (db as any).documentFile.findFirst({ where: { path: filePath } })
@@ -50,7 +104,7 @@ export async function createDocument(formData: FormData) {
       // Merge tags (preserve existing non-desc tags, replace desc)
       let newTags: string[] = Array.isArray(existing.tags as any) ? ((existing.tags as any) as string[]) : []
       // remove desc and any integration tags that would incorrectly route to Integration Files
-      newTags = buildTags(newTags)
+      newTags = buildTags(newTags, { includeIntegration: true })
       await (db as any).documentFile.update({ where: { id: existing.id }, data: { title, path: filePath, tags: newTags } })
     } else {
       await (db as any).documentFile.create({ data: { title, path: filePath, tags: tagsWithDesc } })
@@ -61,7 +115,7 @@ export async function createDocument(formData: FormData) {
       const existing = await db.upload.findFirst({ where: { kind: 'DOCUMENT' as any, path: filePath } })
       if (existing) {
         let newTags: string[] = Array.isArray(existing.tags) ? (existing.tags as string[]) : []
-        newTags = buildTags(newTags)
+        newTags = buildTags(newTags, { includeIntegration: true })
         await db.upload.update({ where: { id: existing.id }, data: { title, path: filePath, tags: newTags } })
       } else {
         await db.upload.create({ data: { title, path: filePath, tags: tagsWithDesc, kind: 'DOCUMENT' as any }, select: { id: true } })
@@ -90,31 +144,34 @@ export async function updateDocument(formData: FormData) {
     const current = await (db as any).documentFile.findUnique({ where: { id } })
     if (current) {
       if (file && typeof file === 'object' && 'arrayBuffer' in file && (file as any).size > 0) {
-        const bytes = Buffer.from(await (file as File).arrayBuffer())
-        const ext = path.extname((file as any).name || '') || '.bin'
-        const safeName = (file as any).name?.replace(/[^a-zA-Z0-9._-]/g, '_') || `document${ext}`
-        const dir = path.join(process.cwd(), 'public', 'uploads', 'files')
-        await fs.mkdir(dir, { recursive: true })
-        const fileName = `${Date.now()}_${safeName}`
-        const abs = path.join(dir, fileName)
-        await fs.writeFile(abs, bytes)
-        pathVal = `/uploads/files/${fileName}`
+        pathVal = await persistUploadedFile(file as File)
       }
-        const INTEGRATION_TAGS = new Set(['Index File','Reference File','refscope:open','refscope:full'])
-        const DOC_TAGS = new Set(['Contracts','Various documents','Internal documents'])
-        let newTags: string[] | undefined = Array.isArray(current.tags as any) ? ((current.tags as any) as string[]) : []
-        if (tagsSent) {
-          // remove integration/doc tags and reapply single doc tag
-          newTags = newTags.filter((t) => !String(t).startsWith('desc:') && !INTEGRATION_TAGS.has(String(t)) && !DOC_TAGS.has(String(t)))
-          const doc = String(formData.get('tag') || '').trim() || submittedTags.find((x) => DOC_TAGS.has(String(x))) || ''
-          if (doc) newTags.push(doc)
+      const INTEGRATION_TAGS = new Set(['Index File','Reference File','refscope:open','refscope:full'])
+      const DOC_TAGS = new Set(['Contracts','Various documents','Internal documents'])
+      let newTags: string[] | undefined = Array.isArray(current.tags as any) ? ((current.tags as any) as string[]) : []
+      if (tagsSent) {
+        const integrationSelected = submittedTags.filter((x) => INTEGRATION_TAGS.has(String(x)))
+        // remove integration/doc tags and reapply single doc tag
+        newTags = newTags.filter((t) => !String(t).startsWith('desc:') && !DOC_TAGS.has(String(t)) && (integrationSelected.length ? !INTEGRATION_TAGS.has(String(t)) : true))
+        const doc = String(formData.get('tag') || '').trim() || submittedTags.find((x) => DOC_TAGS.has(String(x))) || ''
+        if (doc) newTags.push(doc)
+        if (integrationSelected.length) {
+          const seen = new Set(newTags)
+          for (const tag of integrationSelected) {
+            const val = String(tag)
+            if (val && !seen.has(val)) {
+              newTags.push(val)
+              seen.add(val)
+            }
+          }
         }
-        if (description) {
-          newTags = newTags.filter((t) => !String(t).startsWith('desc:'))
-          newTags.push(`desc:${description}`)
-        } else {
-          newTags = newTags.filter((t) => !String(t).startsWith('desc:'))
-        }
+      }
+      if (description) {
+        newTags = newTags.filter((t) => !String(t).startsWith('desc:'))
+        newTags.push(`desc:${description}`)
+      } else {
+        newTags = newTags.filter((t) => !String(t).startsWith('desc:'))
+      }
       await (db as any).documentFile.update({ where: { id }, data: { ...(title?{title}:{}) , ...(pathVal?{path:pathVal}:{}) , ...(newTags?{tags:newTags}:{}) } })
     } else {
       // legacy upload path
@@ -123,20 +180,23 @@ export async function updateDocument(formData: FormData) {
         const DOC_TAGS2 = new Set(['Contracts','Various documents','Internal documents'])
         let tags = Array.isArray(existing?.tags) ? (existing!.tags as string[]) : []
         if (file && typeof file === 'object' && 'arrayBuffer' in file && (file as any).size > 0) {
-        const bytes = Buffer.from(await (file as File).arrayBuffer())
-        const ext = path.extname((file as any).name || '') || '.bin'
-        const safeName = (file as any).name?.replace(/[^a-zA-Z0-9._-]/g, '_') || `document${ext}`
-        const dir = path.join(process.cwd(), 'public', 'uploads', 'files')
-        await fs.mkdir(dir, { recursive: true })
-        const fileName = `${Date.now()}_${safeName}`
-        const abs = path.join(dir, fileName)
-        await fs.writeFile(abs, bytes)
-        pathVal = `/uploads/files/${fileName}`
-      }
+          pathVal = await persistUploadedFile(file as File)
+        }
         if (tagsSent) {
-          tags = tags.filter((t) => !String(t).startsWith('desc:') && !INTEGRATION_TAGS2.has(String(t)) && !DOC_TAGS2.has(String(t)))
+          const integrationSelected = submittedTags.filter((x) => INTEGRATION_TAGS2.has(String(x)))
+          tags = tags.filter((t) => !String(t).startsWith('desc:') && !DOC_TAGS2.has(String(t)) && (integrationSelected.length ? !INTEGRATION_TAGS2.has(String(t)) : true))
           const doc = String(formData.get('tag') || '').trim() || submittedTags.find((x) => DOC_TAGS2.has(String(x))) || ''
           if (doc) tags.push(doc)
+          if (integrationSelected.length) {
+            const seen = new Set(tags)
+            for (const tag of integrationSelected) {
+              const val = String(tag)
+              if (val && !seen.has(val)) {
+                tags.push(val)
+                seen.add(val)
+              }
+            }
+          }
         }
       await db.upload.update({ where: { id }, data: { ...(title?{title}:{}) , ...(pathVal?{path:pathVal}:{}) , ...(tagsSent?{tags}:{}) }, select: { id: true } })
   }

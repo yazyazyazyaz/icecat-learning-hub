@@ -50,7 +50,7 @@ export async function registerUser(input: unknown) {
       await sendMail({
         to: process.env.NEW_USER_NOTIFY_EMAIL || 'yagiz@icecat.com',
         subject: `New registration: ${data.name} <${data.email}>`,
-        text: `A new user registered.\n\nName: ${data.name}\nEmail: ${data.email}\nFunction: ${data.jobFunction}\nInvite: ${data.invite || '-'}\n\nApprove in Admin → Users.`,
+        text: `A new user registered.\n\nName: ${data.name}\nEmail: ${data.email}\nFunction: ${data.jobFunction}\nInvite: ${data.invite || '-'}\n\nApprove in Admin > Users.`,
       })
     } catch (e) {
       console.warn('Failed to send registration email notification', e)
@@ -82,7 +82,7 @@ export async function registerUser(input: unknown) {
       await sendMail({
         to: process.env.NEW_USER_NOTIFY_EMAIL || 'yagiz@icecat.com',
         subject: `New registration: ${data.name} <${data.email}>`,
-        text: `A new user registered.\n\nName: ${data.name}\nEmail: ${data.email}\nFunction: ${data.jobFunction}\nInvite: ${data.invite || '-'}\n\nApprove in Admin → Users.`,
+        text: `A new user registered.\n\nName: ${data.name}\nEmail: ${data.email}\nFunction: ${data.jobFunction}\nInvite: ${data.invite || '-'}\n\nApprove in Admin > Users.`,
       })
     } catch {}
   }
@@ -161,3 +161,4 @@ export async function updateUserEmail(formData: FormData | { id: string; email: 
   revalidatePath('/admin/users')
   return { ok: true }
 }
+

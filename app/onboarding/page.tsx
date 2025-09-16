@@ -66,6 +66,13 @@ export default async function OnboardingPage({ searchParams }: { searchParams?: 
     const idx = (Number(day) - 1) % dayPalette.length
     return dayPalette[idx]
   }
+  function normalizeTrainingDay(day: number | null | undefined) {
+    if (day == null || isNaN(Number(day))) return null
+    const raw = Math.max(1, Math.floor(Number(day)))
+    const week = Math.floor((raw - 1) / 5) + 1
+    const dayInWeek = ((raw - 1) % 5) + 1
+    return { raw, week, day: dayInWeek }
+  }
   const isBonusPath = String((current as any).slug || '').toLowerCase() === 'bonus'
   const extrasOrder = new Map<string, number>()
   { // compute 1-based order among extras (day == null)
@@ -108,29 +115,33 @@ export default async function OnboardingPage({ searchParams }: { searchParams?: 
       {/* Accordion list (compact, per week) */}
 
       <div className="grid gap-3">
-        {itemsSorted.map((item: any) => (
-          <details key={item.id} className="group rounded-lg border bg-white open:border-blue-500 open:ring-2 open:ring-blue-200">
-            <summary className="cursor-pointer px-3 py-2 text-xs font-medium transition-colors group-open:bg-blue-50 group-open:text-blue-900">
-              {item.day == null ? (
-                <>
-                  <span className={colorForDay(extrasOrder.get(String(item.id)) || 1)}>{isBonusPath ? 'Bonus' : 'Extras'} {extrasOrder.get(String(item.id))}</span>
-                  <span className="mx-1 text-neutral-400">—</span>
-                  <span>{item.title}</span>
-                </>
-              ) : (
-                <>
-                  <span>Training {item.day}</span>
-                  <span className="mx-1">-</span>
-                  <span className={colorForDay(item.day)}>Day {item.day}</span>
-                  <span className="mx-1 text-neutral-400">—</span>
-                  <span>{item.title}</span>
-                </>
-              )}
-            </summary>
-            <div className="p-3 border-t bg-neutral-50 space-y-3">
-              {item.programMd && (
-                <pre className="whitespace-pre-wrap text-sm leading-relaxed bg-white border rounded-lg p-3">{item.programMd}</pre>
-              )}
+        {itemsSorted.map((item: any) => {
+          const normalized = normalizeTrainingDay(item.day)
+          const trainingLabel = normalized ? normalized.week : item.day
+          const dayLabel = normalized ? normalized.day : item.day
+          return (
+            <details key={item.id} className="group rounded-lg border bg-white open:border-blue-500 open:ring-2 open:ring-blue-200">
+              <summary className="cursor-pointer px-3 py-2 text-xs font-medium transition-colors group-open:bg-blue-50 group-open:text-blue-900">
+                {item.day == null ? (
+                  <>
+                    <span className={colorForDay(extrasOrder.get(String(item.id)) || 1)}>{isBonusPath ? 'Bonus' : 'Extras'} {extrasOrder.get(String(item.id))}</span>
+                    <span className="mx-1 text-neutral-400">-</span>
+                    <span>{item.title}</span>
+                  </>
+                ) : (
+                  <>
+                    <span>Training {trainingLabel}</span>
+                    <span className="mx-1">-</span>
+                    <span className={colorForDay(dayLabel)}>Day {dayLabel}</span>
+                    <span className="mx-1 text-neutral-400">-</span>
+                    <span>{item.title}</span>
+                  </>
+                )}
+              </summary>
+              <div className="p-3 border-t bg-neutral-50 space-y-3">
+                {item.programMd && (
+                  <pre className="whitespace-pre-wrap text-sm leading-relaxed bg-white border rounded-lg p-3">{item.programMd}</pre>
+                )}
               {Array.isArray(item.attachments) && item.attachments.length > 0 && (() => {
                 const atts = (item.attachments as any[])
                 const isImage = (u: string) => /\.(png|jpe?g|gif|webp|bmp|svg)(?:\?.*)?$/i.test(String(u||''))
