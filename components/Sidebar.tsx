@@ -54,10 +54,11 @@ export function Sidebar({ className = "" }: { className?: string }) {
   const pathname = usePathname()
   const { data: session } = useSession()
   const role = (session?.user as any)?.role as string | undefined
+  const isEditorRole = role === 'TRAINER' || role === 'EDITOR'
+
   const items = navItems.filter((item) => {
-    if (item.href.startsWith('/editor')) return role === 'ADMIN' || role === 'TRAINER'
+    if (item.href.startsWith('/editor')) return role === 'ADMIN' || isEditorRole
     if (item.href.startsWith('/admin')) return role === 'ADMIN'
-    if (item.href === '/user') return role !== 'EMPLOYEE'
     return true
   })
   return (
@@ -109,7 +110,7 @@ export function Sidebar({ className = "" }: { className?: string }) {
             </Link>
           </div>
         )}
-        {role === 'TRAINER' && (
+        {isEditorRole && role !== 'ADMIN' && (
           <div className="mt-4 pt-3 border-t border-[hsl(var(--border))]">
             <Link
               href="/editor"
