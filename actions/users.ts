@@ -94,7 +94,10 @@ const approveSchema = z.object({ id: z.string().cuid() })
 async function requireAdmin() {
   const session = await getServerSession(authOptions)
   const role = (session?.user as any)?.role
-  if (role !== 'ADMIN') throw new Error('Forbidden')
+  if (role !== 'ADMIN') {
+    console.warn('requireAdmin: forbidden - missing ADMIN role')
+    throw new Error('Forbidden')
+  }
 }
 
 export async function approveUser(id: string) {
@@ -112,6 +115,7 @@ export async function approveUser(id: string) {
     }
   }
   revalidatePath('/admin/users')
+  revalidatePath('/admin')
   return { ok: true }
 }
 
