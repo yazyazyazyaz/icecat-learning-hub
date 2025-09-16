@@ -30,12 +30,10 @@ export default async function OnboardingPage({ searchParams }: { searchParams?: 
 
   const byDay = new Map<string, any[]>();
   for (const t of (current as any).tasks as any) {
-    const k = (t as any).day == null ? "X" : String((t as any).day);
-    if (!byDay.has(k)) byDay.set(k, []);
-    (byDay.get(k)!).push(t);
+    const key = (t as any).day == null ? "X" : String((t as any).day);
+    if (!byDay.has(key)) byDay.set(key, []);
+    (byDay.get(key)!).push(t);
   }
-  const groups = Array.from(byDay.entries())
-    .sort((a,b) => ((a[0] === "X") as any) - ((b[0] === "X") as any) || Number(a[0]) - Number(b[0]));
   // Flatten to accordion list per week (compact)
   const itemsSorted = ((current as any).tasks as any[]).slice().sort((a: any,b: any)=>{
     const ad = a.day == null ? 9999 : Number(a.day)
@@ -43,11 +41,6 @@ export default async function OnboardingPage({ searchParams }: { searchParams?: 
     if (ad !== bd) return ad - bd
     return (a.position||0) - (b.position||0)
   })
-
-  // neutral theme for headers/borders
-  function styleForDay(_key: string) {
-    return { border: 'border-neutral-300', header: 'bg-neutral-50 text-neutral-900' } as const
-  }
 
   const dayPalette = [
     'text-blue-700',
@@ -119,6 +112,7 @@ export default async function OnboardingPage({ searchParams }: { searchParams?: 
           const normalized = normalizeTrainingDay(item.day)
           const trainingLabel = normalized ? normalized.week : item.day
           const dayLabel = normalized ? normalized.day : item.day
+
           return (
             <details key={item.id} className="group rounded-lg border bg-white open:border-blue-500 open:ring-2 open:ring-blue-200">
               <summary className="cursor-pointer px-3 py-2 text-xs font-medium transition-colors group-open:bg-blue-50 group-open:text-blue-900">
@@ -142,44 +136,48 @@ export default async function OnboardingPage({ searchParams }: { searchParams?: 
                 {item.programMd && (
                   <pre className="whitespace-pre-wrap text-sm leading-relaxed bg-white border rounded-lg p-3">{item.programMd}</pre>
                 )}
-              {Array.isArray(item.attachments) && item.attachments.length > 0 && (() => {
-                const atts = (item.attachments as any[])
-                const isImage = (u: string) => /\.(png|jpe?g|gif|webp|bmp|svg)(?:\?.*)?$/i.test(String(u||''))
-                const imgAtts = atts.filter((a: any) => isImage(a?.url))
-                const otherAtts = atts.filter((a: any) => !isImage(a?.url))
-                return (
-                  <div className="text-sm">
-                    <div className="mb-1 font-medium">Attachments</div>
-                    {imgAtts.length > 0 && (
-                      <div className="flex flex-wrap gap-3 mb-2">
-                        {imgAtts.map((a: any, i: number) => (
-                          <a key={`img-${i}`} href={a.url} target="_blank" className="block">
-                            <div className="border rounded-lg bg-white p-1 shadow-sm hover:shadow transition">
-                              <img src={a.url} alt={a.name || 'Image attachment'} loading="lazy" className="object-contain" style={{ maxWidth: 500, maxHeight: 500 }} />
-                              <div className="px-1 py-1 text-[11px] text-neutral-600 truncate max-w-[500px]">{a.name || 'Image'}</div>
-                            </div>
-                          </a>
-                        ))}
-                      </div>
-                    )}
-                    {otherAtts.length > 0 && (
-                      <div className="flex flex-wrap gap-2">
-                        {otherAtts.map((a: any, i: number) => (
-                          <a key={`file-${i}`} href={a.url} target="_blank" className="inline-flex items-center gap-1 px-2 py-1 rounded-full border bg-white hover:bg-neutral-50">
-                            <span className="truncate max-w-[16rem]">{a.name || 'Attachment'}</span>
-                          </a>
-                        ))}
-                      </div>
-                    )}
-                  </div>
-                )
-              })()}
-              {item.noteMd && (
-                <pre className="whitespace-pre-wrap text-xs leading-relaxed bg-neutral-50 border border-neutral-200 text-neutral-800 rounded-lg p-3">{item.noteMd}</pre>
-              )}
-            </div>
-          </details>
-        ))}
+
+                {Array.isArray(item.attachments) && item.attachments.length > 0 && (() => {
+                  const atts = item.attachments as any[]
+                  const isImage = (u: string) => /\.(png|jpe?g|gif|webp|bmp|svg)(?:\?.*)?$/i.test(String(u || ''))
+                  const imageAttachments = atts.filter((a: any) => isImage(a?.url))
+                  const otherAttachments = atts.filter((a: any) => !isImage(a?.url))
+
+                  return (
+                    <div className="text-sm">
+                      <div className="mb-1 font-medium">Attachments</div>
+                      {imageAttachments.length > 0 && (
+                        <div className="flex flex-wrap gap-3 mb-2">
+                          {imageAttachments.map((a: any, index: number) => (
+                            <a key={`img-${index}`} href={a.url} target="_blank" className="block">
+                              <div className="border rounded-lg bg-white p-1 shadow-sm hover:shadow transition">
+                                <img src={a.url} alt={a.name || 'Image attachment'} loading="lazy" className="object-contain" style={{ maxWidth: 500, maxHeight: 500 }} />
+                                <div className="px-1 py-1 text-[11px] text-neutral-600 truncate max-w-[500px]">{a.name || 'Image'}</div>
+                              </div>
+                            </a>
+                          ))}
+                        </div>
+                      )}
+                      {otherAttachments.length > 0 && (
+                        <div className="flex flex-wrap gap-2">
+                          {otherAttachments.map((a: any, index: number) => (
+                            <a key={`file-${index}`} href={a.url} target="_blank" className="inline-flex items-center gap-1 px-2 py-1 rounded-full border bg-white hover:bg-neutral-50">
+                              <span className="truncate max-w-[16rem]">{a.name || 'Attachment'}</span>
+                            </a>
+                          ))}
+                        </div>
+                      )}
+                    </div>
+                  )
+                })()}
+
+                {item.noteMd && (
+                  <pre className="whitespace-pre-wrap text-xs leading-relaxed bg-neutral-50 border border-neutral-200 text-neutral-800 rounded-lg p-3">{item.noteMd}</pre>
+                )}
+              </div>
+            </details>
+          )
+        })}
       </div>
     </div>
   );

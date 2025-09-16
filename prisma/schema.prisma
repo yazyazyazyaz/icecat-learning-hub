@@ -6,7 +6,7 @@ datasource db {
   provider  = "postgresql"
   // Pooled connection (Neon -pooler host)
   url       = env("DATABASE_URL")
-  // Direct connection (no -pooler), used by Prisma Migrate in some environments
+  // Direct connection (no -pooler). Provide DIRECT_URL or rely on the build script fallback to DATABASE_URL.
   directUrl = env("DIRECT_URL")
 }
 
