@@ -49,9 +49,43 @@ export default async function EditorIntegrationFilesPage({ searchParams }: { sea
     byGroup[key].push(it)
   }
 
+  const scopeTag = scope === 'full' ? 'full' : 'open'
+
   return (
     <div className="space-y-4">
-      {/* Removed header + filter chips for a cleaner editor view */}
+      <section className="max-w-5xl">
+        <div className="flex items-center gap-2 flex-wrap">
+          <Link
+            className={`tag-chip ${group==='All' ? 'bg-sky-100 border-sky-400 text-sky-900 hover:border-sky-400 hover:text-sky-900' : ''}`}
+            href={`/editor/integration?scope=${scopeTag}`}
+          >
+            All
+          </Link>
+          {GROUPS.map((g) => (
+            <Link
+              key={g}
+              className={`tag-chip ${group===g ? 'bg-sky-100 border-sky-400 text-sky-900 hover:border-sky-400 hover:text-sky-900' : ''}`}
+              href={`/editor/integration?scope=${scopeTag}&group=${encodeURIComponent(g)}`}
+            >
+              {displayGroupName(g)}
+            </Link>
+          ))}
+        </div>
+        <div className="flex items-center gap-2 flex-wrap mt-3">
+          <Link
+            className={`tag-chip ${scope==='open' ? 'bg-amber-50 border-amber-300 text-amber-800' : ''}`}
+            href={`/editor/integration?scope=open&group=${encodeURIComponent(group)}`}
+          >
+            Open Icecat
+          </Link>
+          <Link
+            className={`tag-chip ${scope==='full' ? 'bg-amber-50 border-amber-300 text-amber-800' : ''}`}
+            href={`/editor/integration?scope=full&group=${encodeURIComponent(group)}`}
+          >
+            Full Icecat
+          </Link>
+        </div>
+      </section>
 
       {/* Add new (separate bracket) */}
       <section className="bg-white border rounded-2xl shadow-sm p-6">
