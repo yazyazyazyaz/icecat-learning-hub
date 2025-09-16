@@ -2,6 +2,7 @@ import Link from "next/link"
 import { db } from "@/lib/db"
 import { createUpload, updateUpload } from "@/actions/uploads"
 import { SubmitButton, SaveStatus } from "@/components/FormSaveControls"
+import { isAttachmentPath } from "@/lib/uploads"
 
 const DEFAULT_USE_CASES = [
   'APIs',
@@ -135,9 +136,9 @@ export default async function AdminManualsPage({ searchParams }: { searchParams?
                 {byGroup[group].map((m: any) => (
                   <tr key={m.id} className="align-middle">
                     <td className="py-2 px-3 text-[15px] text-neutral-900">{m.title}</td>
-                    <td className="py-2 px-3 border-l border-[hsl(var(--border))] whitespace-nowrap text-neutral-700">{m.path?.startsWith('/uploads/') ? 'Attachment' : 'Link'}</td>
+                    <td className="py-2 px-3 border-l border-[hsl(var(--border))] whitespace-nowrap text-neutral-700">{isAttachmentPath(m.path) ? 'Attachment' : 'Link'}</td>
                     <td className="py-2 px-3 border-l border-[hsl(var(--border))] whitespace-nowrap">
-                      {m.path?.startsWith('/uploads/') ? (
+                      {isAttachmentPath(m.path) ? (
                         <span className="space-x-3">
                           <a className="underline font-medium" href={m.path} target="_blank" rel="noreferrer">Preview</a>
                           <a className="underline text-neutral-700" href={m.path} download>Download</a>

@@ -10,7 +10,6 @@ import { Sidebar } from "@/components/Sidebar"
 import Logo from "@/components/Logo"
 import { useSession, signIn } from "next-auth/react"
 import CommandPalette from "@/components/CommandPalette"
-import DarkModeToggle from "@/components/DarkModeToggle"
 import UserMenu from "@/components/UserMenu"
 
 export default function Header() {
@@ -18,8 +17,6 @@ export default function Header() {
   const { data: session, status } = useSession()
   return (
     <header className="sticky top-0 z-40 border-b border-[hsl(var(--border))] bg-[hsl(var(--bg))]/90">
-      {/* dark-only top hairline for separation */}
-      <div className="hidden dark:block absolute inset-x-0 top-0 h-px bg-white/10" aria-hidden></div>
       <div className="flex h-[var(--header-h)] items-center gap-3 px-4">
         <Sheet open={open} onOpenChange={setOpen}>
           <SheetTrigger asChild>
@@ -50,7 +47,6 @@ export default function Header() {
         </Link>
         <div className="ml-auto flex items-center gap-3">
           <CommandPalette />
-          <DarkModeToggle />
           <UserMenu />
         </div>
       </div>

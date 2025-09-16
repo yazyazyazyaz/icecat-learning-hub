@@ -1,9 +1,11 @@
+import Link from "next/link";
 import { prisma } from "@/lib/db";
 import { deletePresentation } from "@/actions/presentations";
 import SearchBox from "@/components/admin/SearchBox";
 import EditPresentationButton from "@/components/admin/EditPresentationButton";
 import { createPresentation, updatePresentation, updatePresentationUseCase } from "@/actions/presentations";
 import { SubmitButton, SaveStatus } from "@/components/FormSaveControls";
+import { isAttachmentPath } from "@/lib/uploads";
 
 const TAGS = [
   "For Retailers",
@@ -181,9 +183,9 @@ export default async function AdminPresentations({
                 {byGroup[group].map((p) => (
                   <tr key={p.id} className="border-t align-top">
                     <td className="py-2 px-4">{p.title}</td>
-                    <td className="py-2 px-4 whitespace-nowrap text-neutral-700">{p.path?.startsWith('/uploads/') ? 'Attachment' : 'Link'}</td>
+                    <td className="py-2 px-4 whitespace-nowrap text-neutral-700">{isAttachmentPath(p.path) ? 'Attachment' : 'Link'}</td>
                     <td className="py-2 px-4 text-gray-700 truncate max-w-[360px]">
-                      <a className="underline font-medium" href={p.path} target="_blank" rel="noreferrer">Click</a>
+                      <a className="underline font-medium" href={p.path} target="_blank" rel="noreferrer">{isAttachmentPath(p.path) ? 'Preview' : 'Open'}</a>
                     </td>
                     <td className="py-2 px-4 text-gray-600">{p.updatedAt.toISOString().slice(0,10)}</td>
                     <td className="py-2 px-4">
@@ -231,4 +233,3 @@ function emojiForTag(tag: string): string {
     default: return '📄'
   }
 }
-import Link from "next/link";

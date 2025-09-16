@@ -42,13 +42,13 @@ async function persistUploadedFile(file: File): Promise<string> {
   const safeName = original.replace(/[^a-zA-Z0-9._-]/g, '_') || `document${ext}`
   const dir = safeUploadDir('files')
   await fs.mkdir(dir, { recursive: true })
+  if (dir.startsWith('/tmp')) {
+    const mime = guessMimeType(ext)
+    return `data:${mime};name=${encodeURIComponent(safeName)};base64,${bytes.toString('base64')}`
+  }
   const fileName = `${Date.now()}_${safeName}`
   const abs = path.join(dir, fileName)
   await fs.writeFile(abs, bytes)
-  if (dir.startsWith('/tmp')) {
-    const mime = guessMimeType(ext)
-    return `data:${mime};base64,${bytes.toString('base64')}`
-  }
   return `/uploads/files/${fileName}`
 }
 

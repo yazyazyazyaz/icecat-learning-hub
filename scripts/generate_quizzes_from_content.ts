@@ -103,7 +103,7 @@ function genQuestion(r: Res, kindHint?: 'easy'|'medium'|'hard', index?: number) 
       return { prompt: `What type best fits “${r.title}”?`, options: opts, correct: k }
     }
     case 1: {
-      const isAttachment = r.url.startsWith('/uploads/')
+      const isAttachment = r.url.startsWith('/uploads/') || r.url.startsWith('data:')
       const correct = isAttachment ? 'Attachment' : 'External link'
       const opts = withDistractors(correct, ['Attachment','External link','PDF viewer','Internal page'])
       return { prompt: `Is this an attachment or an external link? (${r.title})`, options: opts, correct }
@@ -189,4 +189,3 @@ async function main() {
 }
 
 main().catch((e)=>{ console.error(e); process.exit(1) }).finally(()=>prisma.$disconnect())
-

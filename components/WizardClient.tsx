@@ -15,6 +15,7 @@ export default function WizardClient() {
   const [busy, start] = useTransition()
   const [singleResult, setSingleResult] = useState<string | null>(null)
   const [singleRequest, setSingleRequest] = useState<string | null>(null)
+  const [singleFilename, setSingleFilename] = useState<string | null>(null)
   const [singleError, setSingleError] = useState<string | null>(null)
   const [singleFmt, setSingleFmt] = useState<'JSON'|'XML'>('JSON')
   const [batchPreview, setBatchPreview] = useState<{ token: string; headers: string[]; rows: any[][]; totalRows: number } | null>(null)
@@ -26,7 +27,10 @@ export default function WizardClient() {
   const [eta, setEta] = useState<number>(0)
   const etaRef = useRef<any>(null)
   const [batchFmt, setBatchFmt] = useState<'JSON'|'XML'>('JSON')
-  const downloadLabel = useMemo(() => (/\.xml(\?|$)/i.test(String(singleResult||'')) ? 'Download the XML' : 'Download the JSON'), [singleResult])
+  const downloadLabel = useMemo(() => {
+    if (singleFilename) return `Download ${singleFilename}`
+    return singleFmt === 'XML' ? 'Download the XML' : 'Download the JSON'
+  }, [singleFilename, singleFmt])
 
   function clearBatch() {
     if (etaRef.current) { clearInterval(etaRef.current); etaRef.current = null }
@@ -77,6 +81,7 @@ export default function WizardClient() {
       setSingleResult(null)
       setSingleRequest(null)
       setSingleError(null)
+      setSingleFilename(null)
       try {
         if (singleFmt === 'JSON') {
           const ok = await hasAppKey()
@@ -85,12 +90,28 @@ export default function WizardClient() {
         const res = await runSingle(formData)
         const p = (res as any)?.path || null
         const req = (res as any)?.request || null
+        const name = (res as any)?.filename || null
         setSingleResult(p)
         setSingleRequest(req)
-        try { if (p) localStorage.setItem('wizard:singleResult', p) } catch {}
-        try { if (req) localStorage.setItem('wizard:singleRequest', req) } catch {}
+        setSingleFilename(name)
+        try {
+          if (p && !p.startsWith('data:')) {
+            localStorage.setItem('wizard:singleResult', p)
+          } else {
+            localStorage.removeItem('wizard:singleResult')
+          }
+        } catch {}
+        try {
+          if (req) localStorage.setItem('wizard:singleRequest', req)
+          else localStorage.removeItem('wizard:singleRequest')
+        } catch {}
+        try {
+          if (name) localStorage.setItem('wizard:singleFilename', name)
+          else localStorage.removeItem('wizard:singleFilename')
+        } catch {}
       } catch (e: any) {
         setSingleError(String(e?.message || 'Failed'))
+        setSingleFilename(null)
       }
     })
   }
@@ -148,6 +169,7 @@ export default function WizardClient() {
         if (typeof o.colBrand==='number') setColBrand(o.colBrand)
         if (typeof o.colMpn==='number') setColMpn(o.colMpn)
       }
+      const fn = localStorage.getItem('wizard:singleFilename'); if (fn) setSingleFilename(fn)
     } catch {}
       try { const srq = localStorage.getItem('wizard:singleRequest'); if (srq) setSingleRequest(srq) } catch {}
     }, [])
@@ -242,7 +264,7 @@ export default function WizardClient() {
                 <div className="rounded-xl border border-emerald-800 bg-emerald-700 text-white text-sm px-3 py-2">
                   <div className="flex items-center gap-2">
                     <Download className="h-4 w-4" />
-                    <a className="underline text-white" href={singleResult} download>{downloadLabel}</a>
+                        <a className="underline text-white" href={singleResult} download={singleFilename || undefined}>{downloadLabel}</a>
                   </div>
                   <div className="pl-6 grid gap-1 mt-1">
                     {singleRequest && (
@@ -259,7 +281,8 @@ export default function WizardClient() {
                     onClick={()=>{
                       setSingleResult(null)
                       setSingleRequest(null)
-                      try{ localStorage.removeItem('wizard:singleResult'); localStorage.removeItem('wizard:singleRequest') } catch {}
+                      setSingleFilename(null)
+                      try{ localStorage.removeItem('wizard:singleResult'); localStorage.removeItem('wizard:singleRequest'); localStorage.removeItem('wizard:singleFilename') } catch {}
                     }}
                   >
                     Start over
@@ -340,12 +363,6 @@ export default function WizardClient() {
                   <label className="block text-sm mb-1">Icecat username</label>
                   <input name="username" className="w-full rounded-xl border px-3 py-2 text-sm" placeholder="Icecat username" />
                 </div>
-                {batchFmt==='XML' && (
-                  <div>
-                    <label className="block text-sm mb-1">Icecat password</label>
-                    <input name="password" type="password" className="w-full rounded-xl border px-3 py-2 text-sm" placeholder="For XML auth" />
-                  </div>
-                )}
                 <div>
                   <label className="block text-sm mb-1">Language</label>
                   <select name="lang" className="w-full rounded-xl border px-3 py-2 text-sm bg-white" defaultValue="EN">
@@ -360,11 +377,11 @@ export default function WizardClient() {
                 </select>
               </div>
               <div>
-                <label className="block text-sm mb-1">{batchFmt==='XML' ? 'Password' : 'App Key (from Profile)'}</label>
+                <label className="block text-sm mb-1">{batchFmt==='XML' ? 'Icecat password' : 'App Key (from Profile)'}</label>
                 {batchFmt==='JSON' ? (
                   <div className="w-full rounded-xl border px-3 py-2 text-sm bg-neutral-100 text-neutral-600">Uses App Key from Profile <a className="underline ml-2" href="/profile">Go to Profile</a></div>
                 ) : (
-                  <input name="password" type="password" className="w-full rounded-xl border px-3 py-2 text-sm" placeholder="Enter password" />
+                  <input name="password" type="password" className="w-full rounded-xl border px-3 py-2 text-sm" placeholder="Icecat password" />
                 )}
               </div>
               <div className="flex items-center gap-2">
@@ -394,10 +411,13 @@ export default function WizardClient() {
                     {batchResult.metrics && (
                       <div className="rounded-xl border border-blue-200 bg-blue-50 text-blue-900 text-sm px-3 py-2">
                         <div>
-                          Coverage: <span className="text-green-700 font-medium">{batchResult.metrics.success}/{batchResult.metrics.totalRows} matched ({batchResult.metrics.successRate}%)</span>
+                          Coverage: <span className="text-green-700 font-medium">{batchResult.metrics.success}/{batchResult.metrics.attempted || batchResult.metrics.totalRows} matched ({batchResult.metrics.successRate}%)</span>
                         </div>
                         <div>
-                          Attempted: <span className="text-orange-600 font-medium">{batchResult.metrics.attempted}</span>
+                          Processed: <span className="text-orange-600 font-medium">{batchResult.metrics.attempted}</span>
+                          {typeof batchResult.metrics.totalRows === 'number' && batchResult.metrics.totalRows !== batchResult.metrics.attempted && (
+                            <span className="ml-1 text-neutral-600">of {batchResult.metrics.totalRows}</span>
+                          )}
                         </div>
                         <div>
                           Failed: <span className="text-red-800 font-medium">{batchResult.metrics.failed}</span>

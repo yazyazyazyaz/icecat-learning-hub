@@ -13,21 +13,11 @@
   --radius: 16px;
 }
 
-/* Dark tokens (high contrast, legible) */
-.dark {
-  --bg: 222 28% 10%;          /* near-black with slight blue tint */
-  --surface: 222 22% 14%;     /* raised card surface */
-  --fg: 210 20% 96%;          /* soft white */
-  --muted: 215 12% 70%;       /* readable secondary */
-  --border: 220 10% 24%;      /* subtle borders */
-  --accent: 210 90% 60%;      /* vivid but not neon */
-}
-
-
 html, body { height: 100%; }
 
 body {
-  @apply bg-[hsl(var(--bg))] text-[hsl(var(--fg))];
+  font-family: var(--font-mono), ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+  @apply bg-[hsl(var(--bg))] text-[hsl(var(--fg))] font-mono;
 }
 
 a { @apply underline-offset-4 hover:underline; }
@@ -76,12 +66,8 @@ button:focus-visible, a:focus-visible, input:focus-visible, textarea:focus-visib
   /* Consistent tag chip styling */
   .tag-chip { @apply inline-flex items-center gap-2 px-3 py-1.5 rounded-full border text-xs transition bg-white border-[hsl(var(--border))] text-gray-700 hover:bg-gray-50; }
   .tag-chip--active { @apply bg-amber-50 border-amber-300 text-amber-800; }
-  .dark .tag-chip--active { @apply bg-amber-700 border-amber-600 text-white; }
 }
 
 @layer utilities {
   .text-muted { color: hsl(var(--muted)); }
-  /* Improve readability where neutral-600 is used */
-  .dark .text-neutral-600 { color: hsl(var(--muted)) !important; }
-  .dark .text-gray-600 { color: hsl(var(--muted)) !important; }
 }

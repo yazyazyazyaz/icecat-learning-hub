@@ -1,6 +1,7 @@
 import Link from "next/link"
 import { db } from "@/lib/db"
 import ActionButtons from "@/components/ActionButtons"
+import { isAttachmentPath } from "@/lib/uploads"
 
 const DOC_TAGS = [
   'Contracts',
@@ -119,9 +120,9 @@ export default async function DocumentsPage({ searchParams }: { searchParams?: {
                 {byGroup[group].map((m: any) => (
                   <tr key={m.id} className="align-middle">
                     <td className="py-2 px-3 text-xs font-normal text-neutral-900">{m.title}</td>
-                    <td className="py-2 px-3 border-l border-[hsl(var(--border))] whitespace-nowrap text-neutral-700">{m.path?.startsWith('/uploads/') ? 'Attachment' : 'Link'}</td>
+                    <td className="py-2 px-3 border-l border-[hsl(var(--border))] whitespace-nowrap text-neutral-700">{isAttachmentPath(m.path) ? 'Attachment' : 'Link'}</td>
                     <td className="py-2 px-3 border-l border-[hsl(var(--border))] whitespace-nowrap text-right">
-                      {m.path?.startsWith('/uploads/') ? (
+                      {isAttachmentPath(m.path) ? (
                         <ActionButtons links={[{ label: 'Preview', href: m.path }]} labelMode="label" />
                       ) : (
                         <ActionButtons links={[{ label: 'Open', href: m.path }]} labelMode="label" />

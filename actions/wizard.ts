@@ -34,6 +34,21 @@ function getShopName(formShop?: string) {
   return s || process.env.ICECAT_SHOPNAME || process.env.NEXT_PUBLIC_ICECAT_SHOPNAME || 'openicecat-live'
 }
 
+async function persistWizardFile(filename: string, buf: Buffer, mime: string) {
+  const dir = safeUploadDir('wizard')
+  await fs.mkdir(dir, { recursive: true })
+  if (dir.startsWith('/tmp')) {
+    return {
+      path: `data:${mime};name=${encodeURIComponent(filename)};base64,${buf.toString('base64')}`,
+    }
+  }
+  const outPath = path.join(dir, filename)
+  await fs.writeFile(outPath, buf)
+  return {
+    path: `/uploads/wizard/${filename}`,
+  }
+}
+
 async function getAppKeyForCurrentUser(): Promise<string | null> {
   const session = await getServerSession(authOptions)
   const userId = (session?.user as any)?.id as string | undefined
@@ -167,32 +182,26 @@ export async function runSingle(formData: FormData) {
       filename = fileNameJsonByMpnBrand(mpn, brand, lang)
     }
       const buf = await fetchJson(url)
-      const dir = safeUploadDir('wizard')
-      await fs.mkdir(dir, { recursive: true })
-      const outPath = path.join(dir, filename)
-      await fs.writeFile(outPath, buf)
+      const { path: downloadPath } = await persistWizardFile(filename, buf, 'application/json')
       revalidatePath('/wizard')
-      return { ok: true, path: `/uploads/wizard/${filename}`, request: url }
+      return { ok: true, path: downloadPath, request: url, filename }
   } else {
     const auth = { user, pass }
     let url = ''
     let filename = ''
-    if (mode === 'EAN') {
-      if (!ean) throw new Error('EAN required')
-      url = buildXmlUrlByEan({ lang, ean })
-      filename = fileNameXmlByEan(lang)
-    } else {
-      if (!brand || !mpn) throw new Error('Brand and MPN required')
-      url = buildXmlUrlByMpnBrand({ lang, brand, mpn })
-      filename = fileNameXmlByMpnBrand(mpn, brand, lang)
-    }
+      if (mode === 'EAN') {
+        if (!ean) throw new Error('EAN required')
+        url = buildXmlUrlByEan({ lang, ean })
+        filename = fileNameXmlByEan(lang)
+      } else {
+        if (!brand || !mpn) throw new Error('Brand and MPN required')
+        url = buildXmlUrlByMpnBrand({ lang, brand, mpn })
+        filename = fileNameXmlByMpnBrand(mpn, brand, lang)
+      }
       const buf = await fetchXml(url, auth)
-      const dir = safeUploadDir('wizard')
-      await fs.mkdir(dir, { recursive: true })
-      const outPath = path.join(dir, filename)
-      await fs.writeFile(outPath, buf)
+      const { path: downloadPath } = await persistWizardFile(filename, buf, 'application/xml')
       revalidatePath('/wizard')
-      return { ok: true, path: `/uploads/wizard/${filename}`, request: url }
+      return { ok: true, path: downloadPath, request: url, filename }
   }
 }
 
@@ -347,7 +356,7 @@ export async function runBatch(formData: FormData) {
   let pathZip: string
   if (dir.startsWith('/tmp')) {
     // Serverless: return data URL so the client can download without persistent storage
-    pathZip = `data:application/zip;base64,${blob.toString('base64')}`
+    pathZip = `data:application/zip;name=${encodeURIComponent(path.basename(out))};base64,${blob.toString('base64')}`
   } else {
     await fs.writeFile(out, blob)
     pathZip = `/uploads/wizard/${path.basename(out)}`
@@ -367,10 +376,10 @@ export async function runBatch(formData: FormData) {
   let errorsXlsxPath: string | null = null
   if ((errRowsEan.length + errRowsMpn.length) > 0) {
     const xbuf = XLSX.write(wbErr, { bookType: 'xlsx', type: 'buffer' }) as Buffer
+    const xfile = path.join(dir, `batch_${token}_errors.xlsx`)
     if (dir.startsWith('/tmp')) {
-      errorsXlsxPath = `data:application/vnd.openxmlformats-officedocument.spreadsheetml.sheet;base64,${xbuf.toString('base64')}`
+      errorsXlsxPath = `data:application/vnd.openxmlformats-officedocument.spreadsheetml.sheet;name=${encodeURIComponent(path.basename(xfile))};base64,${xbuf.toString('base64')}`
     } else {
-      const xfile = path.join(dir, `batch_${token}_errors.xlsx`)
       await fs.writeFile(xfile, xbuf)
       errorsXlsxPath = `/uploads/wizard/${path.basename(xfile)}`
     }
@@ -384,16 +393,17 @@ export async function runBatch(formData: FormData) {
     const sheet = XLSX.utils.aoa_to_sheet([header, ...linkRows])
     XLSX.utils.book_append_sheet(wbLinks, sheet, 'Links')
     const lbuf = XLSX.write(wbLinks, { bookType: 'xlsx', type: 'buffer' }) as Buffer
+    const lfile = path.join(dir, `batch_${token}_links.xlsx`)
     if (dir.startsWith('/tmp')) {
-      linksXlsxPath = `data:application/vnd.openxmlformats-officedocument.spreadsheetml.sheet;base64,${lbuf.toString('base64')}`
+      linksXlsxPath = `data:application/vnd.openxmlformats-officedocument.spreadsheetml.sheet;name=${encodeURIComponent(path.basename(lfile))};base64,${lbuf.toString('base64')}`
     } else {
-      const lfile = path.join(dir, `batch_${token}_links.xlsx`)
       await fs.writeFile(lfile, lbuf)
       linksXlsxPath = `/uploads/wizard/${path.basename(lfile)}`
     }
   }
   revalidatePath('/wizard')
   const totalRows = Math.max(0, rows.length)
+  const denominator = attempted || totalRows
   return {
     ok: true,
     path: pathZip,
@@ -404,7 +414,7 @@ export async function runBatch(formData: FormData) {
       attempted,
       success,
       failed,
-      successRate: totalRows ? Math.round((success / totalRows) * 100) : 0,
+      successRate: denominator ? Number(((success / denominator) * 100).toFixed(1)) : 0,
     }
   }
 }

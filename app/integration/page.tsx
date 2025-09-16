@@ -2,6 +2,7 @@ import Link from "next/link"
 import { db } from "@/lib/db"
 import ActionButtons from "@/components/ActionButtons"
 import DetailTitle from "@/components/DetailTitle"
+import { extractFileName, guessMimeFromData, isAttachmentPath } from "@/lib/uploads"
 // no client components needed here
 
 export const revalidate = 3600
@@ -173,8 +174,8 @@ export default async function IntegrationFilesPage({ searchParams }: { searchPar
                         <td className="py-2 px-3 border-l border-[hsl(var(--border))] whitespace-nowrap text-right">
                           <ActionButtons
                             links={[
-                              ...(p.open ? [{ label: 'Open', href: p.open.path }] : []),
-                              ...(p.full ? [{ label: 'Full', href: p.full.path }] : []),
+                              ...(p.open ? [{ label: isAttachmentPath(p.open.path) ? 'Preview (Open)' : 'Open', href: p.open.path }] : []),
+                              ...(p.full ? [{ label: isAttachmentPath(p.full.path) ? 'Preview (Full)' : 'Full', href: p.full.path }] : []),
                             ]}
                             openDesc={getDesc(p.open)}
                             fullDesc={getDesc(p.full)}
@@ -193,7 +194,11 @@ export default async function IntegrationFilesPage({ searchParams }: { searchPar
                           <code className="px-1 py-0.5 rounded bg-neutral-100 text-neutral-800 text-[11px]">{fileFormat(m.path)}</code>
                         </td>
                         <td className="py-2 px-3 border-l border-[hsl(var(--border))] whitespace-nowrap text-right">
-                          <ActionButtons links={[{ label: 'Link', href: m.path }]} desc={getDesc(m)} favicon={"https://www.google.com/s2/favicons?sz=32&domain=icecat.biz"} />
+                          <ActionButtons
+                            links={[{ label: isAttachmentPath(m.path) ? 'Preview' : 'Link', href: m.path }]}
+                            desc={getDesc(m)}
+                            favicon={"https://www.google.com/s2/favicons?sz=32&domain=icecat.biz"}
+                          />
                         </td>
                       </tr>
                     ))}
@@ -222,11 +227,21 @@ function fmtDate(d: any) {
 
 function fileFormat(path: string) {
   try {
+    if (path?.startsWith('data:')) {
+      const name = extractFileName(path)
+      if (name) {
+        const ext = (name.split('.').pop() || '').toUpperCase()
+        if (ext) return ext
+      }
+      const mime = guessMimeFromData(path)
+      if (mime) return mime.split('/').pop()?.toUpperCase() || 'DATA'
+      return 'DATA'
+    }
     const name = (path || '').split('/').pop() || ''
     const noGz = name.replace(/\.gz$/i, '')
     const ext = (noGz.split('.').pop() || '').toUpperCase()
-    return ext || '—'
-  } catch { return '—' }
+    return ext || '-'
+  } catch { return '-' }
 }
 
 function getDesc(m: any): string | null {

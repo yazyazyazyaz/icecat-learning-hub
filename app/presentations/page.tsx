@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { prisma } from "@/lib/db";
 import ActionButtons from "@/components/ActionButtons";
+import { isAttachmentPath } from "@/lib/uploads";
 
 const TAGS = [
   "For Retailers",
@@ -85,9 +86,9 @@ export default async function PresentationsPage({
                 {byGroup[group].map((p: any) => (
                   <tr key={p.id} className="align-middle">
                     <td className="py-2 px-3 text-xs font-normal text-neutral-900">{p.title}</td>
-                    <td className="py-2 px-3 border-l border-[hsl(var(--border))] whitespace-nowrap text-neutral-700">{p.path?.startsWith('/uploads/') ? 'Attachment' : 'Link'}</td>
+                    <td className="py-2 px-3 border-l border-[hsl(var(--border))] whitespace-nowrap text-neutral-700">{isAttachmentPath(p.path) ? 'Attachment' : 'Link'}</td>
                     <td className="py-2 px-3 border-l border-[hsl(var(--border))] whitespace-nowrap text-right">
-                      {p.path?.startsWith('/uploads/') ? (
+                      {isAttachmentPath(p.path) ? (
                         <ActionButtons links={[{ label: 'Preview', href: p.path }]} labelMode="label" />
                       ) : (
                         <ActionButtons links={[{ label: 'Open', href: p.path }]} labelMode="label" />

@@ -5,6 +5,7 @@ import { createPresentation, updatePresentation, updatePresentationUseCase, dele
 import ConfirmDelete from "@/components/ConfirmDelete";
 import ToggleDetails from "@/components/ToggleDetails";
 import { SubmitButton, SaveStatus } from "@/components/FormSaveControls";
+import { extractFileName, guessMimeFromData, isAttachmentPath } from "@/lib/uploads";
 
 const TAGS = [
   "For Retailers",
@@ -114,7 +115,7 @@ export default async function EditorPresentationsPage({ searchParams }: { search
                   <Fragment key={p.id}>
                   <tr key={p.id} className="align-middle">
                     <td className="py-2 px-3 text-xs font-normal text-neutral-900">{p.title}</td>
-                    <td className="py-2 px-3 border-l border-[hsl(var(--border))] whitespace-nowrap text-neutral-700">{p.path?.startsWith('/uploads/') ? 'Attachment' : 'Link'}</td>
+                    <td className="py-2 px-3 border-l border-[hsl(var(--border))] whitespace-nowrap text-neutral-700">{isAttachmentPath(p.path) ? 'Attachment' : 'Link'}</td>
                     <td className="py-2 px-3 border-l border-[hsl(var(--border))]">
                       <div className="flex items-center gap-2 justify-end">
                         <ToggleDetails targetId={`edit-${p.id}`} />
@@ -200,6 +201,16 @@ function faviconForTag(tag: string): string | null {
 }
 function fileFormat(path: string) {
   try {
+    if (path?.startsWith('data:')) {
+      const name = extractFileName(path)
+      if (name) {
+        const ext = (name.split('.').pop() || '').toUpperCase()
+        if (ext) return ext
+      }
+      const mime = guessMimeFromData(path)
+      if (mime) return mime.split('/').pop()?.toUpperCase() || 'DATA'
+      return 'DATA'
+    }
     const name = (path || '').split('/').pop() || ''
     const noGz = name.replace(/\.gz$/i, '')
     const ext = (noGz.split('.').pop() || '').toUpperCase()

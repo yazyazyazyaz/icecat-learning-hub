@@ -5,6 +5,7 @@ import { createUpload, updateUpload, deleteUpload, importManualsFromUrls } from 
 import ConfirmDelete from "@/components/ConfirmDelete"
 import ToggleDetails from "@/components/ToggleDetails"
 import { SubmitButton, SaveStatus } from "@/components/FormSaveControls"
+import { extractFileName, guessMimeFromData, isAttachmentPath } from "@/lib/uploads"
 
 const DEFAULT_USE_CASES = [
   'APIs',
@@ -118,7 +119,7 @@ https://example.com/post-2" className="w-full rounded-xl border px-3 py-2 text-s
                   <Fragment key={m.id}>
                   <tr key={m.id} className="align-middle">
                     <td className="py-2 px-3 text-xs text-neutral-900">{m.title}</td>
-                    <td className="py-2 px-3 border-l border-[hsl(var(--border))] whitespace-nowrap text-neutral-700">{m.path?.startsWith('/uploads/') ? 'Attachment' : 'Link'}</td>
+                    <td className="py-2 px-3 border-l border-[hsl(var(--border))] whitespace-nowrap text-neutral-700">{isAttachmentPath(m.path) ? 'Attachment' : 'Link'}</td>
                     <td className="py-2 px-3 border-l border-[hsl(var(--border))] whitespace-nowrap text-neutral-700">
                       <code className="px-1 py-0.5 rounded bg-neutral-100 text-neutral-800 text-[11px]">{fileFormat(m.path)}</code>
                     </td>
@@ -182,9 +183,19 @@ https://example.com/post-2" className="w-full rounded-xl border px-3 py-2 text-s
 
 function fileFormat(path: string) {
   try {
+    if (path?.startsWith('data:')) {
+      const name = extractFileName(path)
+      if (name) {
+        const ext = (name.split('.').pop() || '').toUpperCase()
+        if (ext) return ext
+      }
+      const mime = guessMimeFromData(path)
+      if (mime) return mime.split('/').pop()?.toUpperCase() || 'DATA'
+      return 'DATA'
+    }
     const name = (path || '').split('/').pop() || ''
     const noGz = name.replace(/\.gz$/i, '')
     const ext = (noGz.split('.').pop() || '').toUpperCase()
-    return ext || '—'
-  } catch { return '—' }
+    return ext || '-'
+  } catch { return '-' }
 }

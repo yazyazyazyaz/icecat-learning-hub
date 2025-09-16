@@ -5,6 +5,7 @@ import { createDocument, updateDocument, deleteDocument, importDocumentsFromCSV 
 import ConfirmDelete from "@/components/ConfirmDelete"
 import ToggleDetails from "@/components/ToggleDetails"
 import { SubmitButton, SaveStatus } from "@/components/FormSaveControls"
+import { isAttachmentPath } from "@/lib/uploads"
 
 const DOC_TAGS = [
   'Contracts',
@@ -166,9 +167,9 @@ export default async function EditorDocumentsPage({ searchParams }: { searchPara
           <Fragment key={m.id}>
             <tr key={m.id} className="align-middle">
                     <td className="py-2 px-3 text-xs text-neutral-900">{m.title}</td>
-                    <td className="py-2 px-3 border-l border-[hsl(var(--border))] whitespace-nowrap text-neutral-700">{m.path?.startsWith('/uploads/') ? 'Attachment' : 'Link'}</td>
+                    <td className="py-2 px-3 border-l border-[hsl(var(--border))] whitespace-nowrap text-neutral-700">{isAttachmentPath(m.path) ? 'Attachment' : 'Link'}</td>
                     <td className="py-2 px-3 border-l border-[hsl(var(--border))] whitespace-nowrap">
-                      {m.path?.startsWith('/uploads/') ? (
+                      {isAttachmentPath(m.path) ? (
                         <span className="space-x-3">
                           <a className="underline font-medium" href={m.path} target="_blank" rel="noreferrer">Preview</a>
                           <a className="underline text-neutral-700" href={m.path} download>Download</a>
