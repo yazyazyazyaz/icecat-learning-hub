@@ -50,15 +50,18 @@ const navItems: NavItem[] = [
   { href: "/wizard", label: "Wizard", icon: Wand2 },
 ]
 
+type UserRole = 'ADMIN' | 'TRAINER' | 'EDITOR' | 'EMPLOYEE' | 'VIEWER' | undefined
+
 export function Sidebar({ className = "" }: { className?: string }) {
   const pathname = usePathname()
   const { data: session } = useSession()
-  const role = (session?.user as any)?.role as string | undefined
+  const role = (session?.user as any)?.role as UserRole
+  const isAdmin = role === 'ADMIN'
   const isEditorRole = role === 'TRAINER' || role === 'EDITOR'
 
   const items = navItems.filter((item) => {
-    if (item.href.startsWith('/editor')) return role === 'ADMIN' || isEditorRole
-    if (item.href.startsWith('/admin')) return role === 'ADMIN'
+    if (item.href.startsWith('/editor')) return isAdmin || isEditorRole
+    if (item.href.startsWith('/admin')) return isAdmin
     return true
   })
   return (
@@ -88,7 +91,7 @@ export function Sidebar({ className = "" }: { className?: string }) {
             )
           })}
         </nav>
-        {role === 'ADMIN' && (
+        {isAdmin && (
           <div className="mt-4 pt-3 border-t border-[hsl(var(--border))] space-y-2">
             <Link
               href="/editor"
@@ -110,7 +113,7 @@ export function Sidebar({ className = "" }: { className?: string }) {
             </Link>
           </div>
         )}
-        {isEditorRole && role !== 'ADMIN' && (
+        {!isAdmin && isEditorRole && (
           <div className="mt-4 pt-3 border-t border-[hsl(var(--border))]">
             <Link
               href="/editor"
