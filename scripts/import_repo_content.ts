@@ -83,12 +83,40 @@ async function importLearningPaths() {
     // @ts-ignore
     const lp = await (prisma as any).learningPath.upsert({ where: { slug: p.slug }, update: { title: p.title, sortOrder: Number(p.sortOrder||0) }, create: { slug: p.slug, title: p.title, sortOrder: Number(p.sortOrder||0) }, select: { id: true } })
     for (const t of (p.tasks||[])) {
-      // @ts-ignore
-      await (prisma as any).learningTask.upsert({
-        where: { pathId_day_title: { pathId: lp.id, day: t.day ?? null, title: t.title } },
-        update: { programMd: t.programMd ?? null, noteMd: t.noteMd ?? null, trainer: t.trainer ?? null, attachments: t.attachments ?? [], position: Number(t.position||0) },
-        create: { pathId: lp.id, day: t.day ?? null, title: t.title, programMd: t.programMd ?? null, noteMd: t.noteMd ?? null, trainer: t.trainer ?? null, attachments: t.attachments ?? [], position: Number(t.position||0) },
-      })
+      const data = {
+        pathId: lp.id,
+        day: (t.day === null || t.day === undefined) ? null : Number(t.day),
+        title: t.title,
+        programMd: t.programMd ?? null,
+        noteMd: t.noteMd ?? null,
+        trainer: t.trainer ?? null,
+        attachments: t.attachments ?? [],
+        position: Number(t.position || 0),
+      }
+      try {
+        // Prefer upsert when day is not null (composite unique works reliably)
+        if (data.day !== null) {
+          // @ts-ignore
+          await (prisma as any).learningTask.upsert({
+            where: { pathId_day_title: { pathId: data.pathId, day: data.day, title: data.title } },
+            update: { programMd: data.programMd, noteMd: data.noteMd, trainer: data.trainer, attachments: data.attachments, position: data.position },
+            create: data as any,
+          })
+        } else {
+          // When day is null, some Prisma clients require a manual find/update or create
+          // @ts-ignore
+          const existing = await (prisma as any).learningTask.findFirst({ where: { pathId: data.pathId, day: null, title: data.title }, select: { id: true } })
+          if (existing?.id) {
+            // @ts-ignore
+            await (prisma as any).learningTask.update({ where: { id: existing.id }, data: { programMd: data.programMd, noteMd: data.noteMd, trainer: data.trainer, attachments: data.attachments, position: data.position } })
+          } else {
+            // @ts-ignore
+            await (prisma as any).learningTask.create({ data })
+          }
+        }
+      } catch (e) {
+        console.warn('learningTask import failed for', data.title, e)
+      }
     }
   }
 }
@@ -103,4 +131,3 @@ async function main() {
 }
 
 main().catch((e)=>{ console.error(e); process.exit(1) })
-
